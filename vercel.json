@@ -3,11 +3,6 @@
   "buildCommand": "python manage.py collectstatic --noinput --clear",
   "installCommand": "pip install -r requirements.txt",
   "framework": null,
-  "functions": {
-    "api/wsgi.py": {
-      "runtime": "python3.12"
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
