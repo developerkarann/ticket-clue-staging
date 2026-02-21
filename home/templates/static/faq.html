@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main>
+  <!-- Header Banner -->
+  <section class="py-5 position-relative" style="background: linear-gradient(135deg, #001c42 0%, #17497f 100%);">
+    <div class="position-absolute start-0 top-0 w-100 h-100" style="background-image: url('{% static 'assets/images/bg001.jpg' %}'); background-size: cover; opacity: 0.15;"></div>
+    <div class="container position-relative">
+      <div class="row">
+        <div class="col-lg-8 mx-auto text-center py-3">
+          <h1 class="text-white display-6 fw-bold mb-3 animate__animated animate__fadeInUp">Frequently Asked Questions</h1>
+        
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      
+      <div class="row g-4">
+        {% for faq in home_faqs %}
+        <div class="col-lg-6">
+          <div class="faq-card border-0 shadow-sm rounded-4 bg-white p-4 mb-3">
+            <div class="d-flex justify-content-between align-items-center faq-question" data-bs-toggle="collapse" data-bs-target="#faq-{{ forloop.counter }}" role="button" aria-expanded="false" aria-controls="faq-{{ forloop.counter }}">
+              <h6 class="mb-0 fw-normal" style="color: #382c4c;">{{ faq.question }}</h6>
+              <i style="color: #5143d9; font-weight: bold; margin-left: 12px; font-size: 1.2rem;" class="bi bi-chevron-down text-muted"></i>
+            </div>
+            <div class="collapse" id="faq-{{ forloop.counter }}">
+              <div class="pt-3">
+                <p class="mb-0 text-muted">{{ faq.answer }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    
+    </div>
+  </section>
+</main>
+
+<style>
+  .faq-card {
+    transition: box-shadow 0.2s, transform 0.2s;
+    border: 1px solid #f0f0f0;
+  }
+  .faq-card:hover {
+    box-shadow: 0 8px 32px rgba(81, 67, 217, 0.10), 0 1.5px 4px rgba(44, 62, 80, 0.04);
+    transform: translateY(-2px) scale(1.01);
+    border-color: #e0e0ff;
+  }
+  .faq-question {
+    cursor: pointer;
+    user-select: none;
+  }
+  .faq-question h6 {
+    font-size: 1.08rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+  .collapse:not(.show) {
+    /* Hide answer by default */
+  }
+  .collapse.show {
+    animation: fadeInFaq 0.3s;
+  }
+  @keyframes fadeInFaq {
+    from { opacity: 0; transform: translateY(-8px);}
+    to { opacity: 1; transform: translateY(0);}
+  }
+</style>
+{% endblock %}

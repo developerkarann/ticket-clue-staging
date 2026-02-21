@@ -1,0 +1,541 @@
+{% load static %}
+<style>
+    /* Ensure the phone input takes full width */
+    .iti { width: 100%; }
+    
+    /* Adjust label spacing if necessary */
+    .form-label.required::after {
+      content: " *";
+      color: red;
+    }
+  </style>
+  
+<style>
+    /* Custom styles for better visibility */
+    .container{
+        max-width: 1300px;
+    }
+    .required::after {
+        content: "*";
+        color: red;
+        margin-left: 2px;
+    }
+    .booking-card {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .card-header {
+        /* background-color: #0d6efd; */
+        color: white;
+        text-align: center;
+    }
+    .accordion-button {
+        background-color: #f4f5f5;
+        font-weight: bold;
+    }
+    .accordion-button:not(.collapsed) {
+        color: #0d6efd;
+        background-color: #f8f9fa;
+    }
+    .form-section {
+        margin-bottom: 20px;
+    }
+    /* Reduce padding and margins */
+    .form-control, .form-select {
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+    }
+    .form-label {
+        font-size: 1rem;
+    }
+    /* Adjust accordion item padding */
+    .accordion-body {
+        padding: 1rem;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 576px) {
+        .form-section h5 {
+        font-size: 1.25rem;
+        }
+        .form-label {
+        font-size: 0.95rem;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="container ">
+    <div class="card booking-card shadow-sm">    
+
+           <!-- Flight Details Section -->
+           <div id="flightDetails" class="flight-details mx-4 my-4">
+            <h4>Flight Details</h4>
+            <div id="outboundFlight" class="mb-3">
+                <h5 id="outboundStation"></h5>
+                <div id="outboundSegments"></div>
+            </div>
+            <div id="returnFlight">
+                <h5 id="returnStation"></h5>
+                <div id="returnSegments"></div>
+            </div>
+        </div>
+        <!-- End of Flight Details Section -->
+
+        <div class="card-header" style="text-align: left;padding-bottom: 0;margin-left: 3px;margin-top: 12px;">
+        <h3>Traveller Details <span>(Please enter your details same as your passport)</span>
+        </h3>
+        </div>
+        <div class="card-body">
+        <form id="bookingForm" novalidate>
+            
+            
+            <!-- Accordion for Passenger Forms -->
+            <div class="form-section">
+            <h5>Passenger Details</h5>
+            <div class="accordion" id="passengersAccordion">
+               
+            </div>
+            {% if not user.username %}
+            <div class="row g-3 align-items-end mx-0 p-3 border rounded mt-3 mb-1">
+                <div class="col-5">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="login-email" class="form-control" name="primaryEmail" placeholder="john@gmail.com">
+                </div>
+                <div class="col-5">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="login-password" class="form-control" name="primaryEmail" placeholder="....">
+                </div>
+                <div class="col-2">
+                    <button id="login-form-button" style="background-color: #0e0090;border-radius: 8px;" class="btn btn-success btn-sm m-0 p-2 px-4">Login</button>
+                </div>
+            </div>
+            <div style="text-align: center;font-weight: 600;color: #484848;font-size: 12px;" class="mt-2">OR</div>
+            <div class="mt-3">
+                <h5>Continue as guest</h5>
+                <p>Booking information will be sent to this contact.</p>
+            
+                <div class="row g-3 align-items-center">
+                
+                <!-- Country Code Input with Flags -->
+                <div class="col-md-6">
+                    <label class="form-label required">Primary Contact Number</label>
+                    <input type="tel" id="primaryContactNumber" class="form-control" name="primaryContactNumber" placeholder="1234567890" required>
+                </div>
+            
+                <!-- Email Input -->
+                <div class="col-md-6">
+                    <label class="form-label required">Email</label>
+                    <input type="email" class="form-control" name="primaryEmail" placeholder="john@gmail.com" required>
+                </div>
+                
+                
+                </div>
+            
+            </div>
+            {% endif %}
+
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid gap-2">
+            <button type="submit" style="background-color: #0e0090;border-radius: 8px;" class="btn btn-success btn-lg">Continue</button>
+            </div>
+        </form>
+
+        <!-- Response Display -->
+        <div id="response" class="mt-4"></div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        /**
+ * Renders flight segment details into the HTML.
+ * @param {Object} result - The flight result object from the API response.
+ */
+function renderFlightDetails(result) {
+    if (!result || !result.Segments) {
+        $('#flightDetails').html('<p>No flight details available.</p>');
+        return;
+    }
+
+    // Helper Functions
+    // Function to format ISO date-time strings to a readable time format (e.g., "11:25 AM")
+    function formatTime(dateTimeStr) {
+        const options = { hour: '2-digit', minute: '2-digit' };
+        const date = new Date(dateTimeStr);
+        return date.toLocaleTimeString([], options);
+    }
+
+    // Function to calculate total duration in minutes and format it as "Xh Ym"
+    function formatDuration(totalMinutes) {
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        return `${hours}h ${minutes}m`;
+    }
+
+    // Function to map cabin class number to its string representation
+    function mapCabinClass(cabinClassNumber) {
+        const cabinClasses = {
+            1: 'Economy',
+            2: 'Business',
+            3: 'First Class'
+        };
+        return cabinClasses[cabinClassNumber] || 'Unknown';
+    }
+
+    // Function to generate HTML for flight segments with Bootstrap card layout
+    function generateFlightSegmentsHtml(segments) {
+        
+        return segments.map(segment => {
+            const airlineName = segment.Airline.AirlineName;
+            const flightNumber = `${segment.Airline.AirlineCode}-${segment.Airline.FlightNumber}`;
+            const departureTime = formatTime(segment.Origin.DepTime);
+            const arrivalTime = formatTime(segment.Destination.ArrTime);
+            const duration = formatDuration(segment.Duration);
+            const departureAirport = segment.Origin.Airport.AirportName;
+            const arrivalAirport = segment.Destination.Airport.AirportName;
+            const baggage = segment.Baggage;
+            const cabinBaggage = segment.CabinBaggage;
+            const departureDate = new Date(segment.Origin.DepTime).toLocaleDateString();
+            const arrivalDate = new Date(segment.Destination.ArrTime).toLocaleDateString();
+
+            return `
+                <!-- Ticket item START -->
+                <div class="card border mb-4">
+                    <!-- Card header -->
+                    <div class="card-header">
+                        <div class="d-md-flex justify-content-md-between">
+                            <!-- Airline Name -->
+                            <div class="d-flex align-items-center mb-2 mb-md-0">
+                                <img src="{% static 'assets/airline/' %}${segment.Airline.AirlineCode}.png" class="w-30px me-2" alt="Airline Logo">
+                                <h6 class="fw-normal mb-0">${airlineName} (${flightNumber})</h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card body START -->
+                    <div class="card-body p-4 pb-0">
+                        <div class="row g-4 align-items-center">
+                            <!-- Flight Details -->
+                            <div class="col-md-12">
+                                <!-- Flight segment details -->
+                                <div class="row g-4">
+                                    <!-- Departure -->
+                                    <div class="col-sm-4">
+                                        <h4>${departureTime}</h4>
+                                        <h6 class="mb-0 fw-normal">${departureDate}</h6>
+                                        <p class="mb-0">${departureAirport}</p>
+                                    </div>
+
+                                    <!-- Flight duration -->
+                                    <div class="col-sm-4 my-sm-auto text-center">
+                                        <h5>${duration}</h5>
+                                        <div class="position-relative my-4">
+                                            <!-- Line -->
+                                            <hr class="bg-primary opacity-5 position-relative">
+                                            <!-- Icon -->
+                                            <div class="icon-md bg-primary text-white rounded-circle position-absolute top-50 start-50 translate-middle">
+                                                <i class="fa-solid fa-fw fa-plane rtl-flip"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Arrival -->
+                                    <div class="col-sm-4">
+                                        <h4>${arrivalTime}</h4>
+                                        <h6 class="mb-0 fw-normal">${arrivalDate}</h6>
+                                        <p class="mb-0">${arrivalAirport}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Divider -->
+                                <hr class="my-4">
+
+                                <!-- Baggage Info -->
+                                <div class="row g-4">
+                                    <div class="col-sm-6">
+                                        <p><strong>Baggage:</strong> ${baggage}</p>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <p><strong>Cabin Baggage:</strong> ${cabinBaggage}</p>
+                                    </div>
+                                </div>
+                            </div>
+                           
+                        </div> <!-- Row END -->
+                    </div>  
+                    <!-- Card body END -->
+
+                    <!-- Card footer -->
+                    
+                </div>
+                <!-- Ticket item END -->
+            `;
+        }).join('');
+    }
+
+    // Extract Outbound and Return Segments
+    const outboundSegments = result?.Segments[0];
+    const returnSegments = result?.Segments[1];
+
+    const outboundOriginStation = outboundSegments[0]?.Origin.Airport.AirportCode;
+    const outboundDestinationStation = outboundSegments[outboundSegments?.length - 1].Destination.Airport.AirportCode;
+    $("#outboundStation").text(`Outbound: ${outboundOriginStation} → ${outboundDestinationStation}`);
+
+    if(returnSegments !=null){
+        const returnOriginStation = returnSegments[0]?.Origin.Airport.AirportCode;
+        const returnDestinationStation = returnSegments[returnSegments?.length - 1].Destination.Airport.AirportCode;
+        $("#returnStation").text(`Return: ${returnOriginStation} → ${returnDestinationStation}`);
+    }
+    
+  
+    // Generate and Insert HTML for Outbound Segments
+    const outboundHtml = generateFlightSegmentsHtml(outboundSegments);
+    $('#outboundSegments').html(outboundHtml);
+
+    // Check if Return Segments Exist and Generate HTML
+    if (returnSegments && returnSegments.length > 0) {
+        const returnHtml = generateFlightSegmentsHtml(returnSegments);
+        $('#returnSegments').html(returnHtml);
+    } else {
+        $('#returnFlight').hide(); // Hide return flight section if not applicable
+    }
+}
+
+
+</script>
+
+<script>
+
+    var mandatoryPassengerDetails;
+
+    $(document).ready(function() {
+        const passportSections = $('.passportSection');
+        passportSections.hide();
+        const data = JSON.parse('{{fare_rule|escapejs}}');
+        console.log("update data",data);
+        $("#passengersAccordion").empty();
+            const result = data?.Response.Results;
+
+            // **Render Flight Details**
+            renderFlightDetails(result); // <-- Call the function here to display flight details
+            
+            // **Render Passenger Accordions**
+            result?.FareBreakdown?.map(function (item,index){
+                
+            console.log("item",item);
+            for(let i=0;i<item?.PassengerCount;i++){
+                const count = `${item?.PassengerType}-${i+1}`;
+                const isFirst = index === 0 && i === 0;
+            $("#passengersAccordion").append(`
+                 <div class="accordion-item">
+                <h2 class="accordion-header" id="heading${count}">
+                    <button  class="accordion-button ${isFirst ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${count}" aria-expanded="${isFirst}" aria-controls="collapse${count}">
+                    ${item.PassengerType === 2 ? 'Child' :item.PassengerType === 3? 'Infant':'Adult' } ${i+1} (Details same as your passport / identification document)
+                    </button>
+                </h2>
+                <div id="collapse${count}" class="accordion-collapse collapse ${isFirst ? 'show' : ''}" aria-labelledby="heading${count}" data-bs-parent="#passengersAccordion">
+                    <div class="accordion-body">
+                    <!-- Personal Details Section -->
+                    <div class="form-section">
+                        <h6>Personal Information</h6>
+                        <div class="row">
+
+                        <!-- Title -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label required">Title</label>
+                            <select class="form-select" name="passengers[${count}][title]" required>
+                            <option value="" selected disabled>Select Title</option>
+                            <option value="Mr">Mr</option>
+                            <option value="Mrs">Mrs</option>
+                            <option value="Ms">Ms</option>
+                            </select>
+                        </div>  
+                       
+                        <!-- First Name -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label required">First Name</label>
+                            <input type="text" class="form-control" name="passengers[${count}][firstName]" placeholder="John" required>
+                        </div>
+                        <!-- Last Name -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label required">Last Name</label>
+                            <input type="text" class="form-control" name="passengers[${count}][lastName]" placeholder="Doe" required>
+                            <input type="text" class="form-control" name="passengers[${count}][paxType]" placeholder="paxType" hidden value="${item.PassengerType}">
+                        </div>
+                        
+
+                        </div>
+                        <div class="row">
+                        
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label required">Birth City</label>
+                            <input type="text" class="form-control" name="passengers[${count}][city]" placeholder="birth city" required>
+                        </div>
+                        <!-- Country Code -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label required">Nationality</label>
+                            <input type="text" data-count="${count}" class="form-control country-select" placeholder="Select Country" readonly required>
+                            <input type="text" hidden id="country_code${count}" name="passengers[${count}][country_code]" value="IN" class="country-code-input">
+                            </div>
+
+                        <!-- Date of Birth -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label required">Date of Birth</label>
+                            <input type="date" class="form-control datepicker" placeholder="YYYY-MM-DD" name="passengers[${count}][dateOfBirth]" required>
+                        </div>
+                        </div>
+                    </div>
+
+                    ${(result?.IsPassportRequiredAtBook || result?.IsPassportRequiredAtTicket)?`
+                    <!-- Passport Details Section -->
+                    <div class="form-section passportSection">
+                        <h6>Passport Information</h6>
+                        <div class="row">
+                        <!-- Passport Number -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label required">Passport Number</label>
+                            <input type="text" class="form-control" name="passengers[${count}][passportNo]" placeholder="A1234567" required>
+                        </div>
+                         <!-- Passport Issue -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label required">Passport Issue</label>
+                            <input type="date" class="form-control datepicker" placeholder="YYYY-MM-DD" name="passengers[${count}][passportIssue]" required>
+                        </div>
+                        <!-- Passport Expiry -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label required">Passport Expiry</label>
+                            <input type="date" class="form-control datepicker" placeholder="YYYY-MM-DD" name="passengers[${count}][passportExpiry]" required>
+                        </div>
+                        </div>
+                    </div>`:''}
+
+
+                    <!-- Address Details Section -->
+                    <div class="form-section">
+                        <h6>Address Information</h6>
+                        <div class="row">
+                        <!-- Address Line 1 -->
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label required">Address</label>
+                            <textarea type="text" class="form-control" name="passengers[${count}][addressLine1]" placeholder="123 Main St" required></textarea>
+                        </div>
+                        
+                        </div>
+                    </div>
+
+                    </div>
+                </div>
+                </div>
+            `)
+            }
+            })
+        
+    });
+
+    $('#bookingForm').on('submit', function(e) {
+    e.preventDefault();
+
+    // window.location.href = '/book/2'+window.location.search;
+    var form = this;
+    if (form.checkValidity() === false) {
+        e.stopPropagation();
+        $(form).addClass('was-validated');
+        return;
+    }
+
+    var formData = $(form).serialize();
+  
+    $.ajax({
+        url: "{% url 'post_passenger_details' %}",
+        type: 'POST',
+        data: formData,
+        success: function(response) {
+            $('#response').html('<div class="alert alert-success">Form submitted successfully!</div>');
+            if(response.hexId){
+                const url = "{% url 'step_booking_detail' 2 'dummy' %}".replace('dummy', response.hexId);
+                window.location.href = url;
+            }
+        },
+        error: function(xhr, status, error) {
+            console.log(error);
+            $('#response').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
+        }
+    });
+});
+
+</script>
+
+
+<script>
+    $(document).ready( function () {
+
+        $('.country-select').countrySelect({
+            defaultCountry: "in",
+            allowDropdown: true,
+            responsiveDropdown: true
+        });
+
+        $('.country-select').on('change', function() {
+            const countryData = $(this).countrySelect("getSelectedCountryData");
+            const countryCode = countryData?.iso2?.toUpperCase();
+            if(countryCode){
+                const count =$(this).data('count')
+                console.log(count);
+                $(`#country_code${count}`).val(countryCode);
+                // $(this).siblings('.country-code-input').val(countryCode);
+            }
+            
+        });
+
+        const phoneInputField = document.querySelector("#primaryContactNumber");
+
+        if(phoneInputField){
+            const phoneInput = window?.intlTelInput(phoneInputField, {
+                initialCountry: "in", // Set default country
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js", // for formatting/validation
+                separateDialCode: true,
+            });
+        }
+
+        flatpickr('.datepicker', {
+            dateFormat: "Y-m-d", // Set the date format to YYYY-MM-DD
+            disableMobile: true, // Ensures a consistent appearance on mobile devices
+        });
+    });
+</script>
+
+{% include 'components/error-trigger.html' %}
+<script>
+    $(document).ready(function(){
+        $('#login-form-button').click(function(e){
+            console.log("form submitted");
+            e.preventDefault();
+            var email = $('#login-email').val();
+            var password = $('#login-password').val();
+            $.ajax({
+                type: 'POST',
+                url: '{% url "login" %}',
+                data: {
+                    email: email,
+                    password: password
+                },
+                success: function(response){
+                    if(response.success){
+                        // window.location.href = '/';
+                        console.log("success",response);
+                        window.location.reload();
+                    }
+                    console.log(response);
+                },
+                error: function(error){
+                    console.log("error",error.responseJSON?.message);
+                    $('#error-trigger div').text(error.responseJSON?.message);
+                    $('#error-trigger').fadeIn().delay(4000).fadeOut();
+                }
+            });
+        });
+    })
+
+</script>

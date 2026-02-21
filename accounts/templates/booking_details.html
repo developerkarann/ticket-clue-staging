@@ -1,0 +1,754 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flight Booking Details</title>
+  <!-- Ensure mobile responsiveness -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome for Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9fafb;
+    }
+
+    /* Rotation utility for toggles */
+    .rotate-180 {
+      transform: rotate(180deg);
+    }
+    .transition-transform {
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .loader {
+      border-top-color: #5143d9;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media print {
+      header,
+      footer,
+      button,
+      #error-message,
+      #loading {
+        display: none !important;
+      }
+      body {
+        background: #fff;
+        color: #000;
+      }
+      .hidden-print {
+        display: none !important;
+      }
+    }
+
+    /* A little custom styling for status badges */
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;  /* text-sm */
+      font-weight: 600;
+      color: #fff;
+    }
+    .status-inprocess  { background-color: #D97706; }  /* yellow-700 */
+    .status-booked     { background-color: #059669; }  /* green-600 */
+    .status-cancelled  { background-color: #DC2626; }  /* red-600 */
+    .status-failed     { background-color: #DC2626; }  /* red-600 */
+    .status-confirmed  { background-color: #059669; }  /* green-600 */
+    .status-unknown    { background-color: #6B7280; }  /* gray-500 */
+  </style>
+</head>
+
+<body class="text-gray-800">
+
+<!-- Error Message -->
+<div
+  id="error-message"
+  class="hidden fixed top-0 left-0 right-0 bg-red-100 border border-red-400 text-red-700 px-4 py-3 z-50"
+  role="alert"
+>
+  <strong class="font-bold">Error!</strong>
+  <span id="error-text" class="block sm:inline">Something went wrong.</span>
+  <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+    <svg
+      onclick="document.getElementById('error-message').classList.add('hidden');"
+      class="fill-current h-6 w-6 text-red-500 cursor-pointer"
+      role="button"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+    >
+      <title>Close</title>
+      <path
+        d="M14.348 5.652a1 1 0 011.414 1.414L11.414 11l4.348 4.348
+               a1 1 0 01-1.414 1.414L10 12.414l-4.348 4.348
+               a1 1 0 01-1.414-1.414L8.586 11 4.238 6.652
+               a1 1 0 011.414-1.414L10 9.586l4.348-4.348z"
+      />
+    </svg>
+  </span>
+</div>
+
+<!-- Header -->
+<header class="bg-indigo-700 text-white py-4 shadow-sm">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-4">
+    <div class="flex items-center">
+      <a href="/" class="flex items-center space-x-2">
+        <img
+          src="{% static 'assets/images/logo-light.png' %}"
+          alt="Company Logo"
+          class="h-10"
+        />
+        <span class="text-xl font-semibold hidden md:inline-block">My Airline</span>
+      </a>
+    </div>
+    <div class="text-center md:text-right mt-4 md:mt-0">
+      <h1 class="text-2xl font-bold leading-tight">Booking Confirmation</h1>
+      <p id="pnr" class="mt-2 text-lg">
+        PNR: <span class="font-bold">Loading...</span>
+      </p>
+      <p id="booking-id" class="text-lg">
+        Booking ID: <span class="font-bold">Loading...</span>
+      </p>
+    </div>
+  </div>
+</header>
+
+<!-- Loader -->
+<div class="max-w-7xl mx-auto mt-4 px-4" id="loading">
+  <div class="bg-white shadow-md rounded-lg p-6 flex justify-center items-center">
+    <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16"></div>
+    <p class="ml-4 text-lg font-semibold text-gray-700">Loading booking details...</p>
+  </div>
+</div>
+
+<!-- Main Content -->
+<main id="mainContent" class="max-w-7xl mx-auto py-6 px-4 hidden">
+  <div class="mb-4 flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+    <!-- Back Button -->
+    <button
+      onclick="window.history.back()"
+      class="text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded shadow-sm inline-flex items-center"
+    >
+      <i class="fas fa-arrow-left mr-2"></i> Back
+    </button>
+    <!-- Print Button -->
+    <button
+      onclick="window.print()"
+      class="text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded shadow-sm inline-flex items-center"
+    >
+      <i class="fas fa-print mr-2"></i> Print
+    </button>
+  </div>
+
+  <!-- Booking Summary -->
+  <section id="booking-summary-section" class="mb-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="border-b pb-3 mb-4">
+        <h2 class="text-xl font-semibold">Booking Summary</h2>
+      </div>
+      <div id="booking-summary"></div>
+    </div>
+  </section>
+
+  <!-- Flight Details -->
+  <section id="flight-details-section" class="mb-6"></section>
+
+  <!-- Passenger Details -->
+  <section id="passenger-details-section" class="mb-6"></section>
+
+  <!-- Fare Details -->
+  <section id="fare-details-section" class="mb-6"></section>
+
+  <!-- Fare Rules -->
+  <section id="fare-rules-section" class="mb-6"></section>
+
+  <!-- Additional Information -->
+  <section id="additional-info-section" class="mb-6"></section>
+</main>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+  // Show loader, hide main content initially
+  $('#loading').show();
+  $("#mainContent").hide();
+
+  // Fetch the data
+  fetchData();
+
+  function fetchData() {
+    $.ajax({
+      url: "{% url 'get_booking_details' %}",
+      type: 'POST',
+      headers: {
+        'X-CSRFToken': "{{ csrf_token }}",
+      },
+      data: { "bookingId": "{{ booking_id }}" },
+      success: function(response) {
+        $('#loading').hide();
+        $("#mainContent").show();
+
+        var flightItinerary = response.Response && response.Response.FlightItinerary;
+        if (!flightItinerary) {
+          showError('Invalid booking data received.');
+          return;
+        }
+
+        // Populate each section
+        populateBookingSummary(flightItinerary);
+        populateFlightDetails(flightItinerary);
+        populatePassengerDetails(flightItinerary);
+        populateFareDetails(flightItinerary);
+        populateFareRules(flightItinerary);
+        populateAdditionalInfo(flightItinerary);
+
+        // Update PNR and Booking ID
+        $('#pnr').html('PNR: <span class="font-bold">' + (flightItinerary.PNR || 'N/A') + '</span>');
+        $('#booking-id').html('Booking ID: <span class="font-bold">' + (flightItinerary.BookingId || 'N/A') + '</span>');
+      },
+      error: function(xhr, status, error) {
+        $('#loading').hide();
+        $("#mainContent").show();
+        console.error('Error fetching data:', error);
+        showError('Failed to load booking details. Please try again later.');
+      }
+    });
+  }
+
+  function showError(message) {
+    $('#error-text').text(message);
+    $('#error-message').removeClass('hidden');
+  }
+
+  /* ------------------------------------------------------------------
+   * 1. BOOKING SUMMARY
+   * ------------------------------------------------------------------ */
+  function populateBookingSummary(flightItinerary) {
+    if (!flightItinerary) {
+      $('#booking-summary-section').hide();
+      return;
+    }
+    let bookingDate = formatDate(flightItinerary.InvoiceCreatedOn);
+    let journeyType = getJourneyType(flightItinerary.JourneyType);
+    let fareType    = flightItinerary.FareType || 'N/A';
+    let refundable  = flightItinerary.NonRefundable ? 'No' : 'Yes';
+    let origin      = flightItinerary.Origin || 'N/A';
+    let destination = flightItinerary.Destination || 'N/A';
+    let airlineName = flightItinerary.AirlineName || flightItinerary.AirlineCode || 'N/A';
+    let bookingStatusObj = getBookingStatus(flightItinerary.Status);
+
+    let summaryHtml = `
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Booking Date</p>
+          <p class="text-base font-medium mb-3">${bookingDate}</p>
+          <p class="text-sm text-gray-500 mb-1">Journey Type</p>
+          <p class="text-base font-medium mb-3">${journeyType}</p>
+          <p class="text-sm text-gray-500 mb-1">Fare Type</p>
+          <p class="text-base font-medium mb-3">${fareType}</p>
+          <p class="text-sm text-gray-500 mb-1">Refundable</p>
+          <p class="text-base font-medium">${refundable}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Origin</p>
+          <p class="text-base font-medium mb-3">${origin}</p>
+          <p class="text-sm text-gray-500 mb-1">Destination</p>
+          <p class="text-base font-medium mb-3">${destination}</p>
+          <p class="text-sm text-gray-500 mb-1">Airline</p>
+          <p class="text-base font-medium mb-3">${airlineName}</p>
+          <p class="text-sm text-gray-500 mb-1">Booking Status</p>
+          <span class="status-badge ${bookingStatusObj.badgeClass}">
+            ${bookingStatusObj.text}
+          </span>
+        </div>
+      </div>
+    `;
+    $('#booking-summary').html(summaryHtml);
+  }
+
+  /* ------------------------------------------------------------------
+   * 2. FLIGHT DETAILS
+   * ------------------------------------------------------------------ */
+  function populateFlightDetails(flightItinerary) {
+    if (!flightItinerary.Segments || flightItinerary.Segments.length === 0) {
+      $('#flight-details-section').hide();
+      return;
+    }
+
+    let html = `
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="border-b pb-3 mb-4">
+          <h2 class="text-xl font-semibold">Flight Details</h2>
+        </div>
+        <div id="flight-details"></div>
+      </div>
+    `;
+    $('#flight-details-section').html(html);
+
+    let segmentsHtml = '';
+    flightItinerary.Segments.forEach((seg) => {
+      let airlineCode   = seg.Airline.AirlineCode || 'N/A';
+      let flightNumber  = seg.Airline.FlightNumber || 'N/A';
+      let airlineName   = seg.Airline.AirlineName || airlineCode;
+      let fareClass     = seg.Airline.FareClass || 'N/A';
+      let departureTime = formatDateTime(seg.Origin.DepTime);
+      let arrivalTime   = formatDateTime(seg.Destination.ArrTime);
+      let duration      = formatDuration(seg.Duration || 0);
+      let flightStatus  = seg.FlightStatus || 'N/A';
+
+      let originAirportName = seg.Origin.Airport.AirportName
+        + ' (' + seg.Origin.Airport.AirportCode + ')';
+      let originTerminal    = seg.Origin.Airport.Terminal || '';
+      let originCity        = seg.Origin.Airport.CityName + ', ' + seg.Origin.Airport.CountryName;
+
+      let destAirportName   = seg.Destination.Airport.AirportName
+        + ' (' + seg.Destination.Airport.AirportCode + ')';
+      let destTerminal      = seg.Destination.Airport.Terminal || '';
+      let destCity          = seg.Destination.Airport.CityName + ', ' + seg.Destination.Airport.CountryName;
+
+      segmentsHtml += `
+        <div class="border rounded-lg p-4 mb-4 shadow-sm">
+          <div class="flex flex-col md:flex-row md:items-center justify-between">
+            <!-- Airline & Flight Info -->
+            <div class="flex items-start mb-4 md:mb-0">
+              <img
+                style="height:50px"
+                class="mr-3"
+                src="{% static 'assets/airline/' %}${airlineCode}.png"
+                onerror="this.onerror=null;this.style.display='none';"
+                alt="${airlineCode} Logo"
+              />
+              <div>
+                <p class="text-lg font-semibold">
+                  ${airlineName} (${airlineCode} ${flightNumber})
+                </p>
+                <p class="text-gray-600 text-sm">Fare Class: ${fareClass}</p>
+              </div>
+            </div>
+            <!-- Timing & Status -->
+            <div class="text-sm md:text-right">
+              <p><strong>Departure:</strong> ${departureTime}</p>
+              <p><strong>Arrival:</strong> ${arrivalTime}</p>
+              <p><strong>Duration:</strong> ${duration}</p>
+              <p><strong>Status:</strong> ${flightStatus}</p>
+            </div>
+          </div>
+          <!-- Origin & Destination Info -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-50 p-3 rounded-lg">
+            <div>
+              <h5 class="font-semibold mb-1">From</h5>
+              <p class="text-sm"><strong>Airport:</strong> ${originAirportName}</p>
+              <p class="text-sm"><strong>Terminal:</strong> ${originTerminal || 'N/A'}</p>
+              <p class="text-sm"><strong>City:</strong> ${originCity}</p>
+            </div>
+            <div>
+              <h5 class="font-semibold mb-1">To</h5>
+              <p class="text-sm"><strong>Airport:</strong> ${destAirportName}</p>
+              <p class="text-sm"><strong>Terminal:</strong> ${destTerminal || 'N/A'}</p>
+              <p class="text-sm"><strong>City:</strong> ${destCity}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    $('#flight-details').html(segmentsHtml);
+  }
+
+  /* ------------------------------------------------------------------
+   * 3. PASSENGER DETAILS
+   * ------------------------------------------------------------------ */
+  function populatePassengerDetails(flightItinerary) {
+    if (!flightItinerary.Passenger || flightItinerary.Passenger.length === 0) {
+      $('#passenger-details-section').hide();
+      return;
+    }
+
+    let html = `
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="border-b pb-3 mb-4">
+          <h2 class="text-xl font-semibold">Passenger Details</h2>
+        </div>
+        <div id="passenger-details"></div>
+      </div>
+    `;
+    $('#passenger-details-section').html(html);
+
+    let passengersHtml = '';
+    flightItinerary.Passenger.forEach((pax, index) => {
+      let fullName     = `${pax.Title || ''} ${pax.FirstName || ''} ${pax.LastName || ''}`.trim();
+      let paxType      = getPaxType(pax.PaxType);
+      let dob          = formatDate(pax.DateOfBirth);
+      let gender       = pax.Gender === 1 ? 'Male' : 'Female';
+      let ticketNumber = pax.Ticket && pax.Ticket.TicketNumber ? pax.Ticket.TicketNumber : 'N/A';
+      let ticketStatus = pax.Ticket && pax.Ticket.Status ? pax.Ticket.Status : 'N/A';
+      let contactNo    = pax.ContactNo || 'N/A';
+      let email        = pax.Email || 'N/A';
+
+      // Seat, Baggage, Meal, Special Services
+      let seatInfo        = getSeatInfo(pax);
+      let baggageInfo     = getBaggageInfo(pax);
+      let mealInfo        = getMealInfo(pax);
+      let specialServices = getSpecialServices(pax);
+
+      passengersHtml += `
+        <div class="border rounded-lg p-4 mb-4 shadow-sm">
+          <!-- Passenger Toggle Button -->
+          <button
+            class="w-full text-left flex justify-between items-center mb-3 focus:outline-none"
+            onclick="togglePassengerDetails(${index})"
+          >
+            <h3 class="text-lg font-semibold">
+              ${fullName}
+              <span class="text-gray-600">(${paxType})</span>
+            </h3>
+            <i
+              id="passenger-icon-${index}"
+              class="fas fa-chevron-down text-gray-600 transition-transform"
+            ></i>
+          </button>
+          <!-- Collapsible Info -->
+          <div id="passenger-details-${index}" class="hidden text-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+              <div>
+                <p><strong>Date of Birth:</strong> ${dob}</p>
+                <p><strong>Gender:</strong> ${gender}</p>
+                <p><strong>Ticket #:</strong> ${ticketNumber}</p>
+                <p><strong>Ticket Status:</strong> ${ticketStatus}</p>
+              </div>
+              <div>
+                <p><strong>Contact:</strong> ${contactNo}</p>
+                <p><strong>Email:</strong> ${email}</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <h4 class="font-semibold mb-1">Seat</h4>
+                ${seatInfo}
+              </div>
+              <div>
+                <h4 class="font-semibold mb-1">Baggage</h4>
+                ${baggageInfo}
+              </div>
+              <div>
+                <h4 class="font-semibold mb-1">Meal</h4>
+                ${mealInfo}
+              </div>
+            </div>
+            <div class="mt-4">
+              <h4 class="font-semibold mb-1">Special Services</h4>
+              ${specialServices}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    $('#passenger-details').html(passengersHtml);
+  }
+
+  // Toggle passenger detail
+  window.togglePassengerDetails = function(index) {
+    let detailsDiv = $('#passenger-details-' + index);
+    let icon       = $('#passenger-icon-' + index);
+    detailsDiv.toggleClass('hidden');
+    icon.toggleClass('rotate-180');
+  };
+
+  function getSeatInfo(pax) {
+    let seats = [];
+    if (pax.SegmentAdditionalInfo) {
+      pax.SegmentAdditionalInfo.forEach((seg) => {
+        if (seg.Seat) seats.push(seg.Seat);
+      });
+    }
+    if (pax.SeatDynamic) {
+      pax.SeatDynamic.forEach((sd) => {
+        if (sd.Code) seats.push(sd.Code);
+      });
+    }
+    return seats.length
+      ? `<p>Booked Seat(s): ${seats.join(', ')}</p>`
+      : '<p>Not Assigned</p>';
+  }
+
+  function getBaggageInfo(pax) {
+    let baggageIncluded = [];
+    if (pax.SegmentAdditionalInfo) {
+      pax.SegmentAdditionalInfo.forEach((seg) => {
+        if (seg.Baggage) baggageIncluded.push(seg.Baggage);
+      });
+    }
+    let purchasedBaggage = [];
+    if (pax.Baggage) {
+      pax.Baggage.forEach((b) => {
+        if (b.Code !== 'NoBaggage' || b.Weight > 0) {
+          purchasedBaggage.push(`${b.Weight}KG Purchased`);
+        }
+      });
+    }
+
+    let result = '';
+    if (baggageIncluded.length) {
+      result += `<p>Included: ${baggageIncluded.join(', ')}</p>`;
+    }
+    if (purchasedBaggage.length) {
+      result += `<p>Extra: ${purchasedBaggage.join(', ')}</p>`;
+    }
+    return result || '<p>Not Available</p>';
+  }
+
+  function getMealInfo(pax) {
+    let meals = [];
+    if (pax.SegmentAdditionalInfo) {
+      pax.SegmentAdditionalInfo.forEach((seg) => {
+        if (seg.Meal && seg.Meal.trim()) meals.push(seg.Meal);
+      });
+    }
+    if (pax.Ssr) {
+      pax.Ssr.forEach((ssr) => {
+        if (ssr.SsrCode === 'ML' || ssr.SsrCode === 'MEAL') {
+          meals.push(ssr.Detail || 'Meal Requested');
+        }
+      });
+    }
+    return meals.length
+      ? `<p>${meals.join(', ')}</p>`
+      : '<p>No meal selected</p>';
+  }
+
+  function getSpecialServices(pax) {
+    if (pax.Ssr) {
+      let others = pax.Ssr
+        .filter((s) => (s.SsrCode !== 'SEAT' && s.SsrCode !== 'ML' && s.SsrCode !== 'MEAL'))
+        .map((s) => s.Detail || s.SsrCode);
+      if (others.length) {
+        return `<p>${others.join('; ')}</p>`;
+      }
+    }
+    return '<p>None</p>';
+  }
+
+  /* ------------------------------------------------------------------
+   * 4. FARE DETAILS
+   * ------------------------------------------------------------------ */
+  function populateFareDetails(flightItinerary) {
+    if (!flightItinerary || !flightItinerary.Fare) {
+      $('#fare-details-section').hide();
+      return;
+    }
+
+    let html = `
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="border-b pb-3 mb-4">
+          <h2 class="text-xl font-semibold">Fare Details</h2>
+        </div>
+        <div id="fare-details"></div>
+      </div>
+    `;
+    $('#fare-details-section').html(html);
+
+    // Build your own breakdown
+    let baseFare      = flightItinerary.Fare.BaseFare || 0;
+    let tax           = flightItinerary.Fare.Tax || 0;
+    let seatCharges   = flightItinerary.Fare.TotalSeatCharges || 0;
+    let publishedFare = flightItinerary.Fare.PublishedFare || 0;
+    // Example: T. Fee & S.Charges is "110" (custom approach)
+    let tFeeScharge   = 110;
+    let paxWiseTotal  = baseFare + tax + tFeeScharge;
+    let computedGst   = +(publishedFare - paxWiseTotal - seatCharges).toFixed(2);
+
+    let fareHtml = `
+  <!-- Fare Breakdown -->
+  <div class="border rounded-lg p-4">
+    <h3 class="font-medium text-lg mb-3">Fare Breakdown</h3>
+    
+    <div class="mb-2 text-sm">
+      <div class="flex justify-between">
+        <span>Base Fare (Adult x 1):</span>
+        <span>${formatCurrency(paxWiseTotal)}</span>
+      </div>
+    </div>
+
+    <div class="flex justify-between font-medium mb-2">
+      <span>Total Base Fare:</span>
+      <span>${formatCurrency(paxWiseTotal)}</span>
+    </div>
+
+    ${
+      seatCharges > 0
+      ? `
+        <div class="border-t pt-3 mt-3">
+          <div class="flex justify-between font-medium text-base mb-1">
+            <span>Additional Charges:</span>
+            <span>${formatCurrency(seatCharges)}</span>
+          </div>
+          <p class="text-sm text-gray-700 flex justify-between">
+            <span>Seat Charges:</span>
+            <span>${formatCurrency(seatCharges)}</span>
+          </p>
+        </div>
+      `
+      : ''
+    }
+
+    ${
+      computedGst > 0
+      ? `
+        <div class="mt-3 flex justify-between text-sm">
+          <span>Total GST:</span>
+          <strong>${formatCurrency(computedGst)}</strong>
+        </div>
+      `
+      : ''
+    }
+
+    <div class="mt-4 border-t pt-3 text-lg font-bold flex justify-between items-center">
+      <span>Total Paid:</span>
+      <span>${formatCurrency(publishedFare)}</span>
+    </div>
+  </div>
+`;
+
+$('#fare-details').html(fareHtml);
+
+  }
+
+  /* ------------------------------------------------------------------
+   * 5. FARE RULES
+   * ------------------------------------------------------------------ */
+  function populateFareRules(flightItinerary) {
+    if (!flightItinerary.FareRules || flightItinerary.FareRules.length === 0) {
+      $('#fare-rules-section').hide();
+      return;
+    }
+
+    let html = `
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="border-b pb-3 mb-4">
+          <h2 class="text-xl font-semibold">Fare Rules</h2>
+        </div>
+        <div id="fare-rules" class="text-sm leading-relaxed"></div>
+      </div>
+    `;
+    $('#fare-rules-section').html(html);
+
+    let content = '';
+    flightItinerary.FareRules.forEach((rule) => {
+      content += `<div class="mb-4">${rule.FareRuleDetail || 'N/A'}</div>`;
+    });
+    $('#fare-rules').html(content);
+  }
+
+  /* ------------------------------------------------------------------
+   * 6. ADDITIONAL INFORMATION
+   * ------------------------------------------------------------------ */
+  function populateAdditionalInfo(flightItinerary) {
+    let isWebCheckInAllowed = flightItinerary.IsWebCheckInAllowed ? 'Yes' : 'No';
+    let isAutoReissuanceAllowed = flightItinerary.IsAutoReissuanceAllowed ? 'Yes' : 'No';
+    let bookingStatusObj = getBookingStatus(flightItinerary.Status);
+    let flightStatus = (flightItinerary.Segments && flightItinerary.Segments.length)
+      ? flightItinerary.Segments[0].FlightStatus
+      : 'N/A';
+
+    let html = `
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-3 border-b pb-2">Additional Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div>
+            <p><strong>Web Check-In Allowed:</strong> ${isWebCheckInAllowed}</p>
+            <p><strong>Auto Reissuance Allowed:</strong> ${isAutoReissuanceAllowed}</p>
+          </div>
+          <div>
+            <p><strong>Booking Status:</strong> ${bookingStatusObj.text}</p>
+            <p><strong>Flight Status:</strong> ${flightStatus}</p>
+          </div>
+        </div>
+      </div>
+    `;
+    $('#additional-info-section').html(html);
+  }
+
+  /* ------------------------------------------------------------------
+   * UTILITIES
+   * ------------------------------------------------------------------ */
+  function formatDate(dateStr) {
+    if (!dateStr) return 'N/A';
+    let date = new Date(dateStr);
+    return date.toLocaleDateString('en-GB', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
+  }
+
+  function formatDateTime(dateTimeStr) {
+    if (!dateTimeStr) return 'N/A';
+    let date = new Date(dateTimeStr);
+    return date.toLocaleString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  function formatDuration(minutes) {
+    let hrs = Math.floor(minutes / 60);
+    let mins = minutes % 60;
+    return `${hrs}h ${mins}m`;
+  }
+
+  function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR'
+    }).format(amount);
+  }
+
+  function getJourneyType(type) {
+    if (type === 1) return 'One Way';
+    if (type === 2) return 'Round Trip';
+    return 'Unknown';
+  }
+
+  function getPaxType(type) {
+    switch (type) {
+      case 1: return 'Adult';
+      case 2: return 'Child';
+      case 3: return 'Infant';
+      default: return 'Unknown';
+    }
+  }
+
+  function getBookingStatus(status) {
+    // Return both text and a badge class for styling
+    let mapping = {
+      1: { text: 'In Process',  badgeClass: 'status-inprocess' },
+      2: { text: 'Booked',      badgeClass: 'status-booked'    },
+      3: { text: 'Cancelled',   badgeClass: 'status-cancelled' },
+      4: { text: 'Failed',      badgeClass: 'status-failed'    },
+      5: { text: 'Confirmed',   badgeClass: 'status-confirmed' },
+    };
+    return mapping[status] || { text: 'Unknown', badgeClass: 'status-unknown' };
+  }
+});
+</script>
+
+</body>
+</html>

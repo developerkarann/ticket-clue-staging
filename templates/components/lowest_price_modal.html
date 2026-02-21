@@ -1,0 +1,322 @@
+{% load static %}
+<style>
+  .lowest-price-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+
+  .lowest-price-modal-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .lowest-price-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+  }
+
+  .lowest-price-modal-box {
+    position: relative;
+    z-index: 1;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    transition: transform 0.25s ease;
+  }
+
+  .lowest-price-modal-overlay.is-open .lowest-price-modal-box {
+    transform: scale(1);
+  }
+
+  .lowest-price-modal-img-wrap {
+    width: 36%;
+    min-width: 180px;
+    background: rgba(81, 67, 217, 0.08);
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .lowest-price-modal-img-wrap img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 16px 0 0 16px;
+  }
+
+  .lowest-price-modal-body {
+    flex: 1;
+    padding: 1.5rem 1.5rem 1.5rem 1.25rem;
+    overflow-y: auto;
+  }
+
+  .lowest-price-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    color: #333;
+    font-size: 1.1rem;
+  }
+
+  .lowest-price-modal-close:hover {
+    background: #f5f5f5;
+    color: #000;
+  }
+
+  .lowest-price-modal-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.35rem;
+    line-height: 1.3;
+  }
+
+  .lowest-price-modal-title .highlight {
+    color: #5143d9;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .lowest-price-modal-subtitle {
+    font-size: 0.95rem;
+    color: #495057;
+    margin-bottom: 1.25rem;
+  }
+
+  .lowest-price-cta-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .lowest-price-cta-call {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(81, 67, 217, 0.08);
+    border: 2px dashed #5143d9;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .lowest-price-cta-voucher {
+    flex: 1;
+    min-width: 140px;
+    background: rgba(81, 67, 217, 0.06);
+    border: 2px dashed #5143d9;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .lowest-price-cta-with {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.5rem;
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-weight: 500;
+  }
+
+  .lowest-price-cta-call p,
+  .lowest-price-cta-voucher p {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.85rem;
+    color: #333;
+    font-weight: 500;
+  }
+
+  .lowest-price-cta-call a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    background-color: #5143d9;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+
+  .lowest-price-cta-call a:hover {
+    background-color: #4535c8;
+    color: #fff;
+  }
+
+  .lowest-price-voucher-code {
+    display: inline-block;
+    background: #5143d9;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .lowest-price-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .lowest-price-features li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+
+  .lowest-price-features li i {
+    color: #5143d9;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 575px) {
+    .lowest-price-modal-box {
+      flex-direction: column;
+      max-height: 85vh;
+    }
+
+    .lowest-price-modal-img-wrap {
+      width: 100%;
+      min-height: 140px;
+    }
+
+    .lowest-price-modal-img-wrap img {
+      border-radius: 0;
+    }
+
+    .lowest-price-cta-with {
+      width: 100%;
+      order: -1;
+      padding: 0.25rem 0;
+    }
+
+    .lowest-price-cta-row {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+</style>
+
+<div id="lowestPriceModal" class="lowest-price-modal-overlay" aria-hidden="true" role="dialog"
+  aria-labelledby="lowestPriceModalTitle">
+  <div class="lowest-price-modal-box">
+    <button type="button" class="lowest-price-modal-close" aria-label="Close" data-dismiss-lowest-price-modal>
+      <i class="bi bi-x-lg"></i>
+    </button>
+
+    <div class="lowest-price-modal-img-wrap">
+      <img src="{% static 'assets/images/element/contact.svg' %}" alt="Travel expert">
+    </div>
+
+    <div class="lowest-price-modal-body">
+      <h2 id="lowestPriceModalTitle" class="lowest-price-modal-title">
+        Looking for the <span class="highlight">lowest price?</span>
+      </h2>
+      <p class="lowest-price-modal-subtitle">
+        Save an average of $287 per ticket vs online rates!
+      </p>
+
+      <div class="lowest-price-cta-row">
+        <div class="lowest-price-cta-call">
+          <p>Call us now and save even more</p>
+          <a href="tel:+18888435849">
+            <i class="bi bi-telephone-fill"></i>
+            <span>+1 (888) 843-5849</span>
+          </a>
+        </div>
+        <span class="lowest-price-cta-with">with</span>
+        <div class="lowest-price-cta-voucher">
+          <p>$30 OFF Voucher code</p>
+          <span class="lowest-price-voucher-code">ASAP30</span>
+        </div>
+      </div>
+
+      <ul class="lowest-price-features">
+        <li><i class="bi bi-check-lg"></i> Free tailored flight options</li>
+        <li><i class="bi bi-check-lg"></i> Option to lock the lowest price</li>
+        <li><i class="bi bi-check-lg"></i> Flexible payment plans</li>
+      </ul>
+    </div>
+  </div>
+  <div class="lowest-price-modal-backdrop" data-dismiss-lowest-price-modal></div>
+</div>
+
+<script>
+  (function () {
+    function initLowestPriceModal() {
+      var modal = document.getElementById('lowestPriceModal');
+      if (!modal) return;
+      function closeModal() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+      function openModal() {
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+      document.querySelectorAll('[data-dismiss-lowest-price-modal]').forEach(function (el) {
+        el.addEventListener('click', closeModal);
+      });
+      modal.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeModal();
+      });
+      var delayMs = 10000;
+      try {
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('test_lowest_price') === '1') delayMs = 2000;
+      } catch (e) { }
+      window.setTimeout(openModal, delayMs);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initLowestPriceModal);
+    } else {
+      initLowestPriceModal();
+    }
+  })();
+</script>

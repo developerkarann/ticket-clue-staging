@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- **************** MAIN CONTENT START **************** -->
+<main>
+    <!-- =======================
+         Content START -->
+    <section class="pt-3">
+        <div class="container">
+            <div class="row g-2 g-lg-4">
+    
+                <!-- Sidebar START -->
+                <div class="col-lg-4 col-xl-3">
+                    <!-- Responsive offcanvas body START -->
+                    <div class="offcanvas-lg offcanvas-end" tabindex="-1" id="offcanvasSidebar">
+                        <!-- Offcanvas header -->
+                        <div class="offcanvas-header justify-content-end pb-2">
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="offcanvas"
+                                    data-bs-target="#offcanvasSidebar"
+                                    aria-label="Close">
+                            </button>
+                        </div>
+    
+                        <!-- Offcanvas body -->
+                        <div class="offcanvas-body p-3 p-lg-0">
+                            <div class="card bg-light w-100">
+                                <!-- Card body START -->
+                                <div class="card-body p-3">
+                                    <!-- Avatar and content -->
+                                    <div class="text-center mb-3">
+                                        <!-- Avatar -->
+                                        <div class="avatar avatar-xl mb-2">
+                                            <!-- Replace this image with user’s avatar if you have one -->
+                                            <img class="avatar-img rounded-circle border border-2 border-white"
+                                                 src="{% static 'assets/images/logo-avt.png' %}" alt="Avatar">
+                                        </div>
+                                        <h6 class="mb-0">
+                                            {{ user.first_name }} {{ user.last_name }}
+                                        </h6>
+                                        <span class="text-reset text-primary-hover small">
+                                            {{ user.email }}
+                                        </span>
+                                        <hr>
+                                    </div>
+    
+                                    <!-- Sidebar menu item START -->
+                                    <ul class="nav nav-pills-primary-soft flex-column">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" href="/accounts/bookings/">
+                                                <i class="bi bi-ticket-perforated fa-fw me-2"></i>My Bookings
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="/contact">
+                                                <i class="bi bi-gear fa-fw me-2"></i>Help Center
+                                            </a>
+                                        </li>
+                                        <hr>
+                                        <li class="nav-item">
+                                            <a class="nav-link text-danger bg-danger-soft-hover" href="{% url 'logout' %}">
+                                                <i class="fas fa-sign-out-alt fa-fw me-2"></i>Sign Out
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <!-- Sidebar menu item END -->
+                                </div>
+                                <!-- Card body END -->
+                            </div>
+                        </div>
+                    </div>	
+                    <!-- Responsive offcanvas body END -->
+                </div>
+                <!-- Sidebar END -->
+    
+                <!-- Main content START -->
+                <div class="col-lg-8 col-xl-9 ps-xl-5">
+    
+                    <!-- Offcanvas menu button (mobile only) -->
+                    <div class="d-grid mb-0 d-lg-none w-100">
+                        <button class="btn btn-primary mb-4"
+                                type="button"
+                                data-bs-toggle="offcanvas"
+                                data-bs-target="#offcanvasSidebar"
+                                aria-controls="offcanvasSidebar">
+                            <i class="fas fa-sliders-h"></i> Menu
+                        </button>
+                    </div>
+    
+                    <div class="card border bg-transparent">
+                        <!-- Card header -->
+                        <div class="card-header bg-transparent border-bottom">
+                            <h4 class="card-header-title">My Bookings</h4>
+                        </div>
+    
+                        <!-- Card body START -->
+                        <div class="card-body p-3">
+                            
+                            <!-- If no bookings, show a quick fallback message -->
+                            {% if not bookings %}
+                                <div class="bg-light p-4 rounded text-center">
+                                    <h5>No bookings found</h5>
+                                    <p>It seems you haven’t made any reservations yet.</p>
+                                    <a href="/some-search-page" class="btn btn-primary">Start Booking</a>
+                                </div>
+                            {% else %}
+                                <!-- Loop over user’s bookings -->
+                                {% for booking in bookings %}
+                                    {% with flight=booking.flight_itinerary %}
+                                    <div class="card border mb-4">
+                                        <!-- Card header -->
+                                        <div class="card-header border-bottom d-md-flex justify-content-md-between align-items-center">
+                                            <!-- Title and basic booking info -->
+                                            <div class="d-flex align-items-center">
+                                                <div class="icon-lg bg-light rounded-circle flex-shrink-0">
+                                                    <i class="fa-solid fa-plane"></i>
+                                                </div>
+                                                <div class="ms-3">
+                                                    <h6 class="card-title mb-0">
+                                                        {% if flight %}
+                                                            {{ flight.origin }} to {{ flight.destination }}
+                                                        {% else %}
+                                                            No Flight Itinerary
+                                                        {% endif %}
+                                                    </h6>
+                                                    <ul class="nav nav-divider small">
+                                                        {% if booking.search_session %}
+                                                            <li class="nav-item">
+                                                                Booking ID: {{ booking.search_session.bookingId }}
+                                                            </li>
+                                                        {% endif %}
+                                                        {% if flight and flight.pnr %}
+                                                            <li class="nav-item">PNR: {{ flight.pnr }}</li>
+                                                        {% endif %}
+                                                        
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <!-- Manage or other action button -->
+                                            <div class="mt-2 mt-md-0">
+                                                <a href="/accounts/bookings/{{booking.search_session.bookingId}}/" class="btn btn-primary-soft mb-0">
+                                                    Manage Booking
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card body -->
+                                        <div class="card-body">
+                                            <!-- Show Itinerary details -->
+                                            {% if flight %}
+                                                <div class="row g-3 mb-3">
+                                                    <div class="col-sm-6 col-md-4">
+                                                        <strong>Journey Type:</strong> {{ flight.journey_type }}
+                                                    </div>
+                                                    <div class="col-sm-6 col-md-4">
+                                                        <strong>Is Domestic?:</strong>
+                                                        {% if flight.is_domestic %}Yes{% else %}No{% endif %}
+                                                    </div>
+                                                    <div class="col-sm-6 col-md-4">
+                                                        <strong>Non-Refundable?:</strong>
+                                                        {% if flight.non_refundable %}Yes{% else %}No{% endif %}
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Segments -->
+                                                <h6 class="fw-bold mt-2">Segments</h6>
+                                                {% for seg in flight.segments.all %}
+                                                    <div class="bg-light p-2 rounded mb-3">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <strong>{{ seg.origin_city_name }} ({{ seg.origin_airport_code }})</strong>
+                                                                <i class="bi bi-arrow-right mx-2"></i>
+                                                                <strong>{{ seg.dest_city_name }} ({{ seg.dest_airport_code }})</strong>
+                                                            </div>
+                                                            <div class="col-md-6 text-end">
+                                                                Airline: {{ seg.airline_name }} ({{ seg.airline_code }}),
+                                                                Flight: {{ seg.flight_number }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mt-1">
+                                                            <div class="col-md-6">
+                                                                <small class="text-secondary">Departure:</small>
+                                                                {{ seg.dep_time }}
+                                                            </div>
+                                                            <div class="col-md-6 text-end">
+                                                                <small class="text-secondary">Arrival:</small>
+                                                                {{ seg.arr_time }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% empty %}
+                                                    <p class="text-muted">No segments found.</p>
+                                                {% endfor %}
+
+                                                <!-- Passengers -->
+                                                <h6 class="fw-bold mt-2">Passengers</h6>
+                                                {% for pax in flight.passengers.all %}
+                                                    <div class="border rounded p-2 mb-2">
+                                                        <strong>
+                                                            {{ pax.title }} {{ pax.first_name }} {{ pax.last_name }}
+                                                        </strong>
+                                                        <br>
+                                                        <!-- <small class="text-secondary">
+                                                            Type: {{ pax.pax_type }}, Lead: 
+                                                            {% if pax.is_lead_pax %}Yes{% else %}No{% endif %}
+                                                        </small>
+                                                        <br> -->
+                                                        <small class="text-secondary">
+                                                            DOB: {{ pax.date_of_birth|date:"Y-m-d" }}
+                                                        </small>
+                                                        <br>
+                                                        <small class="text-secondary">
+                                                            Contact: {{ pax.contact_no }}
+                                                        </small>
+                                                        {% if pax.email %}
+                                                            <br>
+                                                            <small class="text-secondary">
+                                                                Email: {{ pax.email }}
+                                                            </small>
+                                                        {% endif %}
+                                                    </div>
+                                                {% empty %}
+                                                    <p class="text-muted">No passengers found.</p>
+                                                {% endfor %}
+
+                                
+
+                                               
+                                            {% else %}
+                                                <p class="text-muted">Flight itinerary not found.</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endwith %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <!-- Card body END -->
+                    </div>
+                </div>
+                <!-- Main content END -->
+            </div>
+        </div>
+    </section>
+    <!-- =======================
+         Content END -->
+</main>
+<!-- **************** MAIN CONTENT END **************** -->
+{% endblock %}

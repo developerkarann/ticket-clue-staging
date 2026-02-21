@@ -1,0 +1,545 @@
+<!-- flight_payment_page.html -->
+{% load static %}
+
+<style>
+    /* General Styles */
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    .container {
+        margin-top: 40px;
+        margin-bottom: 40px;
+    }
+    .required::after {
+        content: "*";
+        color: red;
+        margin-left: 2px;
+    }
+    .booking-card {
+        border-radius: 8px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        transition: box-shadow 0.3s ease;
+    }
+    .booking-card:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .card-header {
+        background-color: #5143d9;
+        color: #ffffff;
+        padding: 15px 20px;
+        border-top-left-radius: 8px !important;
+        border-top-right-radius: 8px !important;
+    }
+    .card-header h5 {
+        margin: 5px 0;
+        color: #ffffff !important;
+    }
+    .card-body {
+        padding: 20px 25px;
+    }
+    h3, h5 {
+        color: #343a40;
+        margin-bottom: 25px;
+        font-weight: 600;
+    }
+    /* Button Styles */
+    .btn-custom {
+        background-color: #5143d9;
+        color: #ffffff;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        font-size: 16px;
+        font-weight: 500;
+    }
+    .btn-custom:hover {
+        background-color: #3e2fb1;
+        transform: translateY(-2px);
+    }
+    .btn-custom:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(81, 67, 217, 0.5);
+    }
+    /* Price Summary Styles */
+    .price-summary-card {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 20px 25px;
+        background-color: #ffffff;
+        margin-bottom: 20px;
+        transition: box-shadow 0.3s ease;
+    }
+    .price-summary-card:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .price-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e9ecef;
+        font-size: 16px;
+    }
+    .price-item:last-child {
+        border-bottom: none;
+    }
+    .price-item strong {
+        font-size: 18px;
+    }
+    .price-note {
+        font-size: 14px;
+        color: #6c757d;
+        text-align: center;
+        margin-top: 15px;
+    }
+    /* Cancellation Policy Styles */
+    .cancellation-card {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 20px 25px;
+        background-color: #ffffff;
+        transition: box-shadow 0.3s ease;
+    }
+    .cancellation-card:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    /* Passenger Details Styles */
+    .passenger-details {
+        border: 1px solid #e9ecef;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f8f9fa;
+    }
+    .passenger-details h6 {
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    .passenger-details p {
+        margin-bottom: 5px;
+        color: #495057;
+        font-size: 14px;
+    }
+    .passenger-info-item {
+        margin-bottom: 8px;
+    }
+    /* Collapsible styles (optional if you decide to keep collapsible) */
+    .collapsible-section {
+        margin-top: 15px;
+    }
+    .collapsible-btn {
+        background: none;
+        border: none;
+        color: #5143d9;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        padding: 0;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+    .collapsible-btn i {
+        margin-right: 5px;
+    }
+    .collapsible-content {
+        display: none;
+        padding: 10px;
+        border: 1px solid #e9ecef;
+        border-radius: 5px;
+        background-color: #ffffff;
+    }
+    .collapsible-content p {
+        margin: 5px 0;
+        font-size: 14px;
+    }
+    .show {
+        display: block !important;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 992px) {
+        .d-none.d-lg-block {
+            display: none !important;
+        }
+    }
+    @media (max-width: 576px) {
+        .price-summary-card, .cancellation-card, .booking-card {
+            padding: 15px 20px;
+        }
+        .card-header {
+            padding: 12px 15px;
+        }
+        .card-body {
+            padding: 15px 20px;
+        }
+        .btn-custom {
+            width: 100%;
+            padding: 10px;
+        }
+        .price-item {
+            font-size: 14px;
+        }
+        .price-item strong {
+            font-size: 16px;
+        }
+        .price-note {
+            font-size: 12px;
+        }
+    }
+</style>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<div class="container">
+    <div id="contentLoader">
+        {% include 'components/loader.html' %}
+    </div>
+    <div id="mainContent" class="row">
+        <!-- Booking Details Section -->
+        <div class="col-lg-8">
+            <div class="shadow-sm">
+                <div class="card-header">
+                    <h5>Review & Payment</h5>
+                </div>
+                <div class="card-body">
+                    <h3>Check and Pay</h3>
+
+                    <!-- Display Booking Errors -->
+                    {% if booking_error %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ booking_error }}
+                    </div>
+                    {% endif %}
+
+                    <form method="post" action="" id="form-step-4" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Flight Details Card -->
+                        <div class="booking-card mb-4">
+                            <div class="card-header">
+                                <h5>Flight Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Flight Segments (Loaded via Ajax) -->
+                                <div id="flightDetails"></div>
+                            </div>
+                        </div>
+
+                        <!-- Passenger Details Card -->
+                        <div class="booking-card mb-4">
+                            <div class="card-header">
+                                <h5>Passenger Details</h5>
+                            </div>
+                            <div class="card-body">
+                                {% for passenger in sessionData.passengers.all %}
+                                <div class="passenger-details">
+                                    <h6>
+                                        {% if passenger.gender == 1 %}Mr.{% else %}Ms.{% endif %}
+                                        {{ passenger.first_name }} {{ passenger.last_name }}
+                                    </h6>
+                                    <p class="passenger-info-item">
+                                        <strong>Gender:</strong>
+                                        {% if passenger.gender == 1 %}Male{% else %}Female{% endif %}
+                                    </p>
+                                    {% if passenger.date_of_birth %}
+                                    <p class="passenger-info-item">
+                                        <strong>DOB:</strong> {{ passenger.date_of_birth }}
+                                    </p>
+                                    {% endif %}
+                                    {% if passenger.passport_no %}
+                                    <p class="passenger-info-item">
+                                        <strong>Passport No:</strong> {{ passenger.passport_no }}
+                                    </p>
+                                    {% endif %}
+                                    {% if passenger.passport_expiry %}
+                                    <p class="passenger-info-item">
+                                        <strong>Expiry:</strong> {{ passenger.passport_expiry }}
+                                    </p>
+                                    {% endif %}
+
+                                    {% if passenger.contact_no %}
+                                    <p class="passenger-info-item">
+                                        <strong>Contact:</strong> {{ passenger.contact_no }}
+                                    </p>
+                                    {% endif %}
+                                    {% if passenger.email %}
+                                    <p class="passenger-info-item">
+                                        <strong>Email:</strong> {{ passenger.email }}
+                                    </p>
+                                    {% endif %}
+
+                                    <!-- (Optional Collapsible) Seat / Baggage / Meal info if you want to keep them accessible -->
+                                    {% if passenger.seat_preference.all or passenger.baggage_preference.all or passenger.meal_preference.all %}
+                                        <div class="collapsible-section">
+                                            <button class="collapsible-btn" type="button" 
+                                                    onclick="this.nextElementSibling.classList.toggle('show')">
+                                                <i class="fas fa-plus-circle"></i> Additional Preferences
+                                            </button>
+                                            <div class="collapsible-content">
+                                                {% if passenger.seat_preference.all %}
+                                                <p><strong>Seats Selected:</strong></p>
+                                                <ul style="list-style: circle; margin-left: 20px;">
+                                                    {% for seat in passenger.seat_preference.all %}
+                                                    <li>
+                                                        Seat {{ seat.SeatNo }} ({{ seat.Currency }} {{ seat.Price }})
+                                                    </li>
+                                                    {% endfor %}
+                                                </ul>
+                                                {% endif %}
+
+                                                {% if passenger.baggage_preference.all %}
+                                                <p><strong>Extra Baggage:</strong></p>
+                                                <ul style="list-style: circle; margin-left: 20px;">
+                                                    {% for bag in passenger.baggage_preference.all %}
+                                                    <li>
+                                                        {{ bag.Code }} ({{ bag.Currency }} {{ bag.Price }})
+                                                    </li>
+                                                    {% endfor %}
+                                                </ul>
+                                                {% endif %}
+
+                                                {% if passenger.meal_preference.all %}
+                                                <p><strong>Meal Preferences:</strong></p>
+                                                <ul style="list-style: circle; margin-left: 20px;">
+                                                    {% for meal in passenger.meal_preference.all %}
+                                                    <li>
+                                                        {{ meal.Code }} ({{ meal.Currency }} {{ meal.Price }})
+                                                    </li>
+                                                    {% endfor %}
+                                                </ul>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Payment Button -->
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn-custom">
+                                Proceed to Payment <i class="fas fa-credit-card ms-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Summary Sidebar -->
+        <div class="col-lg-4 d-none d-lg-block">
+            <div class="price-summary-card">
+                <h5 class="mb-4">Price Summary</h5>
+                <div class="price-item">
+                    <span>Base Fare</span>
+                    <span id="base-fare">INR. 0.00</span>
+                </div>
+                <div class="price-item">
+                    <span>Taxes</span>
+                    <span id="taxes">INR. 0.00</span>
+                </div>
+                <div class="price-item">
+                    <span>Other Charges</span>
+                    <span id="other-charges">0.00</span>
+                </div>
+                <!-- Seat Selection Charges -->
+                <div class="price-item" id="seat-charges-row">
+                    <span>Seat Selection Charges</span>
+                    <span id="seat-charges">0.00</span>
+                </div>
+                <!-- Meal Charges -->
+                <div class="price-item" id="meal-charges-row">
+                    <span>Meal Charges</span>
+                    <span id="meal-charges">{{ sessionData.meal_total }}</span>
+                </div>
+                <!-- Baggage Charges -->
+                <div class="price-item" id="baggage-charges-row">
+                    <span>Baggage Charges</span>
+                    <span id="baggage-charges">{{ sessionData.baggage_total }}</span>
+                </div>
+                <!-- Total Fare -->
+                <div class="price-item mt-3 pt-3">
+                    <strong>Total Fare</strong>
+                    <strong id="total-fare">0.00</strong>
+                    <span id="fare-currency" hidden></span>
+                </div>
+                <div class="price-note mt-3">
+                    No hidden fees – track your price at every step
+                </div>
+            </div>
+
+            <!-- Cancellation Policy Card -->
+            <div class="cancellation-card">
+                <h5 class="mb-4">Cancellation Policy</h5>
+                <p id="cancellation-policy"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $("#contentLoader").show();
+        $("#mainContent").hide();
+
+        let seatCharges = 0;
+        let luggageCharges = 0;
+        let mealCharges = 0;
+
+        // Fetch Fare Quote
+        $.ajax({
+            url: "{% url 'fare_quote' %}",
+            type: 'POST',
+            data: {
+                TraceId: "{{TraceId}}",
+                ResultIndex: "{{ResultIndex}}",
+            },
+            success: function(response) {
+                const fareError = response?.fare_rule?.Response?.Error?.ErrorMessage;
+                if (fareError) {
+                    console.log('Fare Quote Error:', fareError);
+                    // If error, go back
+                    window.history.back();
+                    return;
+                }
+                const fareQuoteResponse = response.fare_rule;
+                const segments = fareQuoteResponse.Response.Results.Segments[0] || [];
+
+                // Display flight segments
+                segments.forEach(segment => {
+                    const depTime = new Date(segment.Origin.DepTime).toLocaleString();
+                    const arrTime = new Date(segment.Destination.ArrTime).toLocaleString();
+                    $('#flightDetails').append(`
+                        <div class="border p-3 mb-3 rounded">
+                            <h6><i class="fas fa-plane me-2"></i>
+                                ${segment.Airline.AirlineName}
+                                (${segment.Airline.AirlineCode} ${segment.Airline.FlightNumber})
+                            </h6>
+                            <p><strong>From:</strong> ${segment.Origin.Airport.CityName} (${segment.Origin.Airport.AirportCode}) - ${depTime}</p>
+                            <p><strong>To:</strong> ${segment.Destination.Airport.CityName} (${segment.Destination.Airport.AirportCode}) - ${arrTime}</p>
+                            <p><strong>Duration:</strong> ${segment.Duration} minutes</p>
+                        </div>
+                    `);
+                });
+
+                // Update Price Summary
+                const seat_total_price = parseFloat("{{ sessionData.seat_total }}");
+                const baggage_total_price = parseFloat("{{ sessionData.baggage_total }}");
+                const meal_total_price = parseFloat("{{ sessionData.meal_total }}");
+
+                seatCharges = seat_total_price;
+                luggageCharges = baggage_total_price;
+                mealCharges = meal_total_price;
+
+                const fare = fareQuoteResponse.Response.Results.Fare;
+                $('#base-fare').text(`${fare.Currency} ${fare.BaseFare}`);
+                $('#taxes').text(`${fare.Currency} ${fare.Tax}`);
+
+                $('#seat-charges').text(`${fare.Currency} ${seat_total_price}`);
+                $('#baggage-charges').text(`${fare.Currency} ${baggage_total_price}`);
+                $('#meal-charges').text(`${fare.Currency} ${meal_total_price}`);
+
+                $('#other-charges').text(`${fare.Currency} ${fare.OtherCharges}`);
+                $("#fare-currency").text(fare.Currency);
+
+                const totalFare = (fare.PublishedFare || 0) + luggageCharges + mealCharges + seatCharges;
+                $('#total-fare').text(`${fare.Currency} ${totalFare}`).data('total', totalFare);
+
+                // Update Cancellation Policy
+                const isRefundable = fareQuoteResponse.Response.Results.IsRefundable;
+                let cancellationPolicy = isRefundable
+                    ? '<p>This fare is <strong>refundable</strong>. Cancellation charges may apply.</p>'
+                    : '<p>This fare is <strong>non-refundable</strong>.</p>';
+
+                if (fareQuoteResponse.Response.Results.FareRules && fareQuoteResponse.Response.Results.FareRules.length > 0) {
+                    fareQuoteResponse.Response.Results.FareRules.forEach(rule => {
+                        if (rule.FareRuleDetail) {
+                            cancellationPolicy += `
+                                <p><strong>From ${rule.Origin} to ${rule.Destination}:</strong>
+                                ${rule.FareRuleDetail}</p>`;
+                        }
+                    });
+                }
+                $('#cancellation-policy').html(cancellationPolicy);
+
+                // Hide loader, show content
+                $("#contentLoader").hide();
+                $("#mainContent").show();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching fare quote:", error);
+                window.history.back();
+                $("#contentLoader").hide();
+                $("#mainContent").show();
+            }
+        });
+
+        // Handle Payment
+        $('#form-step-4').on('submit', function(e) {
+            e.preventDefault();
+            $("#mainContent").hide();
+            $("#contentLoader").show(); // Show if you want loader when processing
+
+            const totalAmount = $("#total-fare").data("total");
+            const fareCurrency = $("#fare-currency").text();
+
+            $.ajax({
+                url: "{% url 'make_flight_payment' %}",
+                type: 'POST',
+                data: {
+                    amount: totalAmount,
+                    currency: fareCurrency,
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        var options = {
+                            "key": response.razorpay_key_id,
+                            "amount": response.amount, 
+                            "currency": response.currency,
+                            "order_id": response.order_id,
+                            "handler": function (responseData){
+                                // On successful payment, redirect
+                                window.location.href = '/payment-success/' + responseData.razorpay_payment_id + '/';
+                            },
+                            "prefill": {
+                                "name": "{{ sessionData.passengers.all.0.first_name }} {{ sessionData.passengers.all.0.last_name }}",
+                                "email": "{{ sessionData.email }}",
+                                "contact": "{{ sessionData.primaryContact }}"
+                            },
+                            "notes": {
+                                "address": "Flight Booking",
+                                "resultIndex": "{{ResultIndex}}",
+                                "traceId": "{{TraceId}}"
+                            },
+                            "theme": {
+                                "color": "#F37254"
+                            }
+                        };
+                        var rzp1 = new Razorpay(options);
+                        rzp1.open();
+                    } else {
+                        console.log(response?.message);
+                        alert(`Payment initiation failed: ${response?.message || 'Unknown error'}`);
+                    }
+
+                    $("#contentLoader").hide();
+                    $("#mainContent").show();
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseJSON);
+                    const response = xhr.responseJSON;
+
+                    alert(`An error occurred: ${response?.error || 'Unknown error'}`);
+                    $("#contentLoader").hide();
+                    $("#mainContent").show();
+                }
+            });
+        });
+    });
+</script>

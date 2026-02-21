@@ -1,0 +1,1449 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<!-- Dynamic meta title and description -->
+	<title>{% if metaTitle %}{{ metaTitle }}{% else %}TicketClue - Find Cheap Flights & Plane tickets{% endif %}</title>
+
+	<!-- Meta Tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="author" content="TicketClue">
+	<meta name="description"
+		content="{% if metaDescription %}{{ metaDescription }}{% else %}TicketClue - Find Cheap Flights & Plane tickets{% endif %}">
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+	<!-- Include intlTelInput CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css">
+	<link rel="stylesheet" href="{% static 'assets/css/custom.css' %}">
+
+	<!-- Include intlTelInput JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+
+	<!-- Country Select JS CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/country-select-js/2.1.1/css/countrySelect.css"
+		crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<!-- Country Select JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/country-select-js/2.1.1/js/countrySelect.min.js"
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<!-- Dark mode -->
+	<script>
+		const storedTheme = localStorage.getItem('theme')
+
+		const getPreferredTheme = () => {
+			return 'light';
+			if (storedTheme) {
+				return storedTheme
+			}
+			return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+		}
+
+		const setTheme = function (theme) {
+			if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+				document.documentElement.setAttribute('data-bs-theme', 'dark')
+			} else {
+				document.documentElement.setAttribute('data-bs-theme', theme)
+			}
+		}
+
+		setTheme(getPreferredTheme())
+
+		window.addEventListener('DOMContentLoaded', () => {
+			var el = document.querySelector('.theme-icon-active');
+			if (el != 'undefined' && el != null) {
+				const showActiveTheme = theme => {
+					const activeThemeIcon = document.querySelector('.theme-icon-active use')
+					const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+					const svgOfActiveBtn = btnToActive.querySelector('.mode-switch use').getAttribute('href')
+
+					document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
+						element.classList.remove('active')
+					})
+
+					btnToActive.classList.add('active')
+					activeThemeIcon.setAttribute('href', svgOfActiveBtn)
+				}
+
+				window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+					if (storedTheme !== 'light' || storedTheme !== 'dark') {
+						setTheme(getPreferredTheme())
+					}
+				})
+
+				showActiveTheme(getPreferredTheme())
+
+				document.querySelectorAll('[data-bs-theme-value]')
+					.forEach(toggle => {
+						toggle.addEventListener('click', () => {
+							const theme = toggle.getAttribute('data-bs-theme-value')
+							localStorage.setItem('theme', theme)
+							setTheme(theme)
+							showActiveTheme(theme)
+						})
+					})
+
+			}
+		})
+
+	</script>
+
+	<!-- Favicon -->
+	<link rel="shortcut icon" href="assets/images/favicon.ico">
+
+	<!-- Google Font -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap">
+
+	<!-- Plugins CSS -->
+	<link rel="stylesheet" type="text/css" href="{% static 'assets/vendor/font-awesome/css/all.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'assets/vendor/choices/css/choices.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'assets/vendor/flatpickr/css/flatpickr.min.css' %}">
+
+	<!-- Theme CSS -->
+	<link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+
+	<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "TicketClue",
+  "url": "https://www.ticketclue.com",
+  "logo": "https://ticketclue.com/static/assets/images/logo.png",
+  "sameAs": [
+    "https://www.facebook.com/ticketclue",
+    "https://www.instagram.com/ticketclue",
+    "https://twitter.com/ticketclue",
+    "https://www.linkedin.com/company/ticketclue"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+1-888-843-5849",
+    "email": "info@ticketclue.com",
+    "contactType": "Customer Service",
+    "areaServed": "US",
+    "availableLanguage": ["English", "Spanish"]
+  }
+}
+</script>
+
+	<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "TicketClue",
+  "url": "https://www.ticketclue.com",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://www.ticketclue.com/search?from={from}&to={to}&date={date}",
+    "query-input": "required name=from required name=to required name=date"
+  }
+}
+</script>
+
+	<style>
+		/* Sleek header with reduced height */
+		.header-sticky {
+			position: sticky;
+			top: 0;
+			width: 100%;
+			z-index: 1000;
+			background: rgba(255, 255, 255, 0.85);
+			backdrop-filter: blur(8px);
+			-webkit-backdrop-filter: blur(8px);
+			border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+			transition: all 0.3s ease;
+		}
+
+		/* Reduce navbar height */
+		.navbar {
+			padding: 0.4rem 0;
+			height: 75px;
+		}
+
+		/* Logo size adjustment */
+		.navbar-brand-item {
+			max-height: 35px;
+		}
+
+		/* Styling for the currency dropdown */
+		.currency-select {
+			padding: 4px 15px;
+			font-size: 0.9rem;
+			background-color: rgba(255, 255, 255, 0.9);
+			border: 1px solid rgba(0, 0, 0, 0.1);
+			border-radius: 4px;
+		}
+
+		/* Improved dropdown styling */
+		.dropdown-menu {
+			border-radius: 8px;
+			border: none;
+			box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+			padding: 0.5rem 0;
+			margin-top: 0.5rem;
+			min-width: 220px;
+			animation: fadeIn 0.2s ease;
+		}
+
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+				transform: translateY(-10px);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.dropdown-item {
+			padding: 0.6rem 1.2rem;
+			font-size: 0.95rem;
+			transition: all 0.2s ease;
+			color: #444;
+		}
+
+		.dropdown-item:hover {
+			background-color: rgba(81, 67, 217, 0.08);
+			color: #5143d9;
+			transform: translateX(3px);
+		}
+
+		.dropdown-divider {
+			margin: 0.3rem 0;
+			opacity: 0.1;
+		}
+
+		/* User info in dropdown */
+		.dropdown-menu .px-3 {
+			padding: 0.8rem 1.2rem !important;
+		}
+
+		.dropdown-menu .h6 {
+			margin-bottom: 2px;
+			color: #333;
+		}
+
+		.dropdown-menu .small {
+			color: #777;
+			font-size: 0.8rem;
+		}
+
+		/* Icons in dropdown */
+		.dropdown-item i {
+			width: 20px;
+			text-align: center;
+			margin-right: 8px;
+			opacity: 0.7;
+		}
+
+		/* Top navigation links */
+		.top-nav-links {
+			display: flex;
+			align-items: center;
+			gap: 1.5rem;
+		}
+
+		.top-nav-links .nav-link {
+			font-size: 0.9rem;
+			font-weight: 500;
+			color: #555;
+			padding: 0.3rem 0.5rem;
+			transition: all 0.2s ease;
+		}
+
+		.top-nav-links .nav-link:hover {
+			color: #5143d9;
+		}
+
+		/* Mobile menu improvements */
+		.navbar-toggler {
+			border: none;
+			padding: 0.4rem;
+		}
+
+		.navbar-toggler:focus {
+			box-shadow: none;
+			outline: none;
+		}
+
+		.mobile-menu-divider {
+			margin: 0.4rem 0;
+			border-top: 1px solid rgba(0, 0, 0, 0.06);
+		}
+
+		.mobile-menu-header {
+			font-weight: 600;
+			color: #5143d9;
+			padding: 0.4rem 1rem;
+			font-size: 0.85rem;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+
+		/* Mobile navbar: hamburger left, logo center, call button right (blue theme) */
+		.mobile-nav-call-btn {
+			background-color: #5143d9 !important;
+			color: #fff !important;
+			border: none;
+			border-radius: 8px;
+			padding: 0.4rem 0.75rem;
+			font-size: 0.875rem;
+			font-weight: 500;
+			white-space: nowrap;
+			text-decoration: none;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+		}
+
+		.mobile-nav-call-btn:hover {
+			background-color: #4535c8 !important;
+			color: #fff !important;
+		}
+
+		.mobile-nav-call-btn .text-white {
+			color: #fff !important;
+		}
+
+		/* Responsive behavior */
+		@media (max-width: 991px) {
+			.top-nav-links {
+				display: none;
+			}
+
+			.navbar {
+				padding: 0.3rem 0;
+			}
+
+			/* Mobile navbar order: hamburger | logo | call button */
+			.navbar-container {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				padding-left: 0px;
+			}
+
+			/* Smaller hamburger on mobile */
+			.navbar-toggler-mobile-order {
+				order: 1;
+				margin-left: 0 !important;
+				padding: 0.35rem 0.35rem 0.35rem 0.15rem !important;
+				margin-right: 0rem !important;
+			}
+
+			.navbar-toggler-mobile-order .navbar-toggler-icon {
+				width: 1.5rem;
+				height: 1.5rem;
+				background-size: 100% 100%;
+			}
+
+			/* Smaller logo on mobile + space before phone button */
+			.navbar-brand-mobile-order {
+				order: 2;
+				flex: 1;
+				display: flex;
+				justify-content: center;
+				margin-right: 0 !important;
+				padding-right: 0 !important;
+				margin-left: 0.5rem !important;
+			}
+
+			.navbar-brand-mobile-order .navbar-brand-item {
+				max-height: 18px !important;
+				width: auto !important;
+			}
+
+			/* Smaller phone button on mobile + space from logo */
+			.mobile-nav-call-btn {
+				order: 3;
+				padding: 0.3rem 0.5rem !important;
+				font-size: 0.75rem !important;
+				margin-left: 0.5rem !important;
+			}
+
+			.mobile-nav-call-btn .bi-telephone-fill {
+				font-size: 0.8rem;
+			}
+
+			.navbar-collapse {
+				order: 10;
+				flex: 0 0 100%;
+			}
+
+			.navbar-container .nav.flex-row {
+				order: 11;
+			}
+		}
+
+		/* Button styling */
+		.btn-sm {
+			padding: 0.3rem 0.8rem;
+			font-size: 0.85rem;
+		}
+
+		.btn-primary-soft {
+			background-color: rgba(81, 67, 217, 0.1);
+			color: #5143d9;
+			border: none;
+		}
+
+		.btn-primary-soft:hover {
+			background-color: rgba(81, 67, 217, 0.2);
+		}
+
+		.btn-primary {
+			background-color: #5143d9;
+			border-color: #5143d9;
+		}
+
+		.btn-primary:hover {
+			background-color: #4535c8;
+			border-color: #4535c8;
+		}
+
+		/* Language dropdown */
+		#language_dropdown {
+			padding: 4px 15px;
+			font-size: 0.9rem;
+			border: 1px solid rgba(0, 0, 0, 0.1);
+			border-radius: 4px;
+		}
+
+		/* Call Us Modal: desktop = centered box */
+		.call-us-modal-overlay {
+			position: fixed;
+			inset: 0;
+			z-index: 9999;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 1rem;
+			opacity: 0;
+			visibility: hidden;
+			transition: opacity 0.25s ease, visibility 0.25s ease;
+		}
+
+		.call-us-modal-overlay.is-open {
+			opacity: 1;
+			visibility: visible;
+		}
+
+		.call-us-modal-backdrop {
+			position: absolute;
+			inset: 0;
+			background: rgba(0, 0, 0, 0.5);
+			cursor: pointer;
+		}
+
+		.call-us-modal-box {
+			position: relative;
+			z-index: 1;
+			background: #fff;
+			border-radius: 12px;
+			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+			max-width: 440px;
+			width: 100%;
+			max-height: 90vh;
+			overflow-y: auto;
+			transition: transform 0.25s ease;
+		}
+
+		.call-us-modal-overlay.is-open .call-us-modal-box {
+			transform: scale(1);
+		}
+
+		.call-us-modal-close {
+			position: absolute;
+			top: 12px;
+			right: 12px;
+			z-index: 2;
+			width: 36px;
+			height: 36px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: #fff;
+			border: none;
+			border-radius: 50%;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+			cursor: pointer;
+			color: #333;
+			font-size: 1.1rem;
+		}
+
+		.call-us-modal-close:hover {
+			background: #f5f5f5;
+			color: #000;
+		}
+
+		.call-us-modal-heading {
+			font-size: 1.1rem;
+			font-weight: 700;
+			color: #333;
+			line-height: 1.35;
+		}
+
+		.call-us-modal-subheading {
+			font-size: 1rem;
+			font-weight: 700;
+			color: #333;
+			letter-spacing: 0.5px;
+		}
+
+		.call-us-modal-phone {
+			font-size: 1.5rem;
+			font-weight: 700;
+			background-color: #198754;
+			color: #fff;
+			padding: 0.5rem 1rem;
+			border-radius: 8px;
+		}
+
+		.call-us-modal-phone:hover {
+			background-color: #157347;
+			color: #fff;
+		}
+
+		@media (max-width: 991px) {
+			.call-us-modal-overlay {
+				align-items: flex-end;
+				padding: 0;
+			}
+
+			.call-us-modal-box {
+				max-width: 100%;
+				width: 100%;
+				height: 75vh;
+				max-height: 75vh;
+				border-radius: 16px 16px 0 0;
+				transform: translateY(100%);
+			}
+
+			.call-us-modal-overlay.is-open .call-us-modal-box {
+				transform: translateY(0);
+			}
+		}
+	</style>
+	<style>
+		.banner {
+			background-color: #5143d9;
+			color: #ffffff !important;
+			padding: 30px 0;
+			text-align: center;
+		}
+
+		.banner h3,
+		.banner p {
+			color: white;
+		}
+
+		.banner .feature-box {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			text-align: left;
+		}
+
+		.banner .icon {
+			font-size: 2.5rem;
+			margin-bottom: 10px;
+		}
+
+		.banner h3 {
+			font-weight: bold;
+			font-size: 1.25rem;
+			margin: 0;
+		}
+
+		.banner p {
+			font-size: 1rem;
+			margin: 0;
+		}
+	</style>
+
+
+
+	<script type="text/javascript">
+		function googleTranslateElementInit() {
+			new google.translate.TranslateElement({
+				pageLanguage: 'en',
+				autoDisplay: false  // Prevent automatic widget display
+			}, 'google_translate_element');
+		}
+	</script>
+	<script type="text/javascript"
+		src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+
+
+	<style type="text/css">
+		/* Hide the Google Translate banner */
+		.skiptranslate {
+			display: none !important;
+		}
+
+		body {
+			top: 0px !important;
+		}
+	</style>
+	<meta name="google-site-verification" content="oNuu542Wn-d7o8tawVNFHUxqwg00MTTSFG5EY8GTebk" />
+
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=AW-16880219392"></script>
+	<script> window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'AW-16880219392'); </script>
+	<script> window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'AW-16880219392'); </script>
+
+	<!-- Trustpilot -->
+	<script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
+	<!-- End Trustpilot -->
+
+	<!-- Dynamic WebPage schema markup -->
+	<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "{% if metaTitle %}{{ metaTitle }}{% else %}TicketClue - Find Cheap Flights & Plane tickets{% endif %}",
+  "url": "{{ request.build_absolute_uri }}",
+  "description": "{% if metaDescription %}{{ metaDescription }}{% else %}TicketClue - Find Cheap Flights & Plane tickets{% endif %}"
+}
+</script>
+
+	<!-- Dynamic BreadcrumbList schema -->
+	<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://ticketclue.com"
+    }{% if breadcrumbs %}{% for breadcrumb in breadcrumbs %},
+    {
+      "@type": "ListItem",
+      "position": {{ forloop.counter|add:"1" }},
+      "name": "{{ breadcrumb.name }}",
+      "item": "{{ breadcrumb.url }}"
+    }{% endfor %}{% endif %}
+  ]
+}
+</script>
+
+	<script type="text/javascript">
+		(function (c, l, a, r, i, t, y) {
+			c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+			t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+			y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+		})(window, document, "clarity", "script", "s1e8lzolg0");
+	</script>
+</head>
+
+<body>
+	<script type="text/javascript">
+		function doGTranslate(lang_pair) {
+			// If the passed value is from a DOM element, extract its value.
+			if (lang_pair.value) lang_pair = lang_pair.value;
+			if (lang_pair === '') return;
+			// Extract the target language code (e.g., "es" or "fr")
+			var targetLang = lang_pair.split('|')[1];
+			// Locate the Google Translate dropdown
+			var gtCombo = document.querySelector('.goog-te-combo');
+			if (gtCombo) {
+				gtCombo.value = targetLang;
+				// Dispatch a change event to trigger translation
+				gtCombo.dispatchEvent(new Event('change'));
+			}
+		}
+	</script>
+
+
+	<div id="google_translate_element" style="display: none;"></div>
+
+	{% if not hideNav %}
+	{% include "components/call_us_modal.html" %}
+	<!-- Top alert START -->
+	<!-- <div class="alert alert-warning py-2 m-0 bg-primary border-0 rounded-0 alert-dismissible fade show text-center overflow-hidden" role="alert">
+	<p class="text-white m-0">Traveling internationally? Get update information on COVID-19 travel guidance and restrictions<a href="index-flight.html#" class="btn btn-xs btn-dark ms-2 mb-0">Learn more!</a></p>
+	
+	<button type="button" class="btn-close btn-close-white opacity-9 p-3" data-bs-dismiss="alert" aria-label="Close"></button>
+</div> -->
+	<!-- Top alert END -->
+
+	<!-- Header START -->
+	<header class="navbar-light header-sticky">
+		<!-- Logo Nav START -->
+		<nav class="navbar navbar-expand-lg">
+			<div class="container navbar-container" style="max-width: 1300px;">
+				<!-- Navbar toggler - first on mobile (top left), hidden on desktop -->
+				<button class="navbar-toggler navbar-toggler-mobile-order ms-auto d-lg-none" type="button"
+					data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse"
+					aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<!-- Logo START - centered on mobile -->
+				<a class="navbar-brand navbar-brand-mobile-order mr-7 pr-3" href="/">
+					<img class="light-mode-item navbar-brand-item rs-logo" src="{% static 'assets/images/logo.png' %}"
+						alt="logo" style="max-height: 22px; width: auto;margin-right: 25px;">
+					<img class="dark-mode-item navbar-brand-item" src="{% static 'assets/images/logo-light.png' %}"
+						alt="logo" style="max-height: 40px; width: auto;">
+				</a>
+				<!-- Logo END -->
+
+				<!-- Mobile call button - top right, blue theme, only on mobile -->
+				<a href="tel:+16502631714" class="btn mobile-nav-call-btn d-lg-none d-flex align-items-center"
+					title="Call us">
+					<i class="bi bi-telephone-fill me-1 text-white"></i>
+					<span class="text-white">+1 (888) 843-5849</span>
+				</a>
+
+				<!-- Desktop Navigation Links - Only visible on desktop -->
+				<div class="top-nav-links d-none d-lg-flex align-items-center ms-auto">
+					<a href="/about" class="nav-link px-2 py-2 rounded-pill hover-shadow">
+						<i class="bi bi-info-circle me-1"></i>About Us
+					</a>
+					<a href="/contact" class="nav-link px-2 py-2 rounded-pill hover-shadow">
+						<i class="bi bi-envelope me-1"></i>Contact Us
+					</a>
+
+					<a href="tel:+18888435849" style="border: 1px solid #5143d9;"
+						class="nav-link px-3 py-2 me-2 rounded-pill hover-shadow text-primary fw-bold js-call-us-trigger"
+						title="Call us" data-call-us-modal>
+						<i class="bi bi-telephone-fill me-1"></i>+1 (888) 843-5849
+					</a>
+				</div>
+
+				<!-- Main navbar START -->
+				<div class="navbar-collapse collapse" id="navbarCollapse">
+					<!-- Mobile menu items -->
+					<ul class="navbar-nav navbar-nav-scroll me-auto d-lg-none">
+						<!-- Phone CTA for mobile -->
+						<li class="nav-item"><a class="nav-link text-primary fw-bold js-call-us-trigger"
+								href="tel:+18888435849" title="Call us" data-call-us-modal><i
+									class="bi bi-telephone-fill me-2"></i>+1 (888) 843-5849</a></li>
+						<li>
+							<div class="mobile-menu-divider"></div>
+						</li>
+
+						<li class="nav-item">
+							<a class="nav-link" href="/contact">
+								<i class="bi bi-envelope me-2"></i>Contact Us
+							</a>
+						</li>
+
+						<!-- User account links for mobile - only show if logged in -->
+						{% if user.email %}
+
+						<li>
+							<div class="mobile-menu-header mt-2">My Account</div>
+						</li>
+
+						<li class="nav-item"><a class="nav-link" href="/profile"><i class="bi bi-person me-2"></i>My
+								Profile</a></li>
+						<li class="nav-item"><a class="nav-link" href="/accounts/bookings/"><i
+									class="bi bi-bookmark-check me-2"></i>My Bookings</a></li>
+						<li class="nav-item"><a class="nav-link" href="/contact"><i class="bi bi-headset me-2"></i>Help
+								Center</a></li>
+						<li style="min-width: 100px;" class="nav-item me-2 ">
+							<select id="language_dropdown" class="form-select" onchange="doGTranslate(this.value)">
+								<option value="en|en" selected>English</option>
+								<option value="en|es">Spanish</option>
+								<option value="en|fr">French</option>
+							</select>
+						</li>
+
+						{% if not hideCurrency %}
+						<li class="nav-item me-2">
+							<select id="currency_dropdown" class="form-select currency-select">
+								<option selected>INR</option>
+							</select>
+						</li>
+						{% endif %}
+
+
+						<li class="nav-item"><a class="nav-link text-danger" href="{% url 'logout' %}"><i
+									class="bi bi-power me-2"></i>Sign Out</a></li>
+						{% else %}
+						<li>
+							<div class="mobile-menu-divider"></div>
+						</li>
+						<li class="nav-item"><a class="nav-link" href="{% url 'login' %}"><i
+									class="bi bi-box-arrow-in-right me-2"></i>Log In</a></li>
+						<li class="nav-item"><a class="nav-link" href="{% url 'register' %}"><i
+									class="bi bi-person-plus me-2"></i>Register</a></li>
+						{% endif %}
+
+						<li>
+							<div class="mobile-menu-divider mt-2"></div>
+						</li>
+
+					</ul>
+				</div>
+				<!-- Main navbar END -->
+
+				<!-- Script to close mobile menu when clicking outside -->
+				<script>
+					document.addEventListener('click', function (event) {
+						const navbarCollapse = document.getElementById('navbarCollapse');
+						const navbarToggler = document.querySelector('.navbar-toggler');
+
+						// Check if the navbar is expanded and the click is outside the navbar
+						if (navbarCollapse.classList.contains('show') &&
+							!navbarCollapse.contains(event.target) &&
+							!navbarToggler.contains(event.target)) {
+							// Create and dispatch a click event on the navbar toggler to close the menu
+							navbarToggler.click();
+						}
+					});
+				</script>
+
+				<!-- Navbar right side START -->
+				<ul class="nav flex-row align-items-center list-unstyled ms-lg-auto">
+					<!-- Language dropdown -->
+					<li class="nav-item me-3 d-none d-lg-block">
+						<select style="min-width: 110px;" id="language_dropdown"
+							class="form-select form-select-sm rounded-pill border-light shadow-sm"
+							onchange="doGTranslate(this.value)">
+							<option value="en|en" selected>🇺🇸 English</option>
+							<option value="en|es">🇪🇸 Spanish</option>
+							<option value="en|fr">🇫🇷 French</option>
+						</select>
+					</li>
+
+					<!-- Currency dropdown (if applicable) -->
+					{% if not hideCurrency %}
+					<li class="nav-item me-3 d-none d-lg-block">
+						<select style="min-width: 80px;" id="currency_dropdown"
+							class="form-select form-select-sm rounded-pill border-light shadow-sm currency-select">
+							<option selected>INR</option>
+						</select>
+					</li>
+					{% endif %}
+
+					<!-- Sign In/Profile dropdown - Only visible on desktop -->
+					<li class="nav-item d-none d-lg-block">
+						{% if user.email %}
+						<div class="dropdown">
+							<a style="background-color: white;"
+								class="mt-1 btn btn-sm btn-light rounded-pill shadow-sm dropdown-toggle" href="#"
+								role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+								<i style="color: #5143d9;" class="bi bi-person-circle fa-fw me-1"></i>{{ user.first_name
+								}}
+							</a>
+							<ul class="dropdown-menu dropdown-menu-end shadow-lg rounded-3 border-0"
+								aria-labelledby="profileDropdown">
+								<li class="px-3 py-2">
+									<div class="d-flex align-items-center">
+										<div
+											class="avatar-circle me-2 bg-primary-soft d-flex align-items-center justify-content-center">
+											<span class="avatar-initials text-primary">{{ user.first_name|slice:":1"
+												}}{{ user.last_name|slice:":1" }}</span>
+										</div>
+										<div>
+											<a class="h6 mb-0" href="/profile">{{ user.first_name }} {{ user.last_name
+												}}</a>
+											<p class="small text-muted m-0">{{ user.email }}</p>
+										</div>
+									</div>
+								</li>
+								<li>
+									<hr class="dropdown-divider">
+								</li>
+								<li><a class="dropdown-item py-2" href="/profile"><i
+											class="bi bi-person-gear fa-fw me-2 text-primary-soft"></i>My Profile</a>
+								</li>
+								<li><a class="dropdown-item py-2" href="/accounts/bookings/"><i
+											class="bi bi-bookmark-check fa-fw me-2 text-primary-soft"></i>My
+										Bookings</a></li>
+								<li><a class="dropdown-item py-2" href="/contact"><i
+											class="bi bi-headset fa-fw me-2 text-primary-soft"></i>Help Center</a></li>
+								<li>
+									<hr class="dropdown-divider">
+								</li>
+								<li><a class="dropdown-item py-2 text-danger" href="{% url 'logout' %}"><i
+											class="bi bi-box-arrow-right fa-fw me-2"></i>Sign Out</a></li>
+							</ul>
+						</div>
+						{% else %}
+						<div class="d-flex">
+							<a href="{% url 'login' %}" class="btn btn-sm btn-primary rounded-pill shadow-sm me-2 mt-2">
+								<i class="bi bi-box-arrow-in-right me-1"></i>Log In
+							</a>
+							<!-- <a href="{% url 'register' %}" class="btn btn-sm btn-primary rounded-pill shadow-sm">
+						<i class="bi bi-person-plus me-1"></i>Register
+					</a> -->
+						</div>
+						{% endif %}
+					</li>
+				</ul>
+				<!-- Navbar right side END -->
+			</div>
+		</nav>
+		<!-- Logo Nav END -->
+	</header>
+	<!-- Header END -->
+
+
+
+
+	{% endif %}
+
+	<!-- <section class="banner">
+	<div class="container">
+		<h2 style="color: white;font-size: 36px;line-height: 38px;" class="my-4">Why Book With Us</h2>
+	  <div class="row text-center mt-5 mb-5">
+		
+		<div class="col-md-3">
+		  <div class="feature-box">
+			<div class="icon">
+			  <i class="fas fa-shield-alt"></i>
+			</div>
+			<h3>Safe &amp; Secure</h3>
+			<p>Purchase with Confidence: Safe &amp; Secure Bookings</p>
+		  </div>
+		</div>
+		<div class="col-md-3">
+		  <div class="feature-box">
+			<div class="icon">
+			  <i class="fas fa-mobile-alt"></i>
+			</div>
+			<h3>Easy Booking</h3>
+			<p>We offer easy and convenient flight bookings with attractive offers.</p>
+		  </div>
+		</div>
+		<div class="col-md-3">
+		  <div class="feature-box">
+			<div class="icon">
+			  <i class="fas fa-tag"></i>
+			</div>
+			<h3>Lowest Price</h3>
+			<p>We ensure low rates on hotel reservation, holiday packages and on flight tickets.</p>
+		  </div>
+		</div>
+		<div class="col-md-3">
+		  <div class="feature-box">
+			<div class="icon">
+			  <i class="fas fa-headset"></i>
+			</div>
+			<h3>24/7 Customer Support</h3>
+			<p>Get assistance 24/7 on any kind of travel-related query. We are happy to assist you.</p>
+		  </div>
+		</div>
+	  </div>
+	</div>
+  </section> -->
+
+	<!-- **************** MAIN CONTENT START **************** -->
+	{% block content %}
+	{% endblock %}
+	<!-- **************** MAIN CONTENT END **************** -->
+
+	{% if not hideNav %}
+	<div class="lastmin-banner-link" href="tel:+18888435849">
+
+		<div class="customer-img">
+
+		</div>
+
+		<p><strong>Phone-Only Deal!</strong>
+			<span class="custom-content">Limited-Time Fare Discounts – Book by Phone!"
+				<!-- <strong class="promocode">RING50</strong>  -->
+				<strong>Call us 24/7</strong>
+			</span>
+		</p>
+
+		<sectio class="call-buton">
+			<a class="cc-calto-action-ripple" href="tel:+18888435849">
+				<i class="fa fa-phone"></i>
+			</a>
+			</section>
+	</div>
+	{% endif %}
+
+	{% if not hideNav %}
+	<!-- =======================
+Footer START -->
+	<footer style="background-color: #001c42;" class=" pt-5">
+		<div class="container">
+			<!-- Row START -->
+			<div class="row g-4">
+
+				<!-- Widget 1 START -->
+				<div class="col-lg-3">
+					<!-- logo -->
+					<a href="/">
+						<img class="h-40px" src="{% static 'assets/images/logo-light.png' %}" alt="logo">
+					</a>
+					<p class="my-3 text-body-secondary">Departure defective arranging rapturous did believe him all had
+						supported.</p>
+					<p class="mb-2"><a href="flight-booking.html#" class="text-body-secondary text-primary-hover"><i
+								class="bi bi-telephone me-2"></i>+18888435849</a> </p>
+					<p class="mb-0"><a href="flight-booking.html#" class="text-body-secondary text-primary-hover"><i
+								class="bi bi-envelope me-2"></i>info@ticketclue.com</a></p>
+				</div>
+				<!-- Widget 1 END -->
+
+				<!-- Widget 2 START -->
+				<div class="col-lg-8 ms-auto">
+					<div class="row g-4">
+						<!-- Link block -->
+						<div class="col-6 col-md-3">
+							<h5 class="text-white mb-2 mb-md-4">About Us</h5>
+							<ul class="nav flex-column text-primary-hover">
+								<li class="nav-item"><a class="nav-link text-body-secondary" href="/about">About us</a>
+								</li>
+								<li class="nav-item"><a class="nav-link text-body-secondary" href="/contact">Contact
+										us</a></li>
+								<li class="nav-item"><a class="nav-link text-body-secondary" href="/blog">Blog</a></li>
+								<li class="nav-item"><a class="nav-link text-body-secondary" href="/faq">FAQ</a></li>
+								<li class="nav-item"><a class="nav-link text-body-secondary"
+										href="/privacy-policy">Privacy Policy</a></li>
+								<li class="nav-item"><a class="nav-link text-body-secondary"
+										href="/terms-conditions">Terms & conditions</a></li>
+							</ul>
+						</div>
+
+						<!-- Link block -->
+						<!-- <div class="col-6 col-md-3">
+						<h5 class="text-white mb-2 mb-md-4">Top Countries</h5>
+						<ul class="nav flex-column text-primary-hover">
+							
+							<li class="nav-item"><a class="nav-link text-body-secondary" href="{% url 'air_search' 'MNL' %}">Philippines</a></li>
+							<li class="nav-item"><a class="nav-link text-body-secondary" href="{% url 'air_search' 'FCO' %}">Italy</a></li>
+							<li class="nav-item"><a class="nav-link text-body-secondary" href="{% url 'air_search' 'LHR' %}">United Kingdom</a></li>
+							<li class="nav-item"><a class="nav-link text-body-secondary" href="{% url 'air_search' 'MAD' %}">Spain</a></li>
+							<li class="nav-item"><a class="nav-link text-body-secondary" href="{% url 'air_search' 'LOS' %}">Nigeria</a></li>
+							<li class="nav-item"><a class="nav-link text-body-secondary" href="{% url 'air_search' 'CDG' %}">France</a></li>
+						</ul>
+					</div> -->
+
+						<!-- Link block -->
+						<!-- <div class="col-6 col-md-3">
+						<h5 class="text-white mb-2 mb-md-4">Top Cities</h5>
+						<ul class="nav flex-column text-primary-hover">
+
+							<li class="nav-item"><a class="nav-link text-body-secondary" href="{% url 'air_search' 'LHR' %}">London</a></li>
+							<li class="nav-item"><a class="nav-link text-body-secondary" href="{% url 'air_search' 'CDG' %}">Paris</a></li>
+							<li class="nav-item"><a class="nav-link text-body-secondary" href="{% url 'air_search' 'FCO' %}">Rome</a></li>
+							<li class="nav-item"><a class="nav-link text-body-secondary" href="{% url 'air_search' 'DXB' %}">Dubai</a></li>
+							<li class="nav-item"><a class="nav-link text-body-secondary" href="{% url 'air_search' 'MNL' %}">Manila</a></li>
+							<li class="nav-item"><a class="nav-link text-body-secondary" href="{% url 'air_search' 'LOS' %}">Lagos</a></li>
+							 <li class="nav-item"><a class="nav-link text-body-secondary" href="/airline-web-checkin">Airline web checkin</a></li> 
+							<li class="nav-item"><a class="nav-link text-body-secondary" href="/baggage-policy">Baggage policy</a></li> 
+
+	
+						</ul>
+					</div> -->
+
+						<!-- Link block -->
+						<div class="col-6 col-md-3">
+							<h5 class="text-white mb-2 mb-md-4">Useful Links</h5>
+							<ul class="nav flex-column text-primary-hover">
+								<li class="nav-item"><a class="nav-link text-body-secondary" href="/usa-flights">USA
+										flights</a></li>
+								<li class="nav-item"><a class="nav-link text-body-secondary"
+										href="/canada-flights">Canada flights</a></li>
+								<li class="nav-item"><a class="nav-link text-body-secondary"
+										href="/popular-airlines">Popular airlines</a></li>
+								<li class="nav-item"><a class="nav-link text-body-secondary"
+										href="/popular-flight-route">Popular flight routes</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<!-- Widget 2 END -->
+
+			</div><!-- Row END -->
+
+			<!-- Tops Links -->
+			<div class="row mt-5">
+				<h5 class="mb-2 text-white">Airlines</h5>
+				<ul class="list-inline text-primary-hover lh-lg">
+					{% for airline in airline_list %}
+					<li class="list-inline-item"><a class="nav-link text-body-secondary"
+							href="{% url 'home_airlines' airline.slug %}">{{ airline.name }}</a></li>
+					{% endfor %}
+				</ul>
+			</div>
+
+
+			<!-- Payment and card -->
+			<div class="row my-4">
+				<div class="col-12">
+					<!-- TrustBox widget -->
+					<div class="trustpilot-widget" data-locale="en-US" data-template-id="53aa8912dec7e10d38f59f36"
+						data-businessunit-id="YOUR_BUSINESS_UNIT_ID" data-style-height="150px" data-style-width="100%"
+						data-theme="light">
+						<a href="https://www.trustpilot.com/review/ticketclue.com" target="_blank"
+							rel="noopener">Trustpilot</a>
+					</div>
+					<!-- End TrustBox widget -->
+				</div>
+			</div>
+
+			<!-- Payment and card -->
+			<div class="row g-4 justify-content-between mt-0 mt-md-2">
+
+				<!-- Payment card -->
+				<div class="col-sm-7 col-md-6 col-lg-4">
+					<h5 class="text-white mb-2">Payment & Security</h5>
+					<ul class="list-inline mb-0 mt-3">
+						<li class="list-inline-item"> <a href="flight-booking.html#"><img
+									src="{% static 'assets/images/element/paypal.svg' %}" class="h-30px" alt=""></a>
+						</li>
+						<li class="list-inline-item"> <a href="flight-booking.html#"><img
+									src="{% static 'assets/images/element/visa.svg' %}" class="h-30px" alt=""></a></li>
+						<li class="list-inline-item"> <a href="flight-booking.html#"><img
+									src="{% static 'assets/images/element/mastercard.svg' %}" class="h-30px" alt=""></a>
+						</li>
+						<li class="list-inline-item"> <a href="flight-booking.html#"><img
+									src="{% static 'assets/images/element/expresscard.svg' %}" class="h-30px"
+									alt=""></a></li>
+					</ul>
+				</div>
+				<div class="col-4 text-center">
+					<img src="{% static 'assets/images/iata.png' %}" style="height: 80px;" alt="">
+					<div style="font-size: 10px;color: whitesmoke;font-weight: 500;">ACCREDITED AGENT</div>
+					<div style="font-size: 10px;color: whitesmoke;font-weight: 500;">143-57770</div>
+				</div>
+				<!-- Social media icon -->
+				<div class="col-sm-5 col-md-6 col-lg-3 text-sm-end">
+					<h5 class="text-white mb-2">Follow us on</h5>
+					<ul class="list-inline mb-0 mt-3">
+						<li class="list-inline-item"> <a class="btn btn-sm px-2 bg-facebook mb-0"
+								href="https://www.facebook.com/ticketclue"><i class="fab fa-fw fa-facebook-f"></i></a>
+						</li>
+						<li class="list-inline-item"> <a class="btn btn-sm shadow px-2 bg-instagram mb-0"
+								href="https://www.instagram.com/ticketclue"><i class="fab fa-fw fa-instagram"></i></a>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+
+
+			<!-- Divider -->
+			<hr class="mt-4 mb-0">
+
+			<!-- Bottom footer -->
+			<div class="row">
+				<div class="container">
+					<div class="d-lg-flex justify-content-between align-items-center py-3 text-center text-lg-start">
+						<!-- copyright text -->
+						<div class="text-body-secondary text-primary-hover"> TicketClue is a platform of Travel Pae
+							Private Limited. Copyright © 2024 Travel Pae Private Limited. All rights reserved. </div>
+						<!-- copyright links-->
+						<div class="nav mt-2 mt-lg-0">
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- =======================
+Footer END -->
+	{% endif %}
+	<!-- Back to top -->
+	<div class="back-top"></div>
+
+	<script>
+		(function () {
+			function initCallUsModal() {
+				var modal = document.getElementById('callUsModal');
+				if (!modal) return;
+				var triggers = document.querySelectorAll('.js-call-us-trigger');
+				var dismiss = document.querySelectorAll('[data-dismiss-call-modal]');
+				function openModal(e) {
+					if (e) e.preventDefault();
+					modal.classList.add('is-open');
+					modal.setAttribute('aria-hidden', 'false');
+					document.body.style.overflow = 'hidden';
+				}
+				function closeModal() {
+					modal.classList.remove('is-open');
+					modal.setAttribute('aria-hidden', 'true');
+					document.body.style.overflow = '';
+				}
+				triggers.forEach(function (el) { el.addEventListener('click', function (e) { e.preventDefault(); openModal(); }); });
+				// Any tel: link (outside the modal) opens the call-us modal
+				document.addEventListener('click', function (e) {
+					var link = e.target.closest('a[href^="tel:"]');
+					if (!link) return;
+					if (modal.contains(link)) return; // allow tel link inside modal to dial
+					e.preventDefault();
+					openModal();
+				});
+				dismiss.forEach(function (el) { el.addEventListener('click', closeModal); });
+				modal.addEventListener('keydown', function (e) {
+					if (e.key === 'Escape') closeModal();
+				});
+				window.addEventListener('openCallUsModal', function () {
+					modal.classList.add('is-open');
+					modal.setAttribute('aria-hidden', 'false');
+					document.body.style.overflow = 'hidden';
+				});
+			}
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', initCallUsModal);
+			} else {
+				initCallUsModal();
+			}
+		})();
+	</script>
+
+	<!-- Bootstrap JS -->
+	<script src="{% static 'assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+
+	<!-- Vendors -->
+	<script src="{% static 'assets/vendor/choices/js/choices.min.js' %}"></script>
+	<script src="{% static 'assets/vendor/flatpickr/js/flatpickr.min.js' %}"></script>
+
+	<!-- ThemeFunctions -->
+	<script src="{% static 'assets/js/functions.js' %}"></script>
+
+	{% if not hideCurrency %}
+	<script>
+		const currencyData = [
+			{ "code": "AED", "name": "United Arab Emirates Dirham" },
+			{ "code": "AFN", "name": "Afghan Afghani" },
+			{ "code": "ALL", "name": "Albanian Lek" },
+			{ "code": "AMD", "name": "Armenian Dram" },
+			{ "code": "ANG", "name": "Netherlands Antillean Guilder" },
+			{ "code": "AOA", "name": "Angolan Kwanza" },
+			{ "code": "ARS", "name": "Argentine Peso" },
+			{ "code": "AUD", "name": "Australian Dollar" },
+			{ "code": "AWG", "name": "Aruban Florin" },
+			{ "code": "AZN", "name": "Azerbaijani Manat" },
+			{ "code": "BAM", "name": "Bosnia-Herzegovina Convertible Mark" },
+			{ "code": "BBD", "name": "Barbadian Dollar" },
+			{ "code": "BDT", "name": "Bangladeshi Taka" },
+			{ "code": "BGN", "name": "Bulgarian Lev" },
+			{ "code": "BHD", "name": "Bahraini Dinar" },
+			{ "code": "BIF", "name": "Burundian Franc" },
+			{ "code": "BMD", "name": "Bermudian Dollar" },
+			{ "code": "BND", "name": "Brunei Dollar" },
+			{ "code": "BOB", "name": "Bolivian Boliviano" },
+			{ "code": "BRL", "name": "Brazilian Real" },
+			{ "code": "BSD", "name": "Bahamian Dollar" },
+			{ "code": "BTN", "name": "Bhutanese Ngultrum" },
+			{ "code": "BWP", "name": "Botswanan Pula" },
+			{ "code": "BYN", "name": "Belarusian Ruble" },
+			{ "code": "BZD", "name": "Belize Dollar" },
+			{ "code": "CAD", "name": "Canadian Dollar" },
+			{ "code": "CDF", "name": "Congolese Franc" },
+			{ "code": "CHF", "name": "Swiss Franc" },
+			{ "code": "CLP", "name": "Chilean Peso" },
+			{ "code": "CNY", "name": "Chinese Yuan" },
+			{ "code": "COP", "name": "Colombian Peso" },
+			{ "code": "CRC", "name": "Costa Rican Colón" },
+			{ "code": "CUC", "name": "Cuban Convertible Peso" },
+			{ "code": "CUP", "name": "Cuban Peso" },
+			{ "code": "CVE", "name": "Cape Verdean Escudo" },
+			{ "code": "CZK", "name": "Czech Republic Koruna" },
+			{ "code": "DJF", "name": "Djiboutian Franc" },
+			{ "code": "DKK", "name": "Danish Krone" },
+			{ "code": "DOP", "name": "Dominican Peso" },
+			{ "code": "DZD", "name": "Algerian Dinar" },
+			{ "code": "EGP", "name": "Egyptian Pound" },
+			{ "code": "ERN", "name": "Eritrean Nakfa" },
+			{ "code": "ETB", "name": "Ethiopian Birr" },
+			{ "code": "EUR", "name": "Euro" },
+			{ "code": "FJD", "name": "Fijian Dollar" },
+			{ "code": "FKP", "name": "Falkland Islands Pound" },
+			{ "code": "FOK", "name": "Faroese Króna" },
+			{ "code": "GBP", "name": "British Pound Sterling" },
+			{ "code": "GEL", "name": "Georgian Lari" },
+			{ "code": "GGP", "name": "Guernsey Pound" },
+			{ "code": "GHS", "name": "Ghanaian Cedi" },
+			{ "code": "GIP", "name": "Gibraltar Pound" },
+			{ "code": "GMD", "name": "Gambian Dalasi" },
+			{ "code": "GNF", "name": "Guinean Franc" },
+			{ "code": "GTQ", "name": "Guatemalan Quetzal" },
+			{ "code": "GYD", "name": "Guyanaese Dollar" },
+			{ "code": "HKD", "name": "Hong Kong Dollar" },
+			{ "code": "HNL", "name": "Honduran Lempira" },
+			{ "code": "HRK", "name": "Croatian Kuna" },
+			{ "code": "HTG", "name": "Haitian Gourde" },
+			{ "code": "HUF", "name": "Hungarian Forint" },
+			{ "code": "IDR", "name": "Indonesian Rupiah" },
+			{ "code": "ILS", "name": "Israeli New Shekel" },
+			{ "code": "IMP", "name": "Manx pound" },
+			{ "code": "INR", "name": "Indian Rupee" },
+			{ "code": "IQD", "name": "Iraqi Dinar" },
+			{ "code": "IRR", "name": "Iranian Rial" },
+			{ "code": "ISK", "name": "Icelandic Króna" },
+			{ "code": "JMD", "name": "Jamaican Dollar" },
+			{ "code": "JOD", "name": "Jordanian Dinar" },
+			{ "code": "JPY", "name": "Japanese Yen" },
+			{ "code": "KES", "name": "Kenyan Shilling" },
+			{ "code": "KGS", "name": "Kyrgystani Som" },
+			{ "code": "KHR", "name": "Cambodian Riel" },
+			{ "code": "KMF", "name": "Comorian Franc" },
+			{ "code": "KPW", "name": "North Korean Won" },
+			{ "code": "KRW", "name": "South Korean Won" },
+			{ "code": "KWD", "name": "Kuwaiti Dinar" },
+			{ "code": "KYD", "name": "Cayman Islands Dollar" },
+			{ "code": "KZT", "name": "Kazakhstani Tenge" },
+			{ "code": "LAK", "name": "Laotian Kip" },
+			{ "code": "LBP", "name": "Lebanese Pound" },
+			{ "code": "LKR", "name": "Sri Lankan Rupee" },
+			{ "code": "LRD", "name": "Liberian Dollar" },
+			{ "code": "LSL", "name": "Lesotho Loti" },
+			{ "code": "LYD", "name": "Libyan Dinar" },
+			{ "code": "MAD", "name": "Moroccan Dirham" },
+			{ "code": "MDL", "name": "Moldovan Leu" },
+			{ "code": "MGA", "name": "Malagasy Ariary" },
+			{ "code": "MKD", "name": "Macedonian Denar" },
+			{ "code": "MMK", "name": "Myanma Kyat" },
+			{ "code": "MNT", "name": "Mongolian Tugrik" },
+			{ "code": "MOP", "name": "Macanese Pataca" },
+			{ "code": "MRU", "name": "Mauritanian Ouguiya" },
+			{ "code": "MUR", "name": "Mauritian Rupee" },
+			{ "code": "MVR", "name": "Maldivian Rufiyaa" },
+			{ "code": "MWK", "name": "Malawian Kwacha" },
+			{ "code": "MXN", "name": "Mexican Peso" },
+			{ "code": "MYR", "name": "Malaysian Ringgit" },
+			{ "code": "MZN", "name": "Mozambican Metical" },
+			{ "code": "NAD", "name": "Namibian Dollar" },
+			{ "code": "NGN", "name": "Nigerian Naira" },
+			{ "code": "NIO", "name": "Nicaraguan Córdoba" },
+			{ "code": "NOK", "name": "Norwegian Krone" },
+			{ "code": "NPR", "name": "Nepalese Rupee" },
+			{ "code": "NZD", "name": "New Zealand Dollar" },
+			{ "code": "OMR", "name": "Omani Rial" },
+			{ "code": "PAB", "name": "Panamanian Balboa" },
+			{ "code": "PEN", "name": "Peruvian Nuevo Sol" },
+			{ "code": "PGK", "name": "Papua New Guinean Kina" },
+			{ "code": "PHP", "name": "Philippine Peso" },
+			{ "code": "PKR", "name": "Pakistani Rupee" },
+			{ "code": "PLN", "name": "Polish Złoty" },
+			{ "code": "PYG", "name": "Paraguayan Guaraní" },
+			{ "code": "QAR", "name": "Qatari Rial" },
+			{ "code": "RON", "name": "Romanian Leu" },
+			{ "code": "RSD", "name": "Serbian Dinar" },
+			{ "code": "RUB", "name": "Russian Ruble" },
+			{ "code": "RWF", "name": "Rwandan Franc" },
+			{ "code": "SAR", "name": "Saudi Riyal" },
+			{ "code": "SBD", "name": "Solomon Islands Dollar" },
+			{ "code": "SCR", "name": "Seychellois Rupee" },
+			{ "code": "SDG", "name": "Sudanese Pound" },
+			{ "code": "SEK", "name": "Swedish Krona" },
+			{ "code": "SGD", "name": "Singapore Dollar" },
+			{ "code": "SHP", "name": "Saint Helena Pound" },
+			{ "code": "SLL", "name": "Sierra Leonean Leone" },
+			{ "code": "SOS", "name": "Somali Shilling" },
+			{ "code": "SRD", "name": "Surinamese Dollar" },
+			{ "code": "SSP", "name": "South Sudanese Pound" },
+			{ "code": "STN", "name": "São Tomé and Príncipe Dobra" },
+			{ "code": "SVC", "name": "Salvadoran Colón" },
+			{ "code": "SYP", "name": "Syrian Pound" },
+			{ "code": "SZL", "name": "Swazi Lilangeni" },
+			{ "code": "THB", "name": "Thai Baht" },
+			{ "code": "TJS", "name": "Tajikistani Somoni" },
+			{ "code": "TMT", "name": "Turkmenistani Manat" },
+			{ "code": "TND", "name": "Tunisian Dinar" },
+			{ "code": "TOP", "name": "Tongan Paʻanga" },
+			{ "code": "TRY", "name": "Turkish Lira" },
+			{ "code": "TTD", "name": "Trinidad and Tobago Dollar" },
+			{ "code": "TWD", "name": "New Taiwan Dollar" },
+			{ "code": "TZS", "name": "Tanzanian Shilling" },
+			{ "code": "UAH", "name": "Ukrainian Hryvnia" },
+			{ "code": "UGX", "name": "Ugandan Shilling" },
+			{ "code": "USD", "name": "United States Dollar" },
+			{ "code": "UYU", "name": "Uruguayan Peso" },
+			{ "code": "UZS", "name": "Uzbekistan Som" },
+			{ "code": "VES", "name": "Venezuelan Bolívar Soberano" },
+			{ "code": "VND", "name": "Vietnamese Dong" },
+			{ "code": "VUV", "name": "Vanuatu Vatu" },
+			{ "code": "WST", "name": "Samoan Tala" },
+			{ "code": "XAF", "name": "CFA Franc BEAC" },
+			{ "code": "XCD", "name": "East Caribbean Dollar" },
+			{ "code": "XDR", "name": "Special Drawing Rights" },
+			{ "code": "XOF", "name": "CFA Franc BCEAO" },
+			{ "code": "XPF", "name": "CFP Franc" },
+			{ "code": "YER", "name": "Yemeni Rial" },
+			{ "code": "ZAR", "name": "South African Rand" },
+			{ "code": "ZMW", "name": "Zambian Kwacha" },
+			{ "code": "ZWL", "name": "Zimbabwean Dollar" }
+		];
+
+		// Function to populate the dropdown
+		function populateCurrencyDropdown() {
+			// Get both desktop and mobile currency dropdowns
+			const currencyDropdowns = document.querySelectorAll('#currency_dropdown');
+			const savedCurrency = localStorage.getItem('currency') || 'INR';
+
+			// Sort currencies alphabetically by name
+			currencyData.sort((a, b) => a.name.localeCompare(b.name));
+
+			// Populate both dropdowns
+			currencyDropdowns.forEach(select => {
+				// Clear existing options
+				select.innerHTML = '';
+
+				// Create a default option
+				const defaultOption = document.createElement('option');
+				defaultOption.value = '';
+				defaultOption.textContent = savedCurrency;
+				defaultOption.disabled = true;
+				defaultOption.selected = true;
+				select.appendChild(defaultOption);
+
+				// Populate the dropdown with currency options
+				currencyData.forEach(currency => {
+					const option = document.createElement('option');
+					option.value = currency.code;
+					option.textContent = `${currency.code}`;
+					if (currency.code === savedCurrency) {
+						option.selected = true;
+					}
+					select.appendChild(option);
+				});
+			});
+		}
+
+		// Initialize the dropdowns on page load
+		document.addEventListener('DOMContentLoaded', populateCurrencyDropdown);
+
+		// Set default currency based on localStorage or user IP
+		const savedCurrency = localStorage.getItem('currency');
+
+		// Get both currency dropdowns to keep them in sync
+		const currencyDropdowns = document.querySelectorAll('#currency_dropdown');
+
+		if (savedCurrency) {
+			currencySelect.value = savedCurrency;
+		} else {
+			fetch('https://ipapi.co/json/')
+				.then(response => response.json())
+				.then(data => {
+					const userCurrency = data.currency;
+					if (userCurrency && currencyData.some(c => c.code === userCurrency)) {
+						currencySelect.value = userCurrency;
+						localStorage.setItem('currency', userCurrency);
+					}
+				})
+				.catch(error => console.error('Error fetching user currency:', error));
+		}
+
+		// Listen for changes and store selected currency
+		currencySelect.addEventListener('change', function () {
+			localStorage.setItem('currency', this.value);
+			window.location.reload();
+		});
+	</script>
+	{% endif %}
+
+
+
+</body>
+
+</html>

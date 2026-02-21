@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Flight Booking Form</title>
+  <!-- External CSS for TomSelect -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css" />
+  <!-- Flatpickr CSS (if needed) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style>
+    /* General Styles for Compact Form (Mobile) */
+    @media only screen and (max-width: 768px) {
+      #compact-form {
+        display: block;
+      }
+
+      .booking-form-hidden {
+        display: none;
+      }
+    }
+
+    #compact-form {
+      background-color: #f8f9fa;
+      border: 1px solid #0e009053;
+      padding: 15px;
+      border-radius: 12px;
+      margin: 12px 10px;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    #compact-form:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    #compact-form-details {
+      font-size: 15px;
+      font-weight: 500;
+      color: #333;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    #compact-form .compact-form-content {
+      display: flex;
+      align-items: center;
+    }
+
+    #compact-form .bi-search {
+      font-size: 22px;
+      padding: 0 12px 0 5px;
+      color: #0e0090;
+    }
+
+    #compact-form .edit-search-text {
+      background-color: #0e0090;
+      color: white;
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-left: auto;
+      font-weight: 500;
+    }
+
+    /* Custom styles for professional-looking airport dropdown */
+    .ts-dropdown .airport-option {
+      display: flex;
+      flex-direction: column;
+      padding: 6px 8px;
+    }
+
+    .ts-dropdown .airport-option .airport-code {
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    .ts-dropdown .airport-option .airport-name {
+      font-size: 13px;
+    }
+
+    .ts-dropdown .airport-option .airport-location {
+      font-size: 12px;
+      color: #888;
+    }
+
+    .selected-airport {
+      display: inline-block;
+      font-size: 14px;
+    }
+
+    .nav-pills .active {
+      background-color: #001c42 !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Compact Form for Mobile Devices -->
+  <div id="compact-form" style="display: none;">
+    <div class="compact-form-content">
+      <i class="bi bi-search me-2"></i>
+      <div class="flex-grow-1">
+        <p id="compact-form-details" class="mb-0"></p>
+      </div>
+      <!-- <span class="edit-search-text">Edit Search</span> -->
+    </div>
+  </div>
+
+  <!-- Booking Form -->
+  <form class="bg-mode position-relative px-3 px-sm-4 pt-4 mb-4 mb-sm-0" style="border-radius: 2px;">
+    <div class="row g-2 g-md-4 position-relative">
+      <!-- Nav Tabs -->
+      <div class="col-lg-6">
+        <ul class="nav nav-pills nav-pills-dark" id="pills-tab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-start rounded-0 mb-0 active" id="pills-one-way-tab" data-bs-toggle="pill"
+              data-bs-target="#pills-one-way" type="button" role="tab" aria-selected="true">
+              One Way
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-end rounded-0 mb-0" id="pills-round-trip-tab" data-bs-toggle="pill"
+              data-bs-target="#pills-round-trip" type="button" role="tab" aria-selected="false">
+              Round Trip
+            </button>
+          </li>
+        </ul>
+      </div>
+      <!-- Ticket Class -->
+      <div class="col-lg-3 ms-auto">
+        <div class="form-control-bg-light form-fs-md">
+          <select id="travelClass">
+            <option value="">Select Class</option>
+            <option value="Economy" selected>Economy</option>
+            <option value="Premium Economy">Premium Economy</option>
+            <option value="Business">Business</option>
+            <option value="First Class">First Class</option>
+          </select>
+        </div>
+      </div>
+      <!-- Travelers Dropdown -->
+      <div class="col-lg-3 ms-auto">
+        <div class="form-control-bg-light form-fs-md p-3" style="padding: 0 !important;">
+          <div class="dropdown">
+            <button id="travelerDropdown" class="btn btn-secondary w-100" type="button" data-bs-toggle="dropdown"
+              data-bs-auto-close="outside" aria-expanded="false"
+              style="padding: 6px; background-color: white; border-color: #c7c7c7; color: black; font-weight: 500;">
+              Select Travelers
+            </button>
+            <div class="dropdown-menu p-3" aria-labelledby="travelerDropdown" style="min-width: 300px;">
+              <!-- Adults -->
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <strong>Adults</strong><br>
+                  <small>12+ Years</small>
+                </div>
+                <div>
+                  <button class="btn btn-sm btn-outline-secondary decrease-btn" data-type="adult"
+                    aria-label="Decrease Adults">−</button>
+                  <span id="adultCount" class="mx-2">1</span>
+                  <button class="btn btn-sm btn-outline-secondary increase-btn" data-type="adult"
+                    aria-label="Increase Adults">+</button>
+                </div>
+              </div>
+              <!-- Children -->
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <strong>Children</strong><br>
+                  <small>2-12 Years</small>
+                </div>
+                <div>
+                  <button class="btn btn-sm btn-outline-secondary decrease-btn" data-type="children"
+                    aria-label="Decrease Children">−</button>
+                  <span id="childrenCount" class="mx-2">0</span>
+                  <button class="btn btn-sm btn-outline-secondary increase-btn" data-type="children"
+                    aria-label="Increase Children">+</button>
+                </div>
+              </div>
+              <!-- Infants -->
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <strong>Infants</strong><br>
+                  <small>Below 2 Years</small>
+                </div>
+                <div>
+                  <button class="btn btn-sm btn-outline-secondary decrease-btn" data-type="infant"
+                    aria-label="Decrease Infants">−</button>
+                  <span id="infantCount" class="mx-2">0</span>
+                  <button class="btn btn-sm btn-outline-secondary increase-btn" data-type="infant"
+                    aria-label="Increase Infants">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Hidden Traveler Inputs -->
+          <input type="hidden" name="adult" id="adultInput" value="1" />
+          <input type="hidden" name="children" id="childrenInput" value="0" />
+          <input type="hidden" name="infant" id="infantInput" value="0" />
+        </div>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content mt-4" id="pills-tabContent">
+        <!-- One Way Tab -->
+        <div class="tab-pane fade show active" id="pills-one-way" role="tabpanel" aria-labelledby="pills-one-way-tab">
+          <div class="row g-2 g-md-4">
+            <!-- Leaving From -->
+            <div class="col-md-6 col-lg-4 position-relative">
+              <div class="mobile-search-air form-border-transparent form-fs-lg bg-light h-100">
+                <label class="mb-1"><i class="bi bi-geo-alt me-2"></i>From</label>
+                <select id="from-airport"></select>
+              </div>
+              <!-- Swap Button (if needed) -->
+              <div class="m-hidden btn-flip-icon mt-3 mt-md-0">
+                <button class="btn btn-white shadow btn-round mb-0"><i class="fa-solid fa-right-left"></i></button>
+              </div>
+            </div>
+            <!-- Going To -->
+            <div class="col-md-6 col-lg-4">
+              <div class="mobile-search-air form-border-transparent form-fs-lg bg-light h-100">
+                <label class="mb-1"><i class="bi bi-send me-2"></i>To</label>
+                <select id="to-airport">
+                  <option value="">To location</option>
+                </select>
+              </div>
+            </div>
+            <!-- Departure Date -->
+            <div class="col-lg-4">
+              <div class="mobile-search-air form-border-transparent form-fs-lg bg-light h-100">
+                <label class="mb-1"><i class="bi bi-calendar me-2"></i>Departure</label>
+                <input type="text" class="form-control flatpickr" data-date-format="d M Y" placeholder="Departure date">
+              </div>
+            </div>
+            <!-- Buttons -->
+            <div style="margin-top: 10px;" class="col-12 text-end pt-0">
+              <a class="btn mb-n4 d-lg-none closeCompact me-2">Cancel</a>
+              <a class="btn btn-primary mb-n4 findTicketBtn" href="#">Find ticket <i
+                  class="bi bi-arrow-right ps-3"></i></a>
+            </div>
+          </div>
+        </div>
+        <!-- Round Trip Tab -->
+        <div class="tab-pane fade" id="pills-round-trip" role="tabpanel" aria-labelledby="pills-round-trip-tab">
+          <div class="row g-2 g-md-4">
+            <!-- Leaving From -->
+            <div class="col-md-6 col-xl-3 position-relative">
+              <div class="mobile-search-air form-border-transparent form-fs-lg bg-light h-100">
+                <label class="mb-1"><i class="bi bi-geo-alt me-2"></i>From</label>
+                <select id="from-airport-roundtrip">
+                  <option value="">From location</option>
+                </select>
+              </div>
+              <div class="btn-flip-icon m-hidden mt-3 mt-md-0">
+                <button class="btn btn-white shadow btn-round mb-0"><i class="fa-solid fa-right-left"></i></button>
+              </div>
+            </div>
+            <!-- Going To -->
+            <div class="col-md-6 col-xl-3">
+              <div class="mobile-search-air form-border-transparent form-fs-lg bg-light h-100">
+                <label class="mb-1"><i class="bi bi-send me-2"></i>To</label>
+                <select id="to-airport-roundtrip">
+                  <option value="">To location</option>
+                </select>
+              </div>
+            </div>
+            <!-- Departure Date -->
+            <div class="col-md-6 col-xl-3">
+              <div class="mobile-search-air form-border-transparent form-fs-lg bg-light h-100">
+                <label class="mb-1"><i class="bi bi-calendar me-2"></i>Departure</label>
+                <input type="text" class="form-control flatpickr" data-date-format="d M Y" placeholder="Departure date">
+              </div>
+            </div>
+            <!-- Return Date -->
+            <div class="col-md-6 col-xl-3">
+              <div class="mobile-search-air form-border-transparent form-fs-lg bg-light h-100">
+                <label class="mb-1"><i class="bi bi-calendar me-2"></i>Return</label>
+                <input type="text" class="form-control flatpickr" data-date-format="d M Y" placeholder="Return date">
+              </div>
+            </div>
+            <!-- Button -->
+            <div class="col-12 text-end pt-0">
+              <a class="btn btn-primary mb-n4 findTicketBtn" href="#">Find ticket <i
+                  class="bi bi-arrow-right ps-3"></i></a>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Tab Content -->
+    </div>
+  </form>
+
+  <!-- External JS Libraries -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+  <!-- (Make sure Bootstrap JS is also loaded if you use its components) -->
+
+  <script>
+    /* === Helper: Update Compact Form Details === */
+    function updateCompactFormDetails() {
+      const activeTab = document.querySelector('.tab-pane.active');
+      let fromValue = 'From', toValue = 'To', departureDate = 'Departure Date', returnDate = '', travelClass = 'Class';
+
+      if (activeTab.id === 'pills-one-way') {
+        fromValue = document.querySelector('#pills-one-way #from-airport').value || fromValue;
+        toValue = document.querySelector('#pills-one-way #to-airport').value || toValue;
+        departureDate = document.querySelector('#pills-one-way input.flatpickr').value || departureDate;
+      } else if (activeTab.id === 'pills-round-trip') {
+        fromValue = document.querySelector('#pills-round-trip #from-airport-roundtrip').value || fromValue;
+        toValue = document.querySelector('#pills-round-trip #to-airport-roundtrip').value || toValue;
+        const fpInputs = activeTab.querySelectorAll('input.flatpickr');
+        departureDate = fpInputs[0].value || departureDate;
+        returnDate = fpInputs[1].value || 'Return Date';
+      }
+      travelClass = document.querySelector('#travelClass').value || travelClass;
+
+      let details = `${fromValue} ➔ ${toValue}, ${departureDate}`;
+      if (returnDate && activeTab.id === 'pills-round-trip') { details += ` - ${returnDate}`; }
+      details += `, ${travelClass}`;
+      document.getElementById('compact-form-details').textContent = details;
+    }
+
+    /* === TomSelect Configuration for Remote Airport Search === */
+    const airportSelectConfig = {
+      maxOptions: 50,
+      valueField: 'value',
+      labelField: 'label',
+      searchField: ['code', 'name', 'city', 'country'],
+      placeholder: 'Search Airport',
+      render: {
+        option: function (data, escape) {
+          return `
+            <div class="airport-option" style="position: relative; padding: 8px 12px;">
+              <div class="airport-code" style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="max-width: 75%; overflow: hidden; text-overflow: ellipsis;">${escape(data.name)}</span>
+                <span class="airport-code-text" style="margin-left: 12px;font-size: 12px; font-weight: 500;">${escape(data.code)}</span>
+              </div>
+              <div class="airport-location" style="max-width: 75%; overflow: hidden; text-overflow: ellipsis;">${escape(data.city)}, ${escape(data.country)}</div>
+            </div>
+          `;
+        },
+        item: function (data, escape) {
+          return `<div class="selected-airport"><strong>${escape(data.code)}</strong> - ${escape(data.name)}</div>`;
+        }
+      },
+      onItemAdd() { this.blur(); },
+      load: function (query, callback) {
+        if (!query.length) return callback();
+        $.ajax({
+          url: "{% url 'search_airports' %}",
+          type: 'GET',
+          data: { q: query },
+          dataType: 'json',
+          error: function () {
+            callback();
+          },
+          success: function (res) {
+            console.log(res);
+            // Map the received data to the option format expected by TomSelect.
+            const options = res.map(airport => ({
+              value: airport.iata ? airport.iata.toString() : '',
+              code: airport.iata,
+              name: airport.name,
+              city: airport.city,
+              country: airport.country,
+              label: `${airport.iata} ${airport.name} (${airport.city}, ${airport.country})`
+            }));
+            callback(options);
+          }
+        });
+      }
+    };
+
+    // Initialize TomSelect instances using the remote-loading configuration.
+    const travelClassSelect = new TomSelect('#travelClass', {
+      maxOptions: 50,
+      placeholder: 'Select Class'
+    });
+    const fromAirportTS = new TomSelect('#from-airport', { ...airportSelectConfig, placeholder: 'From Airport' });
+    const toAirportTS = new TomSelect('#to-airport', { ...airportSelectConfig, placeholder: 'To Airport' });
+    const fromAirportRoundTS = new TomSelect('#from-airport-roundtrip', { ...airportSelectConfig, placeholder: 'From Airport' });
+    const toAirportRoundTS = new TomSelect('#to-airport-roundtrip', { ...airportSelectConfig, placeholder: 'To Airport' });
+
+    /* === Prefill Helper: Load an Airport Option by its Code === */
+    function prefillAirport(selectInstance, airportCode) {
+      if (!airportCode) return;
+      $.ajax({
+        url: "{% url 'search_airports' %}",
+        type: 'GET',
+        data: { q: airportCode },
+        dataType: 'json',
+        success: function (data) {
+          // Look for an airport with an exact match.
+          const airport = data.find(item => item.iata === airportCode);
+          if (airport) {
+            const option = {
+              value: airport.iata,
+              code: airport.iata,
+              name: airport.name,
+              city: airport.city,
+              country: airport.country,
+              label: `${airport.iata} ${airport.name} (${airport.city}, ${airport.country})`
+            };
+            selectInstance.addOption(option);
+            selectInstance.setValue(airportCode);
+          }
+        }
+      });
+    }
+
+    $(document).ready(function () {
+      /* === Flatpickr Default Date Setup === */
+      let tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      let dayAfter = new Date(tomorrow);
+      dayAfter.setDate(tomorrow.getDate() + 1);
+      const formatDate = date => date.toISOString().split('T')[0];
+
+      // One Way tab (first flatpickr element)
+      $('.flatpickr:eq(0)').flatpickr({
+        dateFormat: 'd M Y',
+        disableMobile: true,
+        defaultDate: tomorrow
+      });
+      // Round Trip tab: first flatpickr for departure, second for return
+      $('.flatpickr:eq(1)').flatpickr({
+        dateFormat: 'd M Y',
+        disableMobile: true,
+        defaultDate: tomorrow,
+        onChange: function (selectedDates) {
+          const departure = selectedDates[0];
+          if (departure) {
+            let minReturn = new Date(departure);
+            minReturn.setDate(minReturn.getDate() + 1);
+            const returnFP = $('.flatpickr:eq(2)')[0]._flatpickr;
+            returnFP.set('minDate', minReturn);
+            if (returnFP.selectedDates[0] < minReturn) {
+              returnFP.setDate(minReturn);
+            }
+          }
+        }
+      });
+      $('.flatpickr:eq(2)').flatpickr({
+        dateFormat: 'd M Y',
+        disableMobile: true,
+        defaultDate: dayAfter
+      });
+
+      /* === URL Parameter Handling & Prefill for Airports === */
+      const urlParams = new URLSearchParams(window.location.search);
+      const fromParam = urlParams.get('from'),
+        toParam = urlParams.get('to'),
+        departureParam = urlParams.get('departure'),
+        travelClassParam = urlParams.get('class'),
+        adultsParam = urlParams.get('adults'),
+        childrenParam = urlParams.get('children'),
+        infantsParam = urlParams.get('infants'),
+        returnParam = urlParams.get('return');
+
+      if (fromParam && toParam && departureParam && travelClassParam && adultsParam) {
+        // Prefill the airport selects using the helper.
+        prefillAirport(fromAirportTS, fromParam);
+        prefillAirport(toAirportTS, toParam);
+        prefillAirport(fromAirportRoundTS, fromParam);
+        prefillAirport(toAirportRoundTS, toParam);
+        if (returnParam) { $('#pills-round-trip-tab').trigger('click'); }
+        travelClassSelect.setValue(travelClassParam);
+        // Set flatpickr dates accordingly:
+        $('.flatpickr:eq(0)').flatpickr().setDate(departureParam);
+        $('.flatpickr:eq(1)').flatpickr().setDate(departureParam);
+        if (returnParam) {
+          $('.flatpickr:eq(2)').flatpickr().setDate(returnParam);
+        }
+      }
+
+      updateCompactFormDetails();
+
+      /* === Find Ticket Button Handler === */
+      $('.findTicketBtn').on('click', function (event) {
+        event.preventDefault();
+        const activeTabId = $('.tab-pane.active').attr('id');
+        const fromAirport = fromAirportTS.getValue() || fromAirportRoundTS.getValue();
+        const toAirport = toAirportTS.getValue() || toAirportRoundTS.getValue();
+        const ticketClass = $('#travelClass').val();
+        const adultCount = $('#adultInput').val();
+        const childCount = $('#childrenInput').val();
+        const infantCount = $('#infantInput').val();
+        let departureDate = '', returnDate = '';
+
+        if (!fromAirport) { alert('Please select a departure location.'); return; }
+        if (!toAirport) { alert('Please select a destination.'); return; }
+
+        if (activeTabId === 'pills-one-way') {
+          departureDate = $('#' + activeTabId + ' input.flatpickr').val();
+          if (!departureDate) { alert('Please select a departure date.'); return; }
+        } else if (activeTabId === 'pills-round-trip') {
+          departureDate = $('#' + activeTabId + ' input.flatpickr:eq(0)').val();
+          returnDate = $('#' + activeTabId + ' input.flatpickr:eq(1)').val();
+          if (!departureDate) { alert('Please select a departure date.'); return; }
+          if (!returnDate) { alert('Please select a return date.'); return; }
+        }
+        if (!ticketClass) { alert('Please select a ticket class.'); return; }
+        if (adultCount == 0) { alert('Please select the number of travelers.'); return; }
+
+        let queryParams = $.param({
+          from: fromAirport,
+          to: toAirport,
+          departure: departureDate,
+          class: ticketClass,
+          adults: adultCount,
+          children: childCount,
+          infants: infantCount
+        });
+        if (activeTabId === 'pills-round-trip') { queryParams += `&return=${returnDate}`; }
+        window.open(`{% url 'search_flight_results' %}?${queryParams}`, '_blank');
+      });
+
+
+      /* === Traveler Count Handling === */
+      let counts = { adult: 1, children: 0, infant: 0 };
+      const maxCounts = { adult: 10, children: 10, infant: 5 };
+      const minCounts = { adult: 1, children: 0, infant: 0 };
+      const updateDisplay = type => { $('#' + type + 'Count').text(counts[type]); };
+      const updateFormInputs = () => {
+        $('#adultInput').val(counts.adult);
+        $('#childrenInput').val(counts.children);
+        $('#infantInput').val(counts.infant);
+      };
+      const updateDropdownLabel = () => {
+        const total = counts.adult + counts.children + counts.infant;
+        $('#travelerDropdown').text(total + " Traveler" + (total > 1 ? "s" : ""));
+      };
+      updateDropdownLabel();
+      updateFormInputs();
+
+      $('.increase-btn').click(function (e) {
+        e.preventDefault();
+        const type = $(this).data('type');
+        if (counts[type] < maxCounts[type] && (counts.adult + counts.children + counts.infant) < 9) {
+          counts[type]++;
+          if (type === 'infant' && counts.infant > counts.adult) {
+            counts.infant = counts.adult;
+            alert('Each infant must be accompanied by an adult.');
+          }
+          updateDisplay(type);
+          updateDropdownLabel();
+          updateFormInputs();
+        }
+      });
+      $('.decrease-btn').click(function (e) {
+        e.preventDefault();
+        const type = $(this).data('type');
+        if (counts[type] > minCounts[type]) {
+          counts[type]--;
+          updateDisplay(type);
+          updateDropdownLabel();
+          updateFormInputs();
+        }
+      });
+    });
+
+    /* === Mobile Compact Form Handling === */
+    $(document).ready(function () {
+      const hideForm = "{{ hide_form }}";
+      if (!hideForm) { $(".closeCompact").hide(); }
+      const bookingForm = $('form');
+      const compactForm = $('#compact-form');
+      const isMobileDevice = () => hideForm && window.innerWidth <= 768;
+      const hideFormShowCompact = () => {
+        bookingForm.addClass('booking-form-hidden');
+        compactForm.show();
+      };
+      const showFormHideCompact = () => {
+        bookingForm.removeClass('booking-form-hidden');
+        compactForm.hide();
+      };
+
+      $(document).on('click', '.closeCompact', function () {
+        hideFormShowCompact();
+        window.scrollTo(0, 0);
+      });
+      if (isMobileDevice()) {
+        hideFormShowCompact();
+        updateCompactFormDetails();
+      }
+      $(window).on('resize', function () {
+        if (isMobileDevice()) {
+          hideFormShowCompact();
+          updateCompactFormDetails();
+        } else {
+          showFormHideCompact();
+        }
+      });
+      compactForm.on('click', function () { showFormHideCompact(); });
+      $('#from-airport, #to-airport, #from-airport-roundtrip, #to-airport-roundtrip, .flatpickr, #travelClass, #adultInput, #childrenInput, #infantInput').on('change', updateCompactFormDetails);
+      $('.nav-link').on('click', function () { setTimeout(updateCompactFormDetails, 100); });
+      $('.increase-btn, .decrease-btn').on('click', function () { setTimeout(updateCompactFormDetails, 100); });
+    });
+  </script>
+
+</body>
+
+</html>

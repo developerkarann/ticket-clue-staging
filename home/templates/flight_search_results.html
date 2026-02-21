@@ -1,0 +1,955 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  .quote-page .form-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    margin-bottom: 0.35rem;
+    color: #495057;
+  }
+
+  .quote-page .form-control,
+  .quote-page .input-group-text {
+    height: 3.25rem;
+    font-size: 0.9375rem;
+    border-radius: 0.5rem;
+  }
+
+  .quote-page #form-section .form-control,
+  .quote-page #form-section .input-group-text {
+    height: 3.25rem;
+  }
+
+  .quote-page #form-section .btn[type="submit"] {
+    height: 3.25rem;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .quote-page .mb-field {
+    margin-bottom: 0.5rem;
+  }
+
+  .quote-page .input-group .form-control {
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+
+  .quote-page .input-group .input-group-text:first-child {
+    border-radius: 0.5rem 0 0 0.5rem;
+  }
+
+  .quote-page .input-group .form-control:last-child {
+    border-radius: 0.5rem 0 0 0.5rem;
+  }
+
+  .quote-page .input-group .input-group-text:last-child {
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+
+  .quote-page .form-control::placeholder {
+    color: #adb5bd;
+  }
+
+
+  .quote-page .route-line {
+    height: 2px;
+    background: linear-gradient(90deg, #dee2e6 0%, #adb5bd 50%, #dee2e6 100%);
+  }
+
+  .quote-page .route-details {
+    font-size: 0.75rem;
+    color: #6c757d;
+  }
+
+  .quote-page .iti {
+    width: 100%;
+  }
+
+  .quote-page .iti input {
+    height: 2.75rem;
+    border-radius: 0.5rem;
+  }
+
+  .quote-page .phone-help-icon {
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+  }
+
+  .quote-page .success-card {
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .quote-page .success-check {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #198754;
+    border: 3px solid #198754;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .quote-page .success-check i {
+    font-size: 2rem;
+    color: #fff;
+  }
+
+  .quote-page .success-close-btn {
+    min-width: 120px;
+    border: 1px solid #495057;
+    color: #495057;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    background: #fff;
+    font-weight: 500;
+  }
+
+  .quote-page .success-close-btn:hover {
+    background: #f8f9fa;
+    color: #212529;
+    border-color: #212529;
+  }
+
+  .quote-page .success-social-link {
+    width: 40px;
+    height: 40px;
+    border-radius: 0.5rem;
+    background: #e9ecef;
+    color: #495057;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0.25rem;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .quote-page .success-social-link:hover {
+    background: #001c42;
+    color: #fff;
+  }
+
+  .quote-page .left-why-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    border: 1px solid #dee2e6;
+  }
+
+  .quote-page .left-help-card {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .quote-page .route-airport-code {
+    font-size: 2.75rem;
+    font-weight: 700;
+    color: #001c42;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .quote-page .route-airport-city {
+    font-size: 1rem;
+    color: #495057;
+    font-weight: 500;
+    margin-top: 0.25rem;
+  }
+
+  .quote-page .fare-crossed {
+    font-size: 30px;
+    color: #6c757d;
+    text-decoration: line-through;
+    font-weight: 500;
+  }
+
+  .quote-page .fare-current {
+    font-size: 65px;
+    font-weight: 700;
+    color: #001c42;
+    letter-spacing: -0.02em;
+  }
+
+  /* Swap icon column: centered between From/To inputs */
+  .quote-page .mb-field.row .swap-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #editDestinationModal .ts-wrapper {
+    width: 100%;
+  }
+
+  /* Edit modal: match reference exactly - width, spacing, interchange overlap */
+  #editDestinationModal .modal-dialog {
+    max-width: 520px;
+    margin: 1.75rem auto;
+  }
+
+  #editDestinationModal .modal-content {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+  }
+
+  #editDestinationModal .modal-header {
+    padding: 1.5rem 1.5rem 0;
+    border: none;
+  }
+
+  #editDestinationModal .modal-body {
+    padding: 1.25rem 1.5rem 1.5rem;
+  }
+
+  #editDestinationModal .edit-modal-headline {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #212529;
+    text-align: center;
+    margin: 0 0 0.2rem;
+    line-height: 1.3;
+  }
+
+  #editDestinationModal .edit-modal-tagline {
+    font-size: 0.9375rem;
+    color: #495057;
+    text-align: center;
+    margin: 0 0 1.25rem;
+  }
+
+  /* Top row: Round Trip | 1, Economy - light gray, rounded */
+  #editDestinationModal .edit-modal-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  #editDestinationModal .edit-modal-row-2 .edit-modal-input-wrap {
+    margin-bottom: 0;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    background: #f8f9fa !important;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+  }
+
+  /* From/To wrapper for interchange overlap */
+  #editDestinationModal .edit-modal-from-to-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  /* Main inputs: From, To, Date - white, thin border, same full width & spacing */
+  #editDestinationModal .edit-modal-field {
+    margin-bottom: 0;
+  }
+
+  #editDestinationModal .edit-modal-field .edit-modal-input-wrap {
+    width: 100%;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 0.875rem 1rem;
+    min-height: 4rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  #editDestinationModal .edit-modal-field .edit-modal-label-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.35rem;
+  }
+
+  #editDestinationModal .edit-modal-field .edit-modal-label-row .edit-modal-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin: 0;
+  }
+
+  #editDestinationModal .edit-modal-field .edit-modal-value-row {
+    min-height: 1.5rem;
+    display: flex;
+    align-items: center;
+  }
+
+  #editDestinationModal .edit-modal-field .ts-control {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #212529;
+    border: none !important;
+    background: transparent !important;
+    padding-left: 0 !important;
+  }
+
+  #editDestinationModal .edit-modal-field .ts-wrapper {
+    border: none;
+    background: transparent;
+  }
+
+  #editDestinationModal .edit-modal-field .ts-wrapper.single .ts-control {
+    background: transparent;
+  }
+
+  /* Interchange: centered vertically between From and To, aligned right */
+  #editDestinationModal .edit-modal-swap-row {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  #editDestinationModal .edit-modal-swap-row .edit-modal-swap-btn {
+    pointer-events: auto;
+  }
+
+  #editDestinationModal .edit-modal-swap-btn {
+    width: 34px;
+    height: 34px;
+    border: 1px solid #dee2e6;
+    border-radius: 50%;
+    background: #fff;
+    color: #495057;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+
+  #editDestinationModal .edit-modal-swap-btn:hover {
+    background: #f8f9fa;
+    color: #212529;
+    border-color: #adb5bd;
+  }
+
+  #editDestinationModal .edit-modal-swap-btn i {
+    font-size: 0.95rem;
+  }
+
+  /* Date field: same as From/To */
+  #editDestinationModal .edit-modal-field .edit-modal-date-input {
+    font-weight: 500;
+    font-size: 1rem;
+    color: #212529;
+    border: none;
+    background: transparent;
+    width: 100%;
+    padding: 0;
+  }
+
+  /* Search Flights: full width, significantly rounded */
+  #editDestinationModal .btn-search-flights {
+    width: 100%;
+    background: #5143d9;
+    border: none;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  #editDestinationModal .btn-search-flights:hover {
+    background: #4535c8;
+    color: #fff;
+  }
+
+  #editDestinationModal .edit-modal-disclaimer {
+    font-size: 0.7rem;
+    color: #6c757d;
+    text-align: center;
+    margin-top: 0.65rem;
+    line-height: 1.35;
+  }
+
+  #editDestinationModal .form-select.edit-modal-select {
+    background-color: transparent;
+    border: none;
+    font-size: 0.9375rem;
+    color: #212529;
+  }
+
+  /* Sections reused from home: make them prominent and on-theme */
+  .quote-page.testimonials-results .testimonials {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .quote-page.testimonials-results .testimonials h2 {
+    color: #001c42 !important;
+  }
+
+  .quote-page.features-results .features,
+  .quote-page.features-results .features.bg-light {
+    background: transparent !important;
+    padding: 2rem 0;
+  }
+
+  .quote-page.features-results .features h5 {
+    color: #001c42 !important;
+  }
+
+  .quote-page.features-results .features i.bi {
+    color: #093981 !important;
+  }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<main class="py-4 py-lg-5 quote-page"
+  style="background: linear-gradient(180deg, #eef1f5 0%, #F5F7FA 20%); min-height: 80vh; margin-bottom: 100px;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-xl-11 " style="margin-bottom: 100px;">
+        <div class="card border-0 rounded-4 overflow-hidden shadow"
+          style="box-shadow: 0 10px 40px rgba(0,28,66,0.08) !important;">
+          <div class="card-body p-0">
+            <div class="row g-0">
+              <!-- Left: Flight details, pricing + creative fill -->
+              <div class="col-lg-6 p-4 p-xl-5 position-relative d-flex flex-column">
+                <span class="badge rounded-pill px-3 py-2 mb-3 d-inline-flex align-items-center"
+                  style="background-color: #5143d9; color: white; font-size: 0.8rem; font-weight: 500;">
+                  <i class="bi bi-check-lg me-1"></i> Best offline price guarantee
+                </span>
+                <!-- Route: origin | line + plane | destination -->
+                <div class="d-flex align-items-center gap-2 gap-md-3">
+                  <div class="text-nowrap">
+                    <div id="display-from-code" class="route-airport-code">{{ from_code }}</div>
+                    <div id="display-from-city" class="route-airport-city">{{ from_city }}</div>
+                  </div>
+                  <div class="flex-grow-1 min-w-0 mx-1 mx-md-2">
+                    <div class="route-line position-relative my-2" style="top: -2px;">
+                      <span class="position-absolute top-50 start-50 translate-middle bg-white px-2">
+                        <i class="bi bi-airplane text-secondary" style="font-size: 1rem;"></i>
+                      </span>
+                    </div>
+                    <div class="route-details d-flex align-items-center justify-content-center gap-2 flex-wrap mt-1">
+                      <span>{{ travel_class }}</span>
+                      <span>·</span>
+                      <span>{{ trip_type }}</span>
+                      <span>·</span>
+                      <span><i class="bi bi-person me-0.5"></i>{{ passenger_count }}</span>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-start gap-1 text-nowrap">
+                    <div>
+                      <div id="display-to-code" class="route-airport-code">{{ to_code }}</div>
+                      <div id="display-to-city" class="route-airport-city">{{ to_city }}</div>
+                    </div>
+                    <button type="button" id="edit-destination-btn" class="btn btn-light border rounded mt-1"
+                      style="min-width: 36px; height: 36px; padding: 0.25rem;" aria-label="Edit destination"
+                      data-bs-toggle="modal" data-bs-target="#editDestinationModal">
+                      <i class="bi bi-pencil" style="font-size: 0.9rem;"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- Fare: $180 crossed (red), $150 large and highlighted -->
+                <div class="mt-4 pt-3 border-top border-1">
+                  <div class="d-flex align-items-baseline flex-wrap gap-2">
+                    <span id="display-fare-crossed" class="fare-crossed">$180</span>
+                    <span id="display-fare-current" class="fare-current">${{ fixed_price }}</span>
+                    <sup class="text-secondary small">*</sup>
+                    <span class="text-secondary small align-baseline">Total, per person</span>
+                  </div>
+                </div>
+                <ul class="list-unstyled mt-3 mb-0">
+                  <li class="d-flex align-items-center mb-2 small">
+                    <i class="bi bi-check-lg text-success me-2" style="font-size: 1rem;"></i> Lost Baggage Protection
+                  </li>
+                  <li class="d-flex align-items-center mb-2 small">
+                    <i class="bi bi-check-lg text-success me-2" style="font-size: 1rem;"></i> Refund Assurance
+                  </li>
+                  <li class="d-flex align-items-center small">
+                    <i class="bi bi-check-lg text-success me-2" style="font-size: 1rem;"></i> Book Now, Pay Later
+                  </li>
+                </ul>
+                <!-- Left column fill: Why choose us + Need help -->
+                <div class="mt-4 pt-3 border-top border-1 flex-grow-1">
+                  <div class="left-why-card mb-3">
+                    <div class="small fw-bold text-dark mb-2"><i class="bi bi-stars me-1 text-warning"></i> Why book
+                      with us</div>
+                    <ul class="list-unstyled small mb-0">
+                      <li class="d-flex align-items-center mb-1"><i class="bi bi-shield-check text-success me-2"></i>
+                        IATA accredited & secure booking</li>
+                      <li class="d-flex align-items-center mb-1"><i class="bi bi-clock text-primary me-2"></i> 24/7
+                        travel expert support</li>
+                      <li class="d-flex align-items-center"><i class="bi bi-currency-dollar text-success me-2"></i> Best
+                        price guarantee</li>
+                    </ul>
+                  </div>
+                  <div class="left-help-card">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
+                        style="width: 40px; height: 40px;">
+                        <i class="bi bi-headset text-primary"></i>
+                      </div>
+                      <div>
+                        <span class="small fw-bold text-dark">Need help?</span>
+                        <a href="tel:+16502631714" class="d-block small text-primary text-decoration-none fw-bold">+1
+                          (888) 843-5849</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Right: Quote form or success card -->
+              <div class="col-lg-6 bg-light p-4 p-xl-5 position-relative">
+                <div id="form-section">
+                  <div class="rounded-3 p-3 mb-3 d-flex align-items-center gap-2"
+                    style="background-color: #e8f5e9; border: 2px dashed #4caf50;">
+                    <div class="rounded-circle overflow-hidden flex-shrink-0 bg-white"
+                      style="width: 48px; height: 48px;">
+                      <img src="{% static 'assets/images/logo.png' %}" alt="" class="w-100 h-100 object-fit-cover"
+                        onerror="this.style.display='none'">
+                    </div>
+                    <div class="min-w-0">
+                      <a href="tel:16502631714" class="text-decoration-none fw-bold d-block"
+                        style="color: #2e7d32; font-size: 1.1rem;">CALL +1 (888) 843-5849</a>
+                      <span class="small text-secondary">Get EXTRA $30 with Code </span>
+                      <span class="badge rounded-1 px-2 py-0.5"
+                        style="background-color: #ff9800; color: #fff; font-size: 0.7rem;">TICKETCLUE30</span>
+                    </div>
+                  </div>
+                  <div class="position-relative my-3">
+                    <hr class="text-secondary my-0" style="opacity: 0.6;">
+                    <span
+                      class="position-absolute top-50 start-50 translate-middle bg-light px-2 small text-secondary">OR</span>
+                  </div>
+                  <h5 class="fw-bold mb-3" style="font-size: 1.1rem;">Get the Best Quote Guaranteed</h5>
+                  <form id="quote-form" method="post" action="{% url 'flight_lead_form' %}" class="needs-validation"
+                    novalidate>
+                    {% csrf_token %}
+                    <input type="hidden" name="rt_from" value="{{ from_label }}">
+                    <input type="hidden" name="rt_to" value="{{ to_label }}">
+                    <input type="hidden" name="rt_departure" value="{{ departure_iso }}">
+                    {% if return_iso %}<input type="hidden" name="rt_return" value="{{ return_iso }}">{% endif %}
+                    <div class="row g-2 mb-field">
+                      <div class="col-5">
+                        <div class="input-group">
+                          <span class="input-group-text bg-white border-end-0 pe-2"><i
+                              class="bi bi-airplane text-secondary" style="font-size: 0.9rem;"></i></span>
+                          <input type="text" class="form-control border-start-0" id="id_from" value="{{ from_label }}"
+                            required readonly placeholder="From">
+                        </div>
+                      </div>
+                      <div class="col-2 d-flex align-items-center justify-content-center swap-col">
+                        <button type="button" class="btn btn-light border rounded" id="swap-destinations"
+                          style="width: 38px; height: 3.25rem; padding: 0;" aria-label="Swap">
+                          <i class="bi bi-arrow-left-right" style="font-size: 0.85rem;"></i>
+                        </button>
+                      </div>
+                      <div class="col-5">
+                        <div class="input-group">
+                          <input type="text" class="form-control border-end-0" id="id_to" value="{{ to_label }}"
+                            required readonly placeholder="To">
+                          <span class="input-group-text bg-white border-start-0 ps-2"><i
+                              class="bi bi-airplane text-secondary" style="font-size: 0.9rem;"></i></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="mb-field">
+                      <input type="email" class="form-control" id="id_email" name="rt_email" required
+                        placeholder="Email">
+                    </div>
+                    <div class="mb-field">
+                      <div class="position-relative w-100">
+                        <input type="tel" class="form-control" id="id_phone" name="rt_phone" required
+                          placeholder="Phone Number">
+                        <span
+                          class="position-absolute phone-help-icon text-secondary border rounded-circle d-inline-flex align-items-center justify-content-center"
+                          style="pointer-events: none;">?</span>
+                      </div>
+                    </div>
+                    <div class="mb-field">
+                      <input type="text" class="form-control" id="id_name" name="rt_name"
+                        placeholder="Your Name (Optional)">
+                    </div>
+                    <button type="submit"
+                      class="btn w-100 fw-bold text-uppercase text-white border-0 rounded-3 d-flex align-items-center justify-content-center"
+                      style="background-color: #5143d9; font-size: 0.95rem; letter-spacing: 0.02em; height: 2.75rem;">
+                      GET A FREE QUOTE
+                    </button>
+                  </form>
+                  <p class="small text-secondary mt-2 mb-0" style="line-height: 1.4;">
+                    By providing my contact details and clicking on 'GET A FREE QUOTE' I agree to be contacted for
+                    travel information via phone, text messages and email. No purchase necessary. We respect your <a
+                      href="{% url 'privacy_policy' %}" class="text-primary text-decoration-underline">privacy</a>.
+                  </p>
+                </div>
+                <!-- Success state: thank you card with Follow Us + Close -->
+                <div id="quote-form-success" class="success-card d-none" role="status">
+                  <div class="success-check">
+                    <i class="bi bi-check-lg"></i>
+                  </div>
+                  <h5 class="fw-bold text-dark mb-2" style="font-size: 1.25rem;">Thank you for the request!</h5>
+                  <p class="text-secondary small mb-4" style="max-width: 280px; margin-left: auto; margin-right: auto;">
+                    You will get a reply from a Travel Agent shortly.</p>
+                  <button type="button" id="success-close-btn" class="success-close-btn mb-4">Close</button>
+                  <div class="pt-3 border-top border-1">
+                    <p class="small text-secondary mb-2">Follow Us:</p>
+                    <div class="d-flex justify-content-center flex-wrap gap-1">
+                      <a href="https://www.facebook.com/ticketclue" target="_blank" rel="noopener"
+                        class="success-social-link" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                      <a href="https://www.instagram.com/ticketclue" target="_blank" rel="noopener"
+                        class="success-social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                      <a href="https://www.youtube.com/ticketclue" target="_blank" rel="noopener"
+                        class="success-social-link" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                      <a href="https://twitter.com/ticketclue" target="_blank" rel="noopener"
+                        class="success-social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                      <a href="https://www.linkedin.com/company/ticketclue" target="_blank" rel="noopener"
+                        class="success-social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Traveler Stories: testimonials (reused from home) -->
+  <section class="quote-page testimonials-results" style="background: #fff;">
+    {% include 'components/testimonials_section.html' %}
+  </section>
+
+  <!-- Features strip: Secure, Price, 24/7, Cancellation (reused from home) -->
+  <section class="quote-page features-results">
+    {% include 'components/features_section.html' %}
+  </section>
+</main>
+
+<!-- Edit / Search Flights modal - match reference UI -->
+<div class="modal fade" id="editDestinationModal" tabindex="-1" aria-labelledby="editDestinationModalLabel"
+  aria-hidden="true" data-from-code="{{ from_code }}" data-to-code="{{ to_code }}" data-from-city="{{ from_city }}"
+  data-to-city="{{ to_city }}" data-departure="{{ departure_iso }}" data-return="{{ return_iso }}"
+  data-trip-type="{{ trip_type }}" data-passengers="{{ passenger_count }},{{ travel_class }}">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header position-relative">
+        <div class="w-100">
+          <h2 class="edit-modal-headline">We'll meet or beat all competitor prices</h2>
+          <p class="edit-modal-tagline">Free Reservations. Free Quotes.</p>
+        </div>
+        <button type="button" class="btn-close position-absolute top-0 end-0" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="edit-modal-row-2">
+          <div class="edit-modal-input-wrap d-flex align-items-center">
+            <select id="modal-trip-type"
+              class="form-select edit-modal-select border-0 bg-transparent shadow-none flex-grow-1">
+              <option value="Round-Trip" {% if is_round_trip %}selected{% endif %}>Round Trip</option>
+              <option value="One-Way" {% if is_one_way %}selected{% endif %}>One Way</option>
+              <option value="Multi-city">Multi-city</option>
+            </select>
+          </div>
+          <div class="edit-modal-input-wrap d-flex align-items-center">
+            <i class="bi bi-person text-secondary flex-shrink-0 me-2" style="font-size: 1rem;"></i>
+            <select id="modal-passengers-class"
+              class="form-select edit-modal-select border-0 bg-transparent shadow-none flex-grow-1">
+              <option value="1-economy" selected>1, Economy</option>
+              <option value="2-economy">2, Economy</option>
+              <option value="3-economy">3, Economy</option>
+              <option value="1-business">1, Business</option>
+              <option value="1-first">1, First Class</option>
+            </select>
+          </div>
+        </div>
+        <div class="edit-modal-from-to-wrapper">
+          <div class="edit-modal-field">
+            <div class="edit-modal-input-wrap">
+              <div class="edit-modal-label-row">
+                <i class="bi bi-airplane text-secondary" style="font-size: 0.875rem;"></i>
+                <span class="edit-modal-label">From*</span>
+              </div>
+              <div class="edit-modal-value-row">
+                <div class="flex-grow-1 min-w-0"><select id="modal-from-airport"
+                    placeholder="Search city or airport..."></select></div>
+              </div>
+            </div>
+          </div>
+          <div class="edit-modal-swap-row">
+            <button type="button" id="modal-swap-btn" class="edit-modal-swap-btn"
+              aria-label="Swap origin and destination"><i class="bi bi-arrow-down-up"></i></button>
+          </div>
+          <div class="edit-modal-field">
+            <div class="edit-modal-input-wrap">
+              <div class="edit-modal-label-row">
+                <i class="bi bi-airplane text-secondary" style="font-size: 0.875rem;"></i>
+                <span class="edit-modal-label">To*</span>
+              </div>
+              <div class="edit-modal-value-row">
+                <div class="flex-grow-1 min-w-0"><select id="modal-to-airport"
+                    placeholder="Search city or airport..."></select></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="edit-modal-field">
+          <div class="edit-modal-input-wrap">
+            <div class="edit-modal-label-row">
+              <i class="bi bi-calendar3 text-secondary" style="font-size: 0.875rem;"></i>
+              <span class="edit-modal-label">Dates</span>
+            </div>
+            <div class="edit-modal-value-row">
+              <input type="text" id="modal-date-range" class="edit-modal-date-input" readonly placeholder="Select dates"
+                value="{{ departure_display }}{% if return_display %} — {{ return_display }}{% endif %}">
+            </div>
+          </div>
+        </div>
+        <button type="button" id="modal-search-flights-btn" class="btn btn-search-flights">Search Flights</button>
+        <p class="edit-modal-disclaimer">Dates are for informational purpose only. Fares about to be displayed may not
+          necessarily be for the selected dates.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var form = document.getElementById('quote-form');
+    var successEl = document.getElementById('quote-form-success');
+
+    var iti = null;
+    var phoneInput = document.getElementById('id_phone');
+    if (phoneInput && typeof intlTelInput !== 'undefined') {
+      iti = intlTelInput(phoneInput, {
+        initialCountry: 'us',
+        preferredCountries: ['us', 'in', 'gb', 'ca'],
+        separateDialCode: false,
+        utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js'
+      });
+    }
+
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var email = document.getElementById('id_email');
+        var phone = document.getElementById('id_phone');
+        if (!email || !email.value.trim()) { alert('Please enter your email.'); return; }
+        if (!phone || !phone.value.trim()) { alert('Please enter your phone number.'); return; }
+        if (iti) {
+          try { phone.value = iti.getNumber(); } catch (err) { }
+        }
+        var btn = form.querySelector('button[type="submit"]');
+        if (btn) btn.disabled = true;
+        var fd = new FormData(form);
+        fetch(form.action, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data.success) {
+              var formSection = document.getElementById('form-section');
+              if (formSection) formSection.classList.add('d-none');
+              if (successEl) successEl.classList.remove('d-none');
+              // Show Call Us modal 3 seconds after "Thank you for the request!" success
+              setTimeout(function () {
+                window.dispatchEvent(new CustomEvent('openCallUsModal'));
+              }, 3000);
+            } else {
+              alert(data.error || 'Something went wrong.');
+              if (btn) btn.disabled = false;
+            }
+          })
+          .catch(function () {
+            alert('There was an error submitting your request.');
+            if (btn) btn.disabled = false;
+          });
+      });
+    }
+
+    var swapBtn = document.getElementById('swap-destinations');
+    if (swapBtn && form) {
+      swapBtn.addEventListener('click', function () {
+        var fromInput = document.getElementById('id_from');
+        var toInput = document.getElementById('id_to');
+        var rtFrom = form.querySelector('input[name="rt_from"]');
+        var rtTo = form.querySelector('input[name="rt_to"]');
+        if (fromInput && toInput) {
+          var t = fromInput.value;
+          fromInput.value = toInput.value;
+          toInput.value = t;
+          if (rtFrom && rtTo) { rtFrom.value = fromInput.value; rtTo.value = toInput.value; }
+        }
+      });
+    }
+
+    var closeBtn = document.getElementById('success-close-btn');
+    var formSection = document.getElementById('form-section');
+    if (closeBtn && successEl) {
+      closeBtn.addEventListener('click', function () {
+        successEl.classList.add('d-none');
+        if (formSection) formSection.classList.remove('d-none');
+      });
+    }
+
+    // Edit destination modal: TomSelect + prefill + update
+    var modalEl = document.getElementById('editDestinationModal');
+    var searchAirportsUrl = '{% url "search_airports" %}';
+    var modalFromSelect, modalToSelect;
+
+    if (typeof TomSelect !== 'undefined' && modalEl) {
+      var airportSelectConfig = {
+        maxOptions: 50,
+        valueField: 'value',
+        labelField: 'label',
+        searchField: ['code', 'name', 'city', 'country'],
+        placeholder: 'Search city or airport...',
+        load: function (query, callback) {
+          if (!query.length) return callback();
+          fetch(searchAirportsUrl + '?q=' + encodeURIComponent(query))
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+              if (!Array.isArray(res)) res = [];
+              var options = res.map(function (a) {
+                var label = (a.city || a.name || a.iata) + ' (' + (a.iata || '') + ')';
+                return { value: a.iata || '', code: a.iata, name: a.name, city: a.city, country: a.country, label: label };
+              });
+              callback(options);
+            })
+            .catch(function () { callback(); });
+        }
+      };
+      modalFromSelect = new TomSelect('#modal-from-airport', airportSelectConfig);
+      modalToSelect = new TomSelect('#modal-to-airport', airportSelectConfig);
+
+      function prefillModalSelect(instance, code) {
+        if (!code) return;
+        fetch(searchAirportsUrl + '?q=' + encodeURIComponent(code))
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (!Array.isArray(data)) return;
+            var airport = data.find(function (item) { return (item.iata || '').toString().toUpperCase() === code.toString().toUpperCase(); });
+            if (airport) {
+              var label = (airport.city || airport.name || airport.iata) + ' (' + (airport.iata || '') + ')';
+              instance.addOption({ value: airport.iata, code: airport.iata, name: airport.name, city: airport.city, country: airport.country, label: label });
+              instance.setValue(airport.iata);
+            }
+          })
+          .catch(function () { });
+      }
+
+      var modalDateInput = document.getElementById('modal-date-range');
+      var modalDatePicker = null;
+      function formatDateRange(dates) {
+        if (!dates || !dates.length) return '';
+        var fmt = function (d) { return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }); };
+        return dates.length === 2 ? fmt(dates[0]) + ' — ' + fmt(dates[1]) : fmt(dates[0]);
+      }
+      if (modalDateInput && typeof flatpickr !== 'undefined') {
+        modalDatePicker = flatpickr(modalDateInput, {
+          mode: 'range',
+          dateFormat: 'Y-m-d',
+          minDate: 'today',
+          onChange: function (selectedDates) { modalDateInput.value = formatDateRange(selectedDates); }
+        });
+      }
+
+      modalEl.addEventListener('shown.bs.modal', function () {
+        var fromCode = modalEl.getAttribute('data-from-code');
+        var toCode = modalEl.getAttribute('data-to-code');
+        var dep = modalEl.getAttribute('data-departure');
+        var ret = modalEl.getAttribute('data-return');
+        var tripType = modalEl.getAttribute('data-trip-type');
+        var passengers = modalEl.getAttribute('data-passengers') || '1,Economy';
+        modalFromSelect.clear();
+        modalToSelect.clear();
+        prefillModalSelect(modalFromSelect, fromCode);
+        prefillModalSelect(modalToSelect, toCode);
+        var tripSelect = document.getElementById('modal-trip-type');
+        if (tripSelect && tripType) tripSelect.value = tripType === 'Round-Trip' ? 'Round-Trip' : (tripType === 'One-Way' ? 'One-Way' : 'Round-Trip');
+        var passSelect = document.getElementById('modal-passengers-class');
+        if (passSelect && passengers) {
+          var parts = passengers.split(',');
+          var num = (parts[0] || '1').trim();
+          var cls = (parts[1] || 'Economy').trim().toLowerCase().replace(/\s+/g, '-');
+          var val = num + '-' + (cls === 'first-class' ? 'first' : cls === 'premium-economy' ? 'economy' : cls);
+          if (passSelect.querySelector('option[value="' + val + '"]')) passSelect.value = val;
+        }
+        if (modalDatePicker && dep) {
+          if (ret) { modalDatePicker.setDate([dep, ret], false); } else { modalDatePicker.setDate(dep, false); }
+          modalDateInput.value = formatDateRange(modalDatePicker.selectedDates);
+        }
+      });
+
+      document.getElementById('modal-swap-btn').addEventListener('click', function () {
+        var f = modalFromSelect.getValue();
+        var t = modalToSelect.getValue();
+        modalFromSelect.setValue(t);
+        modalToSelect.setValue(f);
+      });
+
+      function applyModalSearch() {
+        var fromVal = modalFromSelect.getValue();
+        var toVal = modalToSelect.getValue();
+        var fromOpt = modalFromSelect.options[fromVal];
+        var toOpt = modalToSelect.options[toVal];
+        if (!fromVal || !toVal) {
+          alert('Please select both From and To.');
+          return;
+        }
+        var fromCity = (fromOpt && (fromOpt.city || fromOpt.name)) || fromVal;
+        var toCity = (toOpt && (toOpt.city || toOpt.name)) || toVal;
+        var fromLabel = fromCity + ' (' + fromVal + ')';
+        var toLabel = toCity + ' (' + toVal + ')';
+
+        document.getElementById('display-from-code').textContent = fromVal;
+        document.getElementById('display-from-city').textContent = fromCity;
+        document.getElementById('display-to-code').textContent = toVal;
+        document.getElementById('display-to-city').textContent = toCity;
+
+        var idFrom = document.getElementById('id_from');
+        var idTo = document.getElementById('id_to');
+        if (idFrom) idFrom.value = fromLabel;
+        if (idTo) idTo.value = toLabel;
+        var rtFrom = form && form.querySelector('input[name="rt_from"]');
+        var rtTo = form && form.querySelector('input[name="rt_to"]');
+        if (rtFrom) rtFrom.value = fromLabel;
+        if (rtTo) rtTo.value = toLabel;
+
+        modalEl.setAttribute('data-from-code', fromVal);
+        modalEl.setAttribute('data-to-code', toVal);
+        modalEl.setAttribute('data-from-city', fromCity);
+        modalEl.setAttribute('data-to-city', toCity);
+
+        var closeBtn = modalEl.querySelector('[data-bs-dismiss="modal"]');
+        if (closeBtn) closeBtn.click();
+      }
+      document.getElementById('modal-search-flights-btn').addEventListener('click', applyModalSearch);
+    }
+  });
+</script>
+{% endblock %}

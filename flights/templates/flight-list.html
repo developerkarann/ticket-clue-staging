@@ -1,0 +1,1052 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- **************** MAIN CONTENT START **************** -->
+<main>
+
+<!-- =======================
+Search START -->
+<section class="pt-0">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<!-- Booking from START -->
+				{% include 'components/flightSearchForm.html' %}
+				<!-- Booking from END -->
+			</div>
+		</div>
+	</div>
+</section>
+<!-- =======================
+Search START -->
+	
+<!-- =======================
+Title and notice board START -->
+<section class="pt-0">
+	<div class="container position-relative">
+
+		<!-- Title and button START -->
+		<div class="row">
+			<div class="col-12">
+				<div class="d-sm-flex justify-content-sm-between align-items-center">
+					<!-- Title -->
+					<div id="flight-summary"></div>
+
+					<!-- Offcanvas Button -->
+					<button class="btn btn-primary d-none d-xl-none mb-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
+						<i class="fa-solid fa-sliders-h me-1"></i> Show filters
+					</button>
+
+					
+				</div>	
+			</div>
+		</div>
+		<!-- Title and button END -->
+
+
+	</div>
+</section>
+<!-- =======================
+Title and notice board END -->
+
+<!-- =======================
+Flight list START -->
+<section class="pt-0">
+	<div class="container">
+		<div class="row">
+
+			<!-- Loader - Display until data is loaded -->
+				<div id="loader" class="text-center my-5">
+					<img style="max-width: 400px;" src="{% static 'assets/images/loader-nr.gif' %}">
+				</div>
+
+			<!-- Left sidebar START -->
+			<aside id="filter_bar" class="col-xl-4 col-xxl-3">
+				<!-- Responsive offcanvas body START -->
+					<div id="filters" class="offcanvas-xl offcanvas-end" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
+						<!-- Offcanvas header -->
+						<div class="offcanvas-header">
+							<h5 class="offcanvas-title" id="offcanvasSidebarLabel">Advance Filters</h5>
+							<button  type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasSidebar" aria-label="Close"></button>
+						</div>
+
+						<!-- Offcanvas body -->
+						<div class="offcanvas-body flex-column p-3 p-xl-0">
+							<form class="rounded-3 shadow">
+								<!-- Stops START -->
+								<div class="card card-body rounded-0 p-4">
+									<h6 class="mb-2">Stops</h6>
+									<div class="row g-1">
+										<div class="col-6 col-md-4">
+											<input type="checkbox" class="btn-check" id="stopDirect">
+											<label class="btn btn-sm btn-light btn-primary-soft-check w-100" for="stopDirect">Direct</label>
+										</div>
+										<div class="col-6 col-md-4">
+											<input type="checkbox" class="btn-check" id="stop1Stop">
+											<label class="btn btn-sm btn-light btn-primary-soft-check w-100" for="stop1Stop">1 Stop</label>
+										</div>
+										<div class="col-12 col-md-4">
+											<input type="checkbox" class="btn-check" id="stop2Plus">
+											<label class="btn btn-sm btn-light btn-primary-soft-check w-100" for="stop2Plus">2+ Stops</label>
+										</div>
+									</div>
+								</div>
+								<!-- Stops END -->
+						
+								<!-- Preferred Airline START -->
+								<div class="card card-body rounded-0 p-4">
+									<h6 class="mb-2">Preferred Airline</h6>
+									<div class="row" id="preferredAirlineContainer">
+										<!-- Preferred Airline options will be injected here -->
+										<!-- Make sure to use col classes when injecting options -->
+									</div>
+								</div>
+								<!-- Preferred Airline END -->
+						
+								<!-- Flight Times START -->
+								<div class="card card-body rounded-0 p-4">
+									<h6 class="mb-2">Flight Times</h6>
+									<div class="row g-2">
+										<div class="col-6">
+											<input type="time" id="depTimeStart" class="form-control">
+										</div>
+										<div class="col-6">
+											<input type="time" id="depTimeEnd" class="form-control">
+										</div>
+									</div>
+								</div>
+								<!-- Flight Times END -->
+						
+								<!-- Duration START -->
+								<div class="card card-body rounded-0 p-4">
+									<div class="d-flex justify-content-between align-items-center mb-2">
+										<h6 class="mb-0">Duration</h6>
+										<button type="button" class="btn btn-link p-0 mb-0" id="resetDurationButton">Reset</button>
+									</div>
+									<p class="mb-2">Maximum travel time</p>
+									<div class="position-relative">
+										<input type="range" id="maxDuration" class="form-range">
+										<div class="d-flex justify-content-between mt-2">
+											<span id="minDurationLabel"></span>
+											<span id="durationOutput"></span>
+										</div>
+									</div>
+								</div>
+								<!-- Duration END -->
+							</form>
+							<!-- Form End -->
+						</div>
+						
+
+						<!-- Buttons -->
+						<div class="d-flex justify-content-between p-2 p-xl-0 mt-xl-4">
+							<button class="btn btn-link p-0 mb-0" id="clearFiltersButton">Clear all</button>
+							
+						</div>
+	
+					</div>
+				<!-- Responsive offcanvas body END -->
+			</aside>
+			<!-- Left sidebar END -->
+
+
+			<!-- Main content START -->
+			<div class="col-xl-8 col-xxl-9">
+				<div class="vstack gap-4" id="flight-list-container">
+
+			
+				<!-- Container for dynamically loaded flights -->
+				<div id="flights-list" class="d-none"></div>
+
+				<div id="pagination-container">
+					<!-- Pagination controls will be injected here by generatePaginationControls() -->
+				</div>
+
+				</div>
+			</div>
+			<!-- Main content END -->
+
+
+
+
+		</div> <!-- Row END -->
+	</div>
+</section>
+<!-- =======================
+Flight list END -->
+
+</main>
+<!-- **************** MAIN CONTENT END **************** -->
+
+
+<script>
+    // Helper functions
+    function formatTime(dateTimeStr) {
+        let date = new Date(dateTimeStr);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatDuration(duration) {
+        let hours = Math.floor(duration / 60);
+        let minutes = duration % 60;
+        return `${hours}hr ${minutes}min`;
+    }
+
+    function getTotalDuration(segments) {
+        let totalDuration = 0;
+        segments.forEach(segment => {
+            totalDuration += segment.Duration;
+        });
+        return totalDuration;
+    }
+
+    function calculateLayover(segment1, segment2) {
+        let arrivalTime = new Date(segment1.Destination.ArrTime);
+        let departureTime = new Date(segment2.Origin.DepTime);
+        let diffMs = departureTime - arrivalTime;
+        let diffMins = Math.floor(diffMs / 60000);
+        return diffMins;
+    }
+
+    function mapCabinClass(cabinClassCode) {
+        switch(cabinClassCode) {
+            case 1:
+                return 'First Class';
+            case 2:
+                return 'Economy';
+            case 3:
+                return 'Business';
+            case 4:
+                return 'Premium Economy';
+            default:
+                return 'Unknown';
+        }
+    }
+
+    function generateTaxBreakupHtml(taxBreakup, currency) {
+        let taxHtml = '';
+        taxBreakup.forEach(tax => {
+            taxHtml += `<tr><td>${tax.key}</td><td>${currency} ${tax.value}</td></tr>`;
+        });
+        return taxHtml;
+    }
+
+    function generateFareBreakdownHtml(fareBreakdown, currency) {
+        let fareHtml = '';
+		console.log(fareBreakdown);
+        fareBreakdown.forEach(fb => {
+			
+            fareHtml += `
+                <tr>
+                    <td>${fb.PassengerType === 2 ? 'Child' :fb.PassengerType === 3? 'Infant':'Adult'}</td>
+                    <td>${fb.PassengerCount}</td>
+                    <td>${currency} ${fb.BaseFare}</td>
+                    <td>${currency} ${fb.Tax}</td>
+                    <td>${currency} ${fb.BaseFare + fb.Tax}</td>
+                </tr>
+            `;
+        });
+        return fareHtml;
+    }
+
+    function generateFlightSegmentsHtml(segments) {
+        let segmentsHtml = '';
+        for (let i = 0; i < segments.length; i++) {
+            let segment = segments[i];
+            segmentsHtml += `
+                <div class="row g-4">
+                    <!-- Airport detail -->
+                    <div class="col-sm-4">
+                        <h4>${segment.Origin.Airport.AirportCode}</h4>
+                        <h6 class="mb-0">${formatTime(segment.Origin.DepTime)}</h6>
+                        <p class="mb-0">${segment.Origin.Airport.AirportName}, ${segment.Origin.Airport.CityName}</p>
+                    </div>
+
+                    <!-- Time -->
+                    <div class="col-sm-4 my-sm-auto text-center">
+                        <!-- Time -->
+                        <h5>${formatDuration(segment.Duration)}</h5>
+
+                        <div class="position-relative my-4">
+                            <!-- Line -->
+                            <hr class="bg-primary opacity-5 position-relative">
+                            <!-- Icon -->
+                            <div class="icon-md bg-primary text-white rounded-circle position-absolute top-50 start-50 translate-middle">
+                                <i class="fa-solid fa-fw fa-plane rtl-flip"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Airport detail -->
+                    <div class="col-sm-4">
+                        <h4>${segment.Destination.Airport.AirportCode}</h4>
+                        <h6 class="mb-0">${formatTime(segment.Destination.ArrTime)}</h6>
+                        <p class="mb-0">${segment.Destination.Airport.AirportName}, ${segment.Destination.Airport.CityName}</p>
+                    </div>
+                </div>
+
+                <!-- Additional Segment Details -->
+                <div class="row">
+                    <div class="col-sm-12">
+                        <p><strong>Baggage:</strong> ${segment.Baggage}, <strong>Cabin Baggage:</strong> ${segment.CabinBaggage}</p>
+                        <p><strong>Flight Number:</strong> ${segment.Airline.AirlineCode} ${segment.Airline.FlightNumber}, <strong>Fare Class:</strong> ${segment.Airline.FareClass}, <strong>Operating Carrier:</strong> ${segment.Airline.OperatingCarrier}</p>
+                        <p><strong>Cabin Class:</strong> ${mapCabinClass(segment.CabinClass)}</p>
+                        <p><strong>Aircraft:</strong> ${segment.Craft}, <strong>Flight Status:</strong> ${segment.FlightStatus}</p>
+                    </div>
+                </div>
+            `;
+
+            if (i < segments.length - 1) {
+                let layoverDuration = calculateLayover(segment, segments[i + 1]);
+                segmentsHtml += `
+                    <div class="bg-light text-center fw-normal rounded-2 mt-3 mb-4 p-2">
+                        Change of planes: ${formatDuration(layoverDuration)} Layover in ${segment.Destination.Airport.CityName}
+                    </div>
+                `;
+            }
+        }
+        return segmentsHtml;
+    }
+
+    function generateFareRulesHtml(fareRules) {
+        let rulesHtml = '';
+        fareRules.forEach(rule => {
+            rulesHtml += `
+                <div class="card border mb-3">
+                    <!-- Card header -->
+                    <div class="card-header d-flex align-items-center border-bottom">
+                        <h5 class="card-title mb-0">${rule.Origin} - ${rule.Destination}</h5>
+                    </div>
+
+                    <!-- Card body -->
+                    <div class="card-body">
+                        <p><strong>Airline:</strong> ${rule.Airline}</p>
+                        <p><strong>Fare Basis Code:</strong> ${rule.FareBasisCode}</p>
+                        <p><strong>Fare Restriction:</strong> ${rule.FareRestriction}</p>
+                        <p><strong>Fare Rule Detail:</strong> ${rule.FareRuleDetail || 'Not Provided'}</p>
+                    </div>
+                </div>
+            `;
+        });
+        return rulesHtml;
+    }
+
+    function generatePaginationControls() {
+        let paginationHtml = '';
+        let paginationContainer = document.getElementById('pagination-container');
+
+        // Previous Page Button
+        if (currentPage > 1) {
+            paginationHtml += `<li class="page-item mb-0"><a class="page-link" href="#" onclick="goToPage(${currentPage - 1})"><i class="fa-solid fa-angle-left"></i></a></li>`;
+        } else {
+            paginationHtml += `<li class="page-item mb-0 disabled"><span class="page-link"><i class="fa-solid fa-angle-left"></i></span></li>`;
+        }
+
+        // Page Numbers (Adjust to show limited page numbers if totalPages is large)
+        let maxPageLinks = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxPageLinks / 2));
+        let endPage = Math.min(totalPages, startPage + maxPageLinks - 1);
+
+        if (startPage > 1) {
+            paginationHtml += `<li class="page-item mb-0"><a class="page-link" href="#" onclick="goToPage(1)">1</a></li>`;
+            if (startPage > 2) {
+                paginationHtml += `<li class="page-item mb-0 disabled"><span class="page-link">..</span></li>`;
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            if (i === currentPage) {
+                paginationHtml += `<li class="page-item mb-0 active"><span class="page-link">${i}</span></li>`;
+            } else {
+                paginationHtml += `<li class="page-item mb-0"><a class="page-link" href="#" onclick="goToPage(${i})">${i}</a></li>`;
+            }
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                paginationHtml += `<li class="page-item mb-0 disabled"><span class="page-link">..</span></li>`;
+            }
+            paginationHtml += `<li class="page-item mb-0"><a class="page-link" href="#" onclick="goToPage(${totalPages})">${totalPages}</a></li>`;
+        }
+
+        // Next Page Button
+        if (currentPage < totalPages) {
+            paginationHtml += `<li class="page-item mb-0"><a class="page-link" href="#" onclick="goToPage(${currentPage + 1})"><i class="fa-solid fa-angle-right"></i></a></li>`;
+        } else {
+            paginationHtml += `<li class="page-item mb-0 disabled"><span class="page-link"><i class="fa-solid fa-angle-right"></i></span></li>`;
+        }
+
+        // Update the pagination container
+        paginationContainer.innerHTML = `
+            <nav class="d-flex justify-content-center" aria-label="navigation">
+                <ul class="pagination pagination-primary-soft d-inline-block d-md-flex rounded mb-0">
+                    ${paginationHtml}
+                </ul>
+            </nav>
+        `;
+    }
+
+    function goToPage(pageNumber) {
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            currentPage = pageNumber;
+            displayFlights();
+        }
+    }
+
+    let pageSize = 10; // Number of flights per page
+    let currentPage = 1; // Current page number
+    let totalFlights = 0;
+    let totalPages = 0;
+    let allFlights = []; // Declare at global scope
+	
+	let filteredFlights = []; // To store flights after applying filters
+	let minFlightDuration = 0;
+	let maxFlightDuration = 1440;
+
+	let TraceId ="";
+
+
+	// Implement the applyFilters Function
+function applyFilters() {
+    // Get filter values
+
+    // Stops
+    let selectedStops = [];
+    if (document.getElementById('stopDirect')?.checked) selectedStops.push(0);
+    if (document.getElementById('stop1Stop')?.checked) selectedStops.push(1);
+    if (document.getElementById('stop2Plus')?.checked) selectedStops.push(2);
+
+    // Preferred Airlines
+    let preferredAirlines = Array.from(document.querySelectorAll('input[name="airline"]:checked')).map(el => el.value);
+
+    // Flight Times
+    let depTimeStart = document.getElementById('depTimeStart')?.value || '00:00';
+    let depTimeEnd = document.getElementById('depTimeEnd')?.value || '23:59';
+
+    // Flight Duration (as a slider/bar)
+    let maxDuration = parseInt(document.getElementById('maxDuration')?.value) || maxFlightDuration;
+
+
+    // Filter flights
+    filteredFlights = allFlights.filter(function(flight) {
+        // Check Stops
+        let numStops = flight.Segments[0].length - 1;
+        if (selectedStops.length > 0) {
+            if (!selectedStops.includes(numStops) && !(selectedStops.includes(2) && numStops > 1)) {
+                return false;
+            }
+        }
+
+        // Preferred Airlines
+        if (preferredAirlines.length > 0) {
+            let airlineCode = flight.Segments[0][0].Airline.AirlineCode;
+            if (!preferredAirlines.includes(airlineCode)) return false;
+        }
+
+        // Check Departure Time
+        let depTime = new Date(flight.Segments[0][0].Origin.DepTime).toTimeString().slice(0,5);
+        if (depTime < depTimeStart || depTime > depTimeEnd) return false;
+
+        // Flight Duration Filtering
+		let totalDuration = getTotalDuration(flight.Segments[0]);
+		if (totalDuration > maxDuration) return false;
+
+        return true;
+    });
+
+    // Update totalFlights and totalPages
+    totalFlights = filteredFlights.length;
+    totalPages = Math.max(1, Math.ceil(totalFlights / pageSize));
+    currentPage = 1;
+
+	generateFlightSummary();
+
+    // Display filtered flights
+    displayFlights();
+}
+
+// Attach Event Listeners to Filter Controls
+function initializeFilters() {
+    // Initialize filteredFlights to allFlights after data is loaded
+    filteredFlights = allFlights;
+
+	// For duration slider
+    const maxDurationInput = document.getElementById('maxDuration');
+    const durationOutput = document.getElementById('durationOutput');
+    const minDurationLabel = document.getElementById('minDurationLabel')
+
+	// Set min and max attributes of the slider
+    maxDurationInput.min = minFlightDuration;
+    maxDurationInput.max = maxFlightDuration;
+    maxDurationInput.value = maxFlightDuration; // Set default value to max duration
+
+    // Update min duration label
+    const minHours = Math.floor(minFlightDuration / 60);
+    const minMinutes = minFlightDuration % 60;
+    minDurationLabel.textContent = `${minHours}h${minMinutes > 0 ? ' ' + minMinutes + 'm' : ''}`;
+
+    // Update the displayed duration (max)
+    const defaultHours = Math.floor(maxFlightDuration / 60);
+    const defaultMinutes = maxFlightDuration % 60;
+    durationOutput.textContent = `${defaultHours}h${defaultMinutes > 0 ? ' ' + defaultMinutes + 'm' : ''}`;
+
+    // Event listener for the duration slider
+    maxDurationInput?.addEventListener('input', function() {
+        const currentValue = parseInt(this.value);
+        const hours = Math.floor(currentValue / 60);
+        const minutes = currentValue % 60;
+        durationOutput.textContent = `${hours}h${minutes > 0 ? ' ' + minutes + 'm' : ''}`;
+        applyFilters();
+    });
+
+    // Reset Duration Button
+    document.getElementById('resetDurationButton')?.addEventListener('click', function() {
+        maxDurationInput.value = maxFlightDuration; // Reset to max flight duration
+        const hours = Math.floor(maxFlightDuration / 60);
+        const minutes = maxFlightDuration % 60;
+        durationOutput.textContent = `${hours}h${minutes > 0 ? ' ' + minutes + 'm' : ''}`;
+        applyFilters();
+    });
+
+    // Attach event listeners to filter controls
+    document.querySelectorAll('.form-check-input, .btn-check').forEach(function(el) {
+        el.addEventListener('change', applyFilters);
+    });
+
+    // For time range inputs
+    document.getElementById('depTimeStart')?.addEventListener('change', applyFilters);
+    document.getElementById('depTimeEnd')?.addEventListener('change', applyFilters);
+
+    // For duration slider
+    document.getElementById('maxDuration')?.addEventListener('input', function() {
+        document.getElementById('durationOutput').textContent = this.value;
+        applyFilters();
+    });
+}
+
+// Dynamically Generate Preferred Airline Options
+function generatePreferredAirlines() {
+    let airlineMap = new Map();
+    allFlights.forEach(function(flight) {
+		console.log(" --- airline ", flight);
+        let airlineCode = flight.Segments[0][0].Airline.AirlineCode;
+        let airlineName = flight.Segments[0][0].Airline.AirlineName;
+        if (!airlineMap.has(airlineCode)) {
+            airlineMap.set(airlineCode, airlineName);
+        }
+    });
+
+    let airlineContainer = document.getElementById('preferredAirlineContainer');
+    airlineContainer.innerHTML = ''; // Clear existing options
+
+    airlineMap.forEach(function(name, code) {
+        let html = `
+        <div class="form-check" style="margin-left:3px">
+            <img style="width:20px;margin-left:3px;margin-right:3px" src="{% static 'assets/airline/' %}${code}.png">
+            <input class="form-check-input" type="checkbox" name="airline" value="${code}" id="airline_${code}">
+            <label class="form-check-label" for="airline_${code}">
+              ${code}  ${name}
+            </label>
+        </div>
+        `;
+        airlineContainer.insertAdjacentHTML('beforeend', html);
+    });
+}
+
+    function displayFlights() {
+		// hide filters
+
+        let flightHtml = ''; // Reset the HTML content
+
+        // Calculate start and end indices for slicing
+        let startIndex = (currentPage - 1) * pageSize;
+        let endIndex = startIndex + pageSize;
+        // let flightsToDisplay = allFlights.slice(startIndex, endIndex);
+		let flightsToDisplay = filteredFlights.slice(startIndex, endIndex);
+
+		if (flightsToDisplay.length === 0) {
+            $('#flights-list').html(`
+            <div class="text-center">
+                <img style="height:300px;margin:auto;margin-top:24px" src="{% static 'assets/images/noflight.jpeg' %}">
+                <p class="text-center mt-3">No flights available for the selected filters. Please try changing the filter.</p>
+            </div>
+            `);
+			$('#pagination-container').html(''); // Clear pagination
+			return;
+		}
+
+		flightsToDisplay.forEach(function(flight){
+			console.log(flight)
+        flightHtml += `
+            <div class="card border mb-4">
+                <!-- Card header -->
+                <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center">
+                    <!-- Airline Name -->
+                    <div class="d-flex align-items-center mb-2 mb-sm-0">
+                        <img src="{% static 'assets/airline/' %}${flight?.Segments[0][0].Airline.AirlineCode}.png" class="w-30px me-2" alt="">
+                        <h6 class="fw-normal mb-0">${flight?.Segments[0][0].Airline.AirlineName}</h6>
+                    </div>
+                    <h6 class="fw-normal mb-0"><span class="text-body">Travel Class:</span> ${mapCabinClass(flight?.Segments[0][0].CabinClass)}</h6>
+                </div>
+
+                <!-- Card body -->
+                <div class="card-body p-3 pb-0">
+                    <!-- Ticket item START -->
+                    
+
+<div class="row g-3 align-items-center text-center text-md-start">
+    <!-- Outbound Flight Details -->
+    <div class="col-md-9">
+        <div class="row g-3 align-items-center">
+            <!-- Departure Airport detail -->
+            <div class="col-4 col-md-3">
+                <h5 class="fs-6 fs-md-4">${formatTime(flight?.Segments[0][0].Origin.DepTime)}</h5>
+                <p class="mb-0 fs-6">${flight?.Segments[0][0].Origin.Airport.AirportCode} · ${formatDate(flight?.Segments[0][0].Origin.DepTime)}</p>
+            </div>
+
+            <!-- Time and duration -->
+            <div class="col-4 col-md-3 my-sm-auto text-center">
+                <h5 class="fs-6 fs-md-5">${formatDuration(getTotalDuration(flight?.Segments[0]))}</h5>
+                <div class="position-relative my-4">
+                    <hr class="bg-primary opacity-5 position-relative">
+                    <div class="icon-md bg-primary text-white rounded-circle position-absolute top-50 start-50 translate-middle">
+                        <i class="fa-solid fa-fw fa-plane rtl-flip"></i>
+                    </div>
+                </div>
+                <p class="mb-0 fs-6"> ${(flight?.Segments[0].length == 1)?'direct flight':(flight?.Segments[0].length - 1) + ' Stop(s)'}</p>
+            </div>
+
+            <!-- Arrival Airport detail -->
+            <div class="col-4 col-md-3">
+                <h5 class="fs-6 fs-md-4">${formatTime(flight?.Segments[0][flight?.Segments[0].length - 1].Destination.ArrTime)}</h5>
+                <p class="mb-0 fs-6">${flight?.Segments[0][flight?.Segments[0].length - 1].Destination.Airport.AirportCode} · ${formatDate(flight?.Segments[0][flight?.Segments[0].length - 1].Destination.ArrTime)}</p>
+            </div>
+        </div>
+
+        <!-- Return Flight Details (if available) -->
+        ${flight?.Segments[1] ? `
+		<!-- Divider for round-trip flights -->
+        <hr class="my-4" />
+        <div class="d-flex align-items-center mb-2 mb-sm-0">
+            <img src="{% static 'assets/airline/' %}${flight?.Segments[1][0].Airline.AirlineCode}.png" class="w-30px me-2" alt="">
+            <h6 class="fw-normal mb-0">${flight?.Segments[1][0].Airline.AirlineName}</h6>
+        </div>
+        <div class="row g-3 align-items-center">
+            <!-- Departure Airport detail for return -->
+            <div class="col-4 col-md-3">
+                <h5 class="fs-6 fs-md-4">${formatTime(flight?.Segments[1][0].Origin.DepTime)}</h5>
+                <p class="mb-0 fs-6">${flight?.Segments[1][0].Origin.Airport.AirportCode} · ${formatDate(flight?.Segments[1][0].Origin.DepTime)}</p>
+            </div>
+
+            <!-- Time and duration for return -->
+            <div class="col-4 col-md-3 my-sm-auto text-center">
+                <h5 class="fs-6 fs-md-5">${formatDuration(getTotalDuration(flight?.Segments[1]))}</h5>
+                <div class="position-relative my-4">
+                    <hr class="bg-primary opacity-5 position-relative">
+                    <div class="icon-md bg-primary text-white rounded-circle position-absolute top-50 start-50 translate-middle">
+                        <i class="fa-solid fa-fw fa-plane rtl-flip"></i>
+                    </div>
+                </div>
+                <p class="mb-0 fs-6">${(flight?.Segments[1].length == 1)?'direct flight':(flight?.Segments[1].length - 1) + ' Stop(s)'}</p>
+            </div>
+
+            <!-- Arrival Airport detail for return -->
+            <div class="col-4 col-md-3">
+                <h5 class="fs-6 fs-md-4">${formatTime(flight?.Segments[1][flight?.Segments[1].length - 1].Destination.ArrTime)}</h5>
+                <p class="mb-0 fs-6">${flight?.Segments[1][flight?.Segments[1].length - 1].Destination.Airport.AirportCode} · ${formatDate(flight?.Segments[1][flight?.Segments[1].length - 1].Destination.ArrTime)}</p>
+            </div>
+        </div>
+        ` : ''}
+    </div>
+
+    <!-- Price and Booking -->
+    <div class="col-md-3 text-md-end">
+		<h3 class="fs-4 fs-md-1">${flight?.Fare.Currency} ${flight?.Fare.PublishedFare}</h3>
+		<a href="{% url 'flight_detail_to_book' %}?TraceId=${TraceId}&ResultIndex=${flight.ResultIndex}" class="btn btn-dark w-100 w-md-auto mb-2 mb-md-0">Book Now</a>
+			</div>
+		</div>
+
+
+                    <!-- Ticket item END -->
+                </div>
+
+                <!-- Card footer -->
+                <div class="card-footer pt-3">
+                    <ul class="list-inline bg-light rounded-2 d-flex flex-column flex-md-row text-center justify-content-between align-items-center mb-0 px-3 py-2">
+                        <li class="list-inline-item text-danger mb-2 mb-md-0 d-none d-md-inline">${flight?.Segments[0][0]?.NoOfSeatAvailable ? "Only " + flight?.Segments[0][0]?.NoOfSeatAvailable + " Seats Left" : ""}</li>
+                        <li class="list-inline-item text-danger mb-2 mb-md-0 d-none d-md-inline">${flight?.IsRefundable ? 'Refundable' : 'Non-Refundable'}</li>
+                        <li class="list-inline-item">
+                            <!-- Collapse button -->
+                            <a class="btn-more d-flex align-items-center collapsed p-0 mb-0" data-bs-toggle="collapse" href="#flightDetail${flight?.ResultIndex}" role="button" aria-expanded="false" aria-controls="flightDetail${flight?.ResultIndex}">
+                                Flight detail<i class="fa-solid fa-angle-down ms-2"></i>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Collapse body START -->
+                    <div class="collapse" id="flightDetail${flight?.ResultIndex}">
+                        <!-- Tabs START -->
+                        <ul class="nav nav-pills nav-justified nav-responsive bg-primary bg-opacity-10 rounded mt-4 mb-3 p-2" id="flightlist-tab${flight?.ResultIndex}" role="tablist">
+                            <!-- Tab items -->
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active mb-0" id="flightlist-tab-1${flight?.ResultIndex}" data-bs-toggle="pill" data-bs-target="#flightlist-tab1${flight?.ResultIndex}" type="button" role="tab" aria-controls="flightlist-tab1${flight?.ResultIndex}" aria-selected="true">Flight Information</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link mb-0" id="flightlist-tab-2${flight?.ResultIndex}" data-bs-toggle="pill" data-bs-target="#flightlist-tab2${flight?.ResultIndex}" type="button" role="tab" aria-controls="flightlist-tab2${flight?.ResultIndex}" aria-selected="false">Fare Detail</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                    <button class="nav-link mb-0" id="flightlist-tab-3${flight?.ResultIndex}" data-bs-toggle="pill" data-bs-target="#flightlist-tab3${flight?.ResultIndex}" type="button" role="tab" aria-controls="flightlist-tab3${flight?.ResultIndex}" aria-selected="false">Baggage Rules</button>
+                                </li>
+                                
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link mb-0" id="flightlist-tab-5${flight?.ResultIndex}" data-bs-toggle="pill" data-bs-target="#flightlist-tab5${flight?.ResultIndex}" type="button" role="tab" aria-controls="flightlist-tab5${flight?.ResultIndex}" aria-selected="false">Fare Rules</button>
+                                </li>
+                        </ul>
+                        <!-- Tabs END -->
+
+                        <!-- Tab content START -->
+                        <div class="tab-content mb-0" id="flightlist-tabContent${flight?.ResultIndex}">
+
+                            <!-- Flight Information Tab -->
+                            <div class="tab-pane fade show active" id="flightlist-tab1${flight?.ResultIndex}" role="tabpanel" aria-labelledby="flightlist-tab-1${flight?.ResultIndex}">
+                                <!-- Flight segments details -->
+                                ${generateFlightSegmentsHtml(flight?.Segments[0])}
+                            </div>
+                            <!-- Flight Information Tab END -->
+
+                            <!-- Fare Detail Tab -->
+                            <div class="tab-pane fade" id="flightlist-tab2${flight?.ResultIndex}" role="tabpanel" aria-labelledby="flightlist-tab-2${flight?.ResultIndex}">
+                                <div class="card card-body">
+                                    <!-- Fare Summary -->
+                                    <h5>Fare Summary</h5>
+                                    <div class="table-responsive">
+                                        <table class="table caption-bottom mb-0">
+                                            <!-- Table head -->
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th scope="col" class="border-0 rounded-start">Base Fare</th>
+                                                    <th scope="col" class="border-0">Taxes and Fees</th>
+                                                    <th scope="col" class="border-0 rounded-end">Total Fare</th>
+                                                </tr>
+                                            </thead>
+                                            <!-- Table body -->
+                                            <tbody>
+                                                <tr>
+                                                    <td>${flight?.Fare.Currency} ${flight?.Fare.BaseFare}</td>
+                                                    <td>${flight?.Fare.Currency} ${flight?.Fare.Tax +flight?.Fare.OtherCharges}</td>
+                                                    <td><h5 class="mb-0">${flight?.Fare.Currency} ${flight?.Fare.PublishedFare}</h5></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Fare Breakdown -->
+                                    <h5 class="mt-4">Fare Breakdown</h5>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Passenger Type</th>
+                                                    <th>Count</th>
+                                                    <th>Base Fare</th>
+                                                    <th>Tax</th>
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${generateFareBreakdownHtml(flight?.FareBreakdown, flight?.Fare.Currency)}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                   
+									
+                                </div>
+                            </div>
+                            <!-- Fare Detail Tab END -->
+
+                           <!-- Baggage Rules Tab -->
+                                <div class="tab-pane fade" id="flightlist-tab3${flight?.ResultIndex}" role="tabpanel" aria-labelledby="flightlist-tab-3${flight?.ResultIndex}">
+                                    <div class="card border">
+                                        <!-- Card header -->
+                                        <div class="card-header d-flex align-items-center border-bottom">
+                                            <h5 class="card-title mb-0">Baggage Information</h5>
+                                        </div>
+
+                                        <!-- Card body -->
+                                        <div class="card-body">
+                                            ${flight?.Segments[0].map(segment => `
+                                                <h6>${segment.Origin.Airport.AirportCode} to ${segment.Destination.Airport.AirportCode}</h6>
+                                                <p><strong>Baggage:</strong> ${segment.Baggage}, <strong>Cabin Baggage:</strong> ${segment.CabinBaggage}</p>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Baggage Rules Tab END -->
+
+
+                                <!-- Fare Rules Tab -->
+                                <div class="tab-pane fade" id="flightlist-tab5${flight?.ResultIndex}" role="tabpanel" aria-labelledby="flightlist-tab-5${flight?.ResultIndex}">
+                                    ${generateFareRulesHtml(flight?.FareRules)}
+                                </div>
+                                <!-- Fare Rules Tab END -->
+
+                        </div>
+                        <!-- Tab content END -->
+                    </div>
+                    <!-- Collapse body END -->
+                </div>
+                <!-- Card footer END -->
+            </div>
+        `;
+    });
+
+		 
+        $('#flights-list').html(flightHtml);
+
+        // Generate pagination controls
+        generatePaginationControls();
+    }
+
+
+	function formatDate(dateStr) {
+		let date = new Date(dateStr);
+		let options = { day: 'numeric', month: 'short' }; // e.g., '25 Jan'
+		return date.toLocaleDateString('en-US', options);
+	}
+
+	// Function to generate flight summary
+	function generateFlightSummary() {
+		let numFlightsAvailable = totalFlights;
+
+		// Generate the HTML
+		let flightInfoHtml = `
+			<div class="mb-3 mb-sm-0">
+				<h1 class="fs-3">Showing ${numFlightsAvailable.toString().padStart(2, '0')} Flight${numFlightsAvailable !== 1 ? 's' : ''} </h1>
+			</div>
+		`;
+
+		// Insert the HTML into your page
+		document.getElementById('flight-summary').innerHTML = flightInfoHtml;
+	}
+
+
+// Clear Filters Functionality
+function clearFilters() {
+    // Reset all checkboxes
+    document.querySelectorAll('.form-check-input, .btn-check').forEach(function(el) {
+        el.checked = false;
+    });
+
+    // Reset time inputs
+    document.getElementById('depTimeStart').value = '';
+    document.getElementById('depTimeEnd').value = '';
+
+    // Reset duration input
+    const maxDurationInput = document.getElementById('maxDuration');
+    const durationOutput = document.getElementById('durationOutput');
+    maxDurationInput.value = maxFlightDuration; // Reset to max duration
+    const hours = Math.floor(maxFlightDuration / 60);
+    const minutes = maxFlightDuration % 60;
+    durationOutput.textContent = `${hours}h${minutes > 0 ? ' ' + minutes + 'm' : ''}`;
+
+    // Reset filteredFlights and display all flights
+    filteredFlights = allFlights;
+    totalFlights = filteredFlights.length;
+    totalPages = Math.max(1, Math.ceil(totalFlights / pageSize));
+    currentPage = 1;
+    displayFlights();
+}
+
+// Attach event listener to "Clear all" button
+document.getElementById('clearFiltersButton')?.addEventListener('click', clearFilters);
+
+
+
+    $(document).ready(function() {
+        // Extract query parameters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const from = urlParams.get('from');
+        const to = urlParams.get('to');
+        const departure = urlParams.get('departure');
+        const travelClass = urlParams.get('class');
+        const adults = urlParams.get('adults');
+        const children = urlParams.get('children');
+        const infants = urlParams.get('infants');
+        const returnDate = urlParams.get('return');
+
+        window.scrollTo(0, 250);
+
+        // Only make the request if required parameters are present
+        if (from && to && departure) {
+			$('#filters').hide();
+            const savedCurrency = localStorage.getItem('currency');
+            $.ajax({
+                url: window.location.pathname,
+                type: "POST",
+                data: {
+                    from: from,
+                    to: to,
+                    departure: departure,
+                    class: travelClass,
+                    adults: adults,
+                    children: children,
+                    infants: infants,
+                    return: returnDate,
+                    currency: savedCurrency || 'INR'
+                },
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                success: function(data) {
+                    $('#loader').hide(); // Hide loader
+					$('#filters').show();
+                    $('#flights-list').removeClass('d-none'); // Show flights list
+
+                    const flights = data?.result?.Results;
+
+					TraceId = data?.result?.TraceId;
+
+                    if (data && flights?.length > 0) {
+                        allFlights = [].concat(...flights);
+
+						let durations = allFlights.map(flight => getTotalDuration(flight.Segments[0]));
+						minFlightDuration = Math.min(...durations);
+						maxFlightDuration = Math.max(...durations);
+
+						generatePreferredAirlines();
+						initializeFilters();
+
+						// Ensure 'filteredFlights' is initialized
+						filteredFlights = allFlights;
+
+						// Display flights
+						displayFlights();
+
+                        // Update totalFlights and totalPages
+                        totalFlights = allFlights.length;
+                        totalPages = Math.ceil(totalFlights / pageSize);
+
+						generateFlightSummary();
+
+                        displayFlights();
+                    } else {
+                        // $('#filter_bar').hide();
+                        $('#flights-list').html(`
+                        <div class="text-center py-3 px-2">
+                            <div class="container">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-12">
+                                        <div class="animate__animated animate__fadeIn">
+                                            <h4 class="h3 text-gradient mb-3" style="background: linear-gradient(45deg, #2937f0, #9f1ae2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Let's Find Your Perfect Flight</h4>
+                                            <p class="text-dark mb-3">Our travel experts are ready 24/7 to help you discover amazing deals and book your dream journey.</p>
+                                            
+                                            <div class="card shadow-sm border-0 rounded-3 hover-lift mb-3" style="background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
+                                                <div class="card-body p-3 py-4">
+                                                    <div class="d-flex flex-column align-items-center">
+                                                        <div class="icon-circle mb-2" style="background: linear-gradient(45deg, #2937f0, #9f1ae2); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                            <i class="fas fa-headset fa-lg text-white"></i>
+                                                        </div>
+                                                        <h2 class="h5 fw-bold mb-2">Speak With Our Travel Experts</h2>
+                                                        <a href="tel:+18888435849" class="btn btn-sm position-relative overflow-hidden mb-2" style="background: linear-gradient(45deg, #2937f0, #9f1ae2); color: white;">
+                                                            <div class="d-flex align-items-center justify-content-center">
+                                                                <i class="fas fa-phone me-1"></i>
+                                                                <span class="fw-bold">+1 (888) 843-5849</span>
+                                                            </div>
+                                                            <div class="ripple-effect"></div>
+                                                        </a>
+                                                        <p class="small text-muted mb-0">Toll-Free 24/7 Support</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="text-center animate__animated animate__fadeInUp animate__delay-1s">
+                                                <div class="d-flex flex-column flex-sm-row align-items-center justify-content-center gap-2 mb-2">
+                                                    <div class="feature-item text-primary small">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        Best Price Guarantee
+                                                    </div>
+                                                    <div class="feature-item text-primary small">
+                                                        <i class="fas fa-shield-alt me-1"></i>
+                                                        Secure Booking
+                                                    </div>
+                                                    <div class="feature-item text-primary small">
+                                                        <i class="fas fa-clock me-1"></i>
+                                                        24/7 Support
+                                                    </div>
+                                                </div>
+                                                <p class="small text-dark mb-0">Let us help you find the best deals and book your perfect flight today!</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <style>
+                            .hover-lift {
+                                transition: transform 0.3s ease;
+                            }
+                            .hover-lift:hover {
+                                transform: translateY(-3px);
+                            }
+                            .ripple-effect {
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                background: rgba(255,255,255,0.3);
+                                transform: scale(0);
+                                transition: transform 0.5s;
+                                border-radius: inherit;
+                            }
+                            .btn:hover .ripple-effect {
+                                transform: scale(2);
+                            }
+                            .feature-item {
+                                padding: 4px 8px;
+                                border-radius: 15px;
+                                background: rgba(41,55,240,0.1);
+                                font-weight: 500;
+                            }
+                            @media (max-width: 768px) {
+                                .h3 {
+                                    font-size: 1.5rem;
+                                }
+                                .feature-item {
+                                    font-size: 0.8rem;
+                                }
+                            }
+                        </style>
+                        `);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log(error)
+                    console.log(status)
+                    $('#loader').hide(); // Hide loader
+                    $('#flights-list').removeClass('d-none'); // Show flights list
+                    $('#flights-list').html(`
+                        <div class="text-center">
+                            <img style="height:300px;margin:auto;margin-top:24px" src="{% static 'assets/images/noflight.jpeg' %}">
+                            <p class="text-center mt-3">There was an error fetching the flights. Please try again later.</p>
+                        </div>
+                        `);
+                }
+            });
+        } else {
+            $('#loader').hide();
+            $('#flights-list').removeClass('d-none');
+            $('#flights-list').html(`
+                <div class="text-center">
+                    <img style="height:300px;margin:auto;margin-top:24px" src="{% static 'assets/images/noflight.jpeg' %}">
+                    <p class="text-center mt-3">Missing required search parameters. Please try changing the search.</p>
+                </div>
+                `);
+        }
+    });
+</script>
+
+
+{% endblock %}

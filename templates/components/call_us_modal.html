@@ -1,0 +1,66 @@
+{% load static %}
+<!-- Call Us Modal: desktop = centered box, mobile = 75% height bottom sheet -->
+<div id="callUsModal" class="call-us-modal-overlay" aria-hidden="true" role="dialog" aria-labelledby="callUsModalTitle">
+  <div class="call-us-modal-box">
+    <button type="button" class="call-us-modal-close" aria-label="Close" data-dismiss-call-modal>
+      <i class="bi bi-x-lg"></i>
+    </button>
+
+    <div class="call-us-modal-header-img rounded-top overflow-hidden">
+      <!-- Replace src with your support team image if needed -->
+      <img src="{% static 'assets/images/element/contact.svg' %}" alt="Customer support" class="w-100 h-100 object-fit-cover" style="max-height: 140px; object-position: center;">
+    </div>
+
+    <div class="call-us-modal-body p-4 text-center">
+      <h2 id="callUsModalTitle" class="call-us-modal-heading mb-2">
+        Want airfares up to <strong class="text-primary">$300</strong> lower than online and SAVE <strong class="text-primary">$30 EXTRA</strong>?
+      </h2>
+      <p class="mb-1 text-dark small">
+        Call Us Toll-FREE: Code <strong>ASAP30</strong>
+      </p>
+      <p class="small text-muted mb-3" style="font-size: 0.8rem;">
+        We have many unpublished deals for offline sales only, due to airline restrictions.
+      </p>
+
+      <h3 class="call-us-modal-subheading mb-3">PHONE SPECIAL SUPER DEALS</h3>
+
+      <a href="tel:+18888435849" class="call-us-modal-phone d-inline-flex align-items-center justify-content-center gap-2 text-decoration-none mb-1">
+        <i class="bi bi-telephone-fill"></i>
+        <span>+1 (888) 843-5849</span>
+      </a>
+      <p class="small text-muted mb-3">Call Toll-Free</p>
+
+      <p class="fw-bold text-dark mb-3">Free instant quotes | Live in 5 seconds</p>
+
+      <div class="call-us-trustpilot mb-3">
+        <div class="d-inline-flex align-items-center gap-1 text-primary small">
+          <i class="bi bi-star-fill"></i>
+          <span>Trustpilot</span>
+        </div>
+        <div class="mt-1">
+          <i class="bi bi-star-fill text-primary me-1"></i>
+          <i class="bi bi-star-fill text-primary me-1"></i>
+          <i class="bi bi-star-fill text-primary me-1"></i>
+          <i class="bi bi-star-fill text-primary me-1"></i>
+          <i class="bi bi-star-fill text-primary"></i>
+        </div>
+      </div>
+
+      <div class="call-us-modal-badges d-flex flex-wrap justify-content-center gap-3 align-items-center small">
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-secondary rounded-pill px-2">BBB</span>
+          <span class="text-muted">Accredited Business A+ Rating</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-globe2 text-primary"></i>
+          <span class="text-muted">20+ Languages</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-primary fw-bold">20+</span>
+          <span class="text-muted">Years in Business</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="call-us-modal-backdrop" data-dismiss-call-modal></div>
+</div>

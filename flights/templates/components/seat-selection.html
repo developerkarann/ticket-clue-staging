@@ -1,0 +1,1262 @@
+{% load static %}
+<style>
+/* Seat Map Container */
+.seat-map {
+    position: relative;
+    padding: 20px;
+    overflow-x: auto;
+    display: inline-block;
+}
+
+.seat-map-container {
+    border: 2px solid #f3f4fa;
+    border-top: none;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 54px;
+    box-shadow: 0px 8px 16px 0px #f3f4fa;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.seat-row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Row Number */
+.seat-row-number {
+    width: 30px;
+    text-align: center;
+    margin-right: 5px;
+    font-weight: bold;
+}
+
+/* Seat Styles */
+.seat {
+    width: 50px;
+    height: 35px;
+    margin: 3px;
+    border: 1px solid #ccc;
+    text-align: center;
+    line-height: 35px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    position: relative;
+}
+
+.seat.available {
+    /* Default available seat color */
+}
+
+.seat.unavailable {
+    background-color: #eef0f8; /* Gray */
+    color: #fff;
+    cursor: not-allowed;
+}
+
+.seat.selected {
+    background-color: #0d6efd; /* Blue */
+    color: #fff;
+}
+
+.seat.window::after {
+    /* content: 'W'; */
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 10px;
+    color: #fff;
+}
+
+.seat.aisle::after {
+    /* content: 'A'; */
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 10px;
+    color: #fff;
+}
+
+/* Seat Tooltip */
+.seat-tooltip {
+    position: absolute;
+    top: -45px;
+    background-color: #000;
+    color: #fff;
+    padding: 3px 5px;
+    border-radius: 3px;
+    font-size: 10px;
+    white-space: nowrap;
+    display: none;
+    z-index: 10;
+}
+
+.seat:hover .seat-tooltip {
+    display: block;
+}
+
+/* Aisle Spacer */
+.seat-spacer {
+    width: 20px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .seat {
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        font-size: 10px;
+    }
+
+    .seat-row-number {
+        width: 25px;
+        font-size: 10px;
+    }
+}
+
+/* Seat Colors for Different Price Levels */
+.price-level-1 {
+    background-color: #8B0000; /* Dark Red */
+    color: #fff;
+}
+
+.price-level-2 {
+    background-color: #00008B; /* Dark Blue */
+    color: #fff;
+}
+
+.price-level-3 {
+    background-color: #006400; /* Dark Green */
+    color: #fff;
+}
+
+.price-level-4 {
+    background-color: #FF8C00; /* Dark Orange */
+    color: #fff;
+}
+
+.price-level-5 {
+    background-color: #4B0082; /* Indigo */
+    color: #fff;
+}
+
+.price-level-6 {
+    background-color: #008B8B; /* Dark Cyan */
+    color: #fff;
+}
+
+.price-level-7 {
+    background-color: #2F4F4F; /* Dark Slate Gray */
+    color: #fff;
+}
+
+.price-level-8 {
+    background-color: #800080; /* Purple */
+    color: #fff;
+}
+
+.price-level-9 {
+    background-color: #A52A2A; /* Brown */
+    color: #fff;
+}
+
+.price-level-10 {
+    background-color: #483D8B; /* Dark Slate Blue */
+    color: #fff;
+}
+
+.price-level-11 {
+    background-color: #556B2F; /* Dark Olive Green */
+    color: #fff;
+}
+
+.price-level-12 {
+    background-color: #B22222; /* Firebrick */
+    color: #fff;
+}
+
+.price-level-13 {
+    background-color: #B8860B; /* Dark Goldenrod */
+    color: #fff;
+}
+
+.price-level-14 {
+    background-color: #008B45; /* Dark Spring Green */
+    color: #fff;
+}
+
+.price-level-15 {
+    background-color: #9932CC; /* Dark Orchid */
+    color: #fff;
+}
+
+
+</style>
+<!-- step3_seat_selection.html -->
+
+<div id="myLoader">
+    {% include 'components/loader.html' %}
+</div>
+
+<div class=" mb-4" id="mainContent">
+    <div class="card-body">
+        <h3 class="text-center mb-4">Customize Your Travel</h3>
+        {% if ssr_error %}
+            <div class="alert alert-danger" role="alert">
+                {{ ssr_error }}
+            </div>
+        {% endif %}
+        <form method="post" action="" id="form-step-3">
+            {% csrf_token %}
+            <div class="row">
+                <!-- Main Content Column -->
+                <div class="col-lg-8">
+                    <!-- Flight Details -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5>Flight Details</h5>
+                        </div>
+                        <div class="card-body" id="flight-details">
+                            <!-- Flight details will be populated here -->
+                        </div>
+                        <div class="card-body" id="seat-selection">
+                            <!-- Seat selection summary will be populated here -->
+                        </div>
+                    </div>
+
+                      
+
+                    <!-- Passenger Preferences -->
+                    <div id="passenger-preferences">
+                        <!-- Passenger preferences will be populated here -->
+                    </div>
+
+                  
+
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                            <i class="fas fa-arrow-left me-2"></i>Back
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Next <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+               <!-- Updated Price Summary Section -->
+                <div class="col-lg-4">
+                    <!-- Price Summary -->
+                    <div class="card p-4 mb-3 shadow-sm">
+                        <h5 class="card-title mb-3" style="color: #0e0090;">Price Summary</h5>
+                        <div class="price-item d-flex justify-content-between py-2 border-bottom">
+                            <span class="font-weight-bold" style="color: #0e0090;">Base Fare</span>
+                            <span id="base-fare" class="font-weight-bold"></span>
+                        </div>
+                        <!-- <div class="price-item d-flex justify-content-between py-2 border-bottom">
+                            <span class="font-weight-bold" style="color: #0e0090;">Fuel Surcharge (YQ Tax)</span>
+                            <span id="yq-tax" class="font-weight-bold"></span>
+                        </div> -->
+                        <!-- <div class="price-item d-flex justify-content-between py-2 border-bottom">
+                            <span class="font-weight-bold" style="color: #0e0090;">Additional Transaction Fee</span>
+                            <span id="additional-txn-fee" class="font-weight-bold"></span>
+                        </div> -->
+                        <!-- <div class="price-item d-flex justify-content-between py-2 border-bottom">
+                            <span class="font-weight-bold" style="color: #0e0090;">Other Charges</span>
+                            <span id="other-charges" class="font-weight-bold"></span>
+                        </div> -->
+                        <!-- Seat Selection Charges -->
+                        <div class="price-item d-flex justify-content-between py-2 border-bottom" id="seat-charges-row" style="display: none;">
+                            <span class="font-weight-bold" style="color: #0e0090;">Seat Selection Charges</span>
+                            <span id="seat-charges" class="font-weight-bold">INR 0.00</span>
+                        </div>
+                        <!-- Meal Charges -->
+                        <div class="price-item d-flex justify-content-between py-2 border-bottom" id="meal-charges-row" style="display: none;">
+                            <span class="font-weight-bold" style="color: #0e0090;">Meal Charges</span>
+                            <span id="meal-charges" class="font-weight-bold">INR 0.00</span>
+                        </div>
+                        <!-- Baggage Charges -->
+                        <div class="price-item d-flex justify-content-between py-2 border-bottom" id="baggage-charges-row">
+                            <span class="font-weight-bold" style="color: #0e0090;">Baggage Charges</span>
+                            <span id="baggage-charges" class="font-weight-bold">INR 0.00</span>
+                        </div>
+                        <div class="price-item d-flex justify-content-between py-2 border-bottom">
+                            <span class="font-weight-bold" style="color: #0e0090;">Total Tax</span>
+                            <span id="total-tax" class="font-weight-bold">INR 0.00</span>
+                        </div>
+                        <!-- Discount -->
+                        <!-- <div class="price-item d-flex justify-content-between py-2 border-bottom text-success" id="discount-row" style="display: none;">
+                            <span class="font-weight-bold" style="color: #0e0090;">Discount</span>
+                            <span id="discount" class="font-weight-bold"></span>
+                        </div> -->
+                        <!-- Total Fare -->
+                        <div class="price-item d-flex justify-content-between py-3" style="border-top: 1px solid #ddd;">
+                            <span class="font-weight-bold" style="color: #0e0090; font-size: 1.1em;">Total Fare</span>
+                            <span id="total-fare" class="font-weight-bold" style="font-size: 1.1em;"></span>
+                        </div>
+                        <div class="price-note mt-3 text-muted">
+                            No hidden fees – track your price at every step
+                        </div>
+                    </div>
+
+                    <div class="card p-4 shadow-sm">
+                        <!-- Cancellation Policy Section -->
+                        <h5 class="card-title mt-4 mb-3" style="color: #0e0090;">Cancellation Policy</h5>
+                        <div id="cancellation-policy">
+                            <!-- Cancellation policy will be displayed here -->
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Seat Selection Modal -->
+<div class="modal fade" id="seatSelectionModal" tabindex="-1" aria-labelledby="seatSelectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select Seats</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <!-- Seat Map will be displayed here -->
+                 <!-- <img src="{% static 'assets/images/aircraft-head.png' %}"> -->
+                
+                <div id="seat-map" class="seat-map">
+                    <!-- Seat map will be populated here -->
+                </div>
+                <!-- <img src="{% static 'assets/images/aircraft-tail.png' %}"> -->
+                <!-- Seat Info Legend -->
+                <div class="mt-3 text-center" id="seat-legend">
+                    <!-- Seat legend will be populated here -->
+                </div>
+                <!-- Seat Selection Summary -->
+                <div id="seat-selection-summary">
+                    <!-- Seat selection summary will be displayed here -->
+                </div>
+                <p class="mt-2 text-center text-muted" style="font-size: 0.9em;">
+                    * Conditions apply. We will try our best to accommodate your seat preferences; however, due to operational considerations, we can't guarantee this selection. The seat map shown may not be the exact replica of the flight layout. Thank you for your understanding.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="confirm-seat-selection">Confirm Selection</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function() {
+        $("#mainContent").hide();
+        
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const TraceId = "{{ TraceId }}";
+        const ResultIndex = "{{ ResultIndex }}";
+    
+        // Initialize variables
+        let fareQuoteData = {}; // Fare Quote API response
+        let ssrData = {}; // SSR API response
+        let passengers = []; // Passengers data
+        let flightSegments = []; // Flight segments data
+    
+        // Fetch Fare Quote Data
+        
+        const fareQuoteRequest = $.ajax({
+            url: "{% url 'fare_quote' %}",
+            type: 'POST',
+            data: {
+                TraceId: TraceId,
+                ResultIndex: ResultIndex
+            }
+        });
+
+        const ssrRequest = $.ajax({
+            url: "{% url 'fare_ssr' %}",
+            type: 'POST',
+            data: {
+                TraceId: TraceId,
+                ResultIndex: ResultIndex
+            }
+        });
+
+        // Use $.when to handle both requests
+    $.when(fareQuoteRequest, ssrRequest)
+        .done(function(fareQuoteResponse, ssrResponse) {
+            // fareQuoteResponse and ssrResponse are arrays where the first element is the data
+            const fareData = fareQuoteResponse[0];
+            const ssrApiData = ssrResponse[0];
+
+            console.log(fareData);
+            console.log(ssrApiData);
+            // Check for errors in fareQuoteData
+            const fareError = fareData?.Response?.Error?.ErrorMessage;
+            if (fareError) {
+                console.error('Fare Quote Error:', fareError);
+                window.history.back();
+                window.history.back();
+                return;
+            }
+
+            // Assign fareQuoteData
+            fareQuoteData = fareData?.fare_rule.Response.Results;
+
+            // Check for errors in ssrData
+            const ssrError = ssrApiData?.Response?.Error?.ErrorMessage;
+            if (ssrError) {
+                console.error('SSR Data Error:', ssrError);
+                window.history.back();
+                window.history.back();
+                return;
+            }
+
+            // Assign ssrData
+            ssrData = ssrApiData?.Response;
+
+            // Proceed to initialize and display data
+            initializePassengers();
+            initializeFlightSegments();
+            displayFlightDetails();
+            displayPassengerPreferences();
+            displayPriceSummary();
+            initializePriceCalculation();
+
+            // Show the main content and hide loader
+            $("#mainContent").show();
+            $("#myLoader").hide();
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            // Handle errors for any of the requests
+            console.error('Error fetching data:', errorThrown);
+            alert('An error occurred while fetching fare details or service options. Please try again.');
+            window.history.back();
+            window.history.back();
+        });
+    
+        // Variables to store selections
+        let selectedSeats = {}; // Key: passenger index, Value: seat info
+        let selectedBaggage = {};
+        let selectedMeals = {};
+        let additionalCharges = {
+            seat: 0,
+            meal: 0,
+            baggage: 0
+        };
+    
+        /*** Function Definitions ***/
+
+        $('#form-step-3').on('submit', function(e) {
+            $("#myLoader").show();
+            $("#mainContent").hide();
+            e.preventDefault();
+            console.log("next");
+            console.log(selectedSeats);
+            console.log(selectedBaggage);
+            console.log(selectedMeals);
+            console.log(additionalCharges);
+            $.ajax({
+                url: "{% url 'make_booking_request' %}",
+                type: 'POST',
+                data: {
+                    isLcc: fareQuoteData?.IsLCC,
+                    selectedSeats: JSON.stringify(selectedSeats),
+                    selectedBaggage: JSON.stringify(selectedBaggage),
+                    selectedMeals: JSON.stringify(selectedMeals),
+                    fare: JSON.stringify(fareQuoteData?.FareBreakdown)
+                },
+                success: function(response) {
+                    console.log("here is ", response);
+                    console.log(response?.hex_session);
+
+                    if(response?.hex_session) {
+                        const url = "{% url 'step_booking_detail' 3 'dummy' %}".replace('dummy', response.hex_session);
+                        window.location.href = url;
+                    }
+                    
+                    const errorMessage = response?.response?.Response?.Error?.ErrorMessage;
+                    const errorCode = response?.response?.Response?.Error?.ErrorCode;
+                    if(errorCode == 5){
+                        window.history.back();
+                    }
+                    if(errorMessage) alert(errorMessage);
+                    
+
+                    $("#myLoader").hide();
+                    $("#mainContent").show();
+                },
+                error: function(xhr) {
+                    // alert(`An error occurred: ${xhr.responseJSON.message || 'Unknown error'}`);
+                    console.log(xhr.responseJSON);
+                    $("#myLoader").hide();
+                    $("#mainContent").show();
+                }
+            });
+
+            // window.location.href = '/book/3/{{hex_session}}';
+            
+        });
+
+        const ourPassengers = JSON.parse("{{passengers|escapejs}}") || [];
+    
+
+        function getPaxType(value) {
+            let passengerType = '';
+            switch (value) {
+                case 1:
+                    passengerType = 'ADULT';
+                    break;
+                case 2:
+                    passengerType = 'CHILD';
+                    break;
+                case 3:
+                    passengerType = 'INFANT';
+                    break;
+                default:
+                    passengerType = 'UNKNOWN';
+            }
+            return passengerType;
+        }
+
+        // Initialize Passengers
+        function initializePassengers() {
+            const fareBreakdown = fareQuoteData.FareBreakdown;
+            ourPassengers?.forEach((passenger) => {
+                    passengers.push({
+                        type: `${passengers.length +1} ${getPaxType(passenger?.pax_type)}`,
+                        id: passenger.id,
+                        name: `${passenger.first_name} ${passenger.last_name}`,
+                        index: passengers.length
+                    });
+            });
+        }
+    
+        // Initialize Flight Segments
+        function initializeFlightSegments() {
+            const segments = fareQuoteData?.Segments[0];
+            segments?.forEach((segment, index) => {
+                flightSegments.push({
+                    passenger: ourPassengers[index],
+                    origin: segment.Origin.Airport.CityName,
+                    destination: segment.Destination.Airport.CityName,
+                    date: segment.Origin.DepTime,
+                    airline: segment.Airline.AirlineName,
+                    flightNumber: segment.Airline.FlightNumber,
+                    index: index
+                });
+            });
+        }
+    
+    // Display Flight Details
+// Display Flight Details
+function displayFlightDetails() {
+    let flightDetailsHtml = '';
+    flightSegments.forEach((segment, index) => {
+        //here do it
+        flightDetailsHtml += `            
+            <p><strong>${segment.airline} ${segment.flightNumber}</strong></p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 0;">
+                <span>${segment.origin} <i class="fas fa-arrow-right"></i> ${segment.destination} 
+                <strong> | Date:</strong> ${new Date(segment.date).toLocaleDateString()}</span>
+                <button type="button" class="btn btn-outline-primary btn-sm open-seat-selection" data-segment-index="${index}">Change Seat</button>
+            </div>
+        `;
+    });
+    $('#flight-details').html(flightDetailsHtml);
+}
+
+// Variable to keep track of the current segment index
+let currentSegmentIndex = 0;
+
+// Open Seat Selection Modal (using event delegation)
+$(document).on('click', '.open-seat-selection', function() {
+    const segmentIndex = $(this).data('segment-index');
+    currentSegmentIndex = segmentIndex;
+    generateSeatMap(segmentIndex);
+    $('#seatSelectionModal').modal('show');
+});
+
+        // Display Passenger Preferences (Baggage and Meal Side by Side)
+        function displayPassengerPreferences() {
+            let preferencesHtml = '';
+            const baggageOptions = ssrData?.Baggage;
+            let mealOptions = [];
+            if(ssrData?.MealDynamic?.length > 0) {
+                mealOptions = ssrData?.MealDynamic[0];
+            } else {
+                mealOptions = ssrData?.Meal;
+            }
+            passengers?.forEach((passenger) => {
+                preferencesHtml += `
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5>${passenger.type} - ${passenger.name}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                `;
+                // Baggage Options
+                preferencesHtml += `
+                    <div class="col-md-6">
+                        <h6>Baggage Options</h6>
+                `;
+                flightSegments?.forEach((segment, sIndex) => {
+                    const segmentBaggage = baggageOptions && baggageOptions[sIndex] ? baggageOptions[sIndex] : [];
+                    if (segmentBaggage.length > 0) {
+                        preferencesHtml += `<label>${segment.origin} to ${segment.destination}:</label>`;
+                        preferencesHtml += `<select class="form-select mb-3 baggage-select" data-passenger-index="${passenger.index}" data-segment-index="${sIndex}">
+                                <option value="" data-price="0">Select Baggage</option>
+                                
+                                ${segmentBaggage.map(option => `
+                                    <option value="${option.Code}"
+                                     data-AirlineCode="${option.AirlineCode || ''}"
+                                    data-FlightNumber="${option.FlightNumber || ''}"
+                                    data-price="${option.Price || 0}" 
+                                    data-destination="${option.Destination}" data-origin="${option.Origin}" data-currency="${option.Currency}" 
+                                    data-weight="${option.Weight}" data-description="${option.Description}" data-waytype="${option.WayType}">${option.Weight}KG - ${option.Currency} ${formatAmount(option.Price || 0)}</option>
+                                `).join('')}
+                            </select>
+                            `;
+                    } else {
+                        preferencesHtml += `<p>No baggage options available for ${segment.origin} to ${segment.destination}.</p>`;
+                    }
+                });
+                preferencesHtml += `</div>`; // Close Baggage Column
+    
+                // Meal Options
+                preferencesHtml += `
+                    <div class="col-md-6">
+                        <h6>Meal Preferences</h6>
+                `;
+                console.log("here meal", mealOptions);
+                if (mealOptions?.length > 0) {
+                    preferencesHtml +=`<br>`
+                    preferencesHtml += `
+                        <select class="form-select mb-3 meal-select" data-passenger-index="${passenger.index}">
+                            <option value="" data-price="0">Select Meal</option>
+                            ${mealOptions?.map(meal => `
+                                <option 
+                                    value="${meal?.Code}" 
+                                    data-AirlineCode="${meal?.AirlineCode || ''}"
+                                    data-FlightNumber="${meal?.FlightNumber || ''}"
+                                    data-price="${meal?.Price || 0}" 
+                                    data-airlineDescription="${meal?.AirlineDescription || ''}" 
+                                    data-wayType="${meal?.WayType || ''}" 
+                                    data-description="${meal?.Description || ''}"
+                                    data-currency="${meal?.Currency || ''}" 
+                                    data-origin="${meal?.Origin || ''}" 
+                                    data-destination="${meal?.Destination || ''}"
+                                >
+                                    ${meal?.Description}${meal?.Price ? ' - ' + meal?.Currency + ' ' + formatAmount(meal.Price) : ''}
+                                </option>
+                            `).join('')}
+                        </select>
+                    `;
+                } else {
+                    preferencesHtml += `<p>No meal options available.</p>`;
+                }
+                preferencesHtml += `</div>`; // Close Meal Column
+                preferencesHtml += `
+                            </div> <!-- End Row -->
+                        </div>
+                    </div>
+                `;
+            });
+            $('#passenger-preferences').html(preferencesHtml);
+
+            $("#mainContent").show();
+                $("#myLoader").hide();
+        }
+
+// Updated generateSeatMap function with spacing and window seat indications
+function generateSeatMap(segmentIndex) {
+    // Access the seat data for the first segment
+    if(!ssrData?.SeatDynamic) return;
+    const seatSegment = ssrData?.SeatDynamic[0]?.SegmentSeat[segmentIndex];
+    if (!seatSegment || !seatSegment.RowSeats) {
+        alert('Seat data is not available for this segment.');
+        return;
+    }
+    const seatData = seatSegment.RowSeats;
+    const seatPrices = getSeatPrices(seatData); // Get seat prices from API data
+    const priceLevels = getPriceLevels(seatPrices); // Get unique price levels and assign colors
+    const segment = flightSegments[segmentIndex];
+    let seatMapHtml = `
+        <div style='position:relative' class="seat-row">
+                <img src="/static/assets/images/plane-top.png" style="width:100%">
+            <h5 style="position:absolute;bottom:16px;color:#0e0090" class="text-center">${segment.origin} to ${segment.destination}</h5>
+        </div>
+    `;
+    seatMapHtml += '<div class="seat-map-container">';
+        const aisleSpace = [];
+        const seatsDemographic = seatData[2]?.Seats?.reduce((acc, seat, index) => {
+            if(seat.SeatType == 2) aisleSpace.push(index);
+        acc[seat.SeatNo.toString()] = index;
+        return acc;}, {});
+       
+    seatData.forEach(row => {
+        seatMapHtml += '<div class="seat-row">';
+        let currentRowLength = row?.Seats?.length || 0;
+        let prevIndex = 0;
+        let alreadySpaceGiven = [];
+        row.Seats?.forEach((seat, index) => {
+            let currentSeatIndex = seatsDemographic[seat.SeatNo];
+            const _currentSeatIndex = currentSeatIndex;
+
+            if(currentSeatIndex != index){
+               
+                const space_count = currentSeatIndex - prevIndex;
+                for(var _=0;_<space_count;_++){
+                    seatMapHtml += `
+                        <div style="border:none;cursor:unset" class="seat">
+                        </div>
+                    `;
+                }
+            }
+            
+            if(aisleSpace.includes(_currentSeatIndex) && aisleSpace.includes(_currentSeatIndex-1) && !alreadySpaceGiven.includes(_currentSeatIndex-1)){
+                seatMapHtml += `
+                <div class="seat-spacer"></div>
+                `;
+                alreadySpaceGiven.push(_currentSeatIndex);
+            } 
+
+            prevIndex = ++currentSeatIndex;
+            
+            const seatNumber = seat.SeatNumber || `${seat.RowNo}${seat.SeatNo}`;
+            let seatClass = 'seat';
+            let tooltipText = `Seat ${seatNumber}`;
+            const seatPrice = Number(seat.Price || 0);
+            const seatCurrency = seat.Currency || 'INR';
+
+            const AirlineCode = seat?.AirlineCode || '';
+            const FlightNumber = seat?.FlightNumber || '';
+            const CraftType = seat?.CraftType || '';
+            const Origin = seat?.Origin || '';
+            const Destination = seat?.Destination || '';
+            const AvailablityType = seat?.AvailablityType || '';
+            const Description = seat?.Description || '';
+            const Code = seat?.Code || '';
+            const RowNo = seat?.RowNo || '';
+            const SeatType = seat?.SeatType || '';
+            const SeatWayType = seat?.SeatWayType || '';
+            const Compartment = seat?.Compartment || '';
+            const Deck = seat?.Deck || '';
+
+            // Seat Availability
+            if (seat?.AvailablityType === 1) {
+                seatClass += ' available';
+                // Assign color based on price level
+                const colorClass = priceLevels[seatPrice] ? priceLevels[seatPrice].colorClass : '';
+                seatClass += ` ${colorClass}`;
+            } else {
+                seatClass += ' unavailable';
+            }
+
+            // Check if seat is already selected
+            if (isSeatSelected(seatNumber)) {
+                seatClass += ' selected';
+            }
+
+            if (seatPrice > 0) {
+                tooltipText += ` - ${seatCurrency} ${formatAmount(seatPrice)}`;
+            }
+
+            // Determine seat type (window, middle, aisle)
+            let seatType = '';
+            if (seat?.SeatType == 1) {
+                seatClass += ' window';
+                seatType = ' (Window Seat)';
+            } else if (seat?.SeatType == 2) {
+                seatClass += ' aisle';
+                seatType = ' (Aisle Seat)';
+            } else if (seat?.SeatType == 3) {
+                seatType = ' (Middle Seat)';
+            }
+            tooltipText += seatType;
+
+            // #check here
+            if(seat?.SeatNo) seatMapHtml += `
+                <div class="${seatClass}" data-seat-number="${seatNumber}"
+                data-AirlineCode=${AirlineCode} data-FlightNumber=${FlightNumber} data-CraftType=${CraftType} data-Origin=${Origin} data-Destination=${Destination} data-AvailablityType=${AvailablityType} data-Description=${Description} data-Code=${Code} data-RowNo=${RowNo} data-SeatType=${SeatType} data-SeatWayType=${SeatWayType} data-Compartment=${Compartment} data-Deck=${Deck}
+                data-price="${seatPrice}" data-currency="${seatCurrency}">
+                    ${(seat.AvailablityType === 1)?seatNumber+'<div class="seat-tooltip">'+tooltipText+'</div>':''}
+                </div>
+            `;
+           
+
+            if(aisleSpace.includes(_currentSeatIndex) && aisleSpace.includes(_currentSeatIndex+1)){
+                seatMapHtml += `
+                <div class="seat-spacer"></div>
+                `;
+                alreadySpaceGiven.push(_currentSeatIndex);
+            } 
+
+            if(currentSeatIndex != index && index == (currentRowLength - 1)){
+                const space_count = Object.values(seatsDemographic).pop() - currentSeatIndex+1;
+                for(var _=0;_<space_count;_++){
+                    seatMapHtml += `
+                        <div style="border:none;cursor:unset" class="seat">
+                        </div>
+                    `;
+                }
+            }
+
+        });
+        seatMapHtml += '</div>';
+    });
+    seatMapHtml += '</div>';
+    $('#seat-map').html(seatMapHtml);
+
+    // Generate Seat Legend
+    generateSeatLegend(priceLevels);
+
+    // Display Seat Selection Summary in Popup
+    displayPopupSeatSelection();
+}
+
+function displayPopupSeatSelection() {
+    let seatSelectionHtml = `
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Passenger</th>
+                    <th>Seat</th>
+                    <th>Fee</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    for (let i = 0; i < passengers.length; i++) {
+        const seatInfo = selectedSeats[currentSegmentIndex] && selectedSeats[currentSegmentIndex][i];
+        const seatNumber = seatInfo ? seatInfo.seatNumber : 'Not Selected';
+        const seatFee = seatInfo ? `${seatInfo.currency} ${formatAmount(seatInfo.price)}` : '-';
+        seatSelectionHtml += `
+            <tr>
+                <td>${passengers[i].name}</td>
+                <td>${seatNumber}</td>
+                <td>${seatFee}</td>
+            </tr>
+        `;
+    }
+    seatSelectionHtml += `
+            </tbody>
+        </table>
+    `;
+    $('#seat-selection-summary').html(seatSelectionHtml);
+}
+
+
+function getSeatPrices(seatData) {
+    let seatPrices = {};
+    if (!Array.isArray(seatData)) {
+        console.error('Invalid seat data:', seatData);
+        return seatPrices;
+    }
+    seatData.forEach(row => {
+        if (!row.Seats || !Array.isArray(row.Seats)) {
+            console.error('Invalid row data:', row);
+            return;
+        }
+        row.Seats.forEach(seat => {
+            const price = Number(seat.Price || 0);
+            if (!seatPrices[price]) {
+                seatPrices[price] = {
+                    price: price,
+                    currency: seat.Currency || 'INR',
+                    count: 0
+                };
+            }
+            seatPrices[price].count++;
+        });
+    });
+    return seatPrices;
+}
+
+        // Get Price Levels and Assign Colors
+        function getPriceLevels(seatPrices) {
+            const uniquePrices = Object.keys(seatPrices).sort((a, b) => a - b);
+            const colorClasses = ['price-level-1', 'price-level-2', 'price-level-3', 'price-level-4', 'price-level-5','price-level-6','price-level-7','price-level-8','price-level-9','price-level-10','price-level-11','price-level-12','price-level-13','price-level-14','price-level-15'];
+            let priceLevels = {};
+            uniquePrices.forEach((price, index) => {
+                priceLevels[price] = {
+                    ...seatPrices[price],
+                    colorClass: colorClasses[index % colorClasses.length]
+                };
+            });
+            return priceLevels;
+        }
+    
+        // Generate Seat Legend
+        function generateSeatLegend(priceLevels) {
+            let legendHtml = `
+                <span class="me-3"><i class="fas fa-square text-secondary"></i> Unavailable</span>
+                <span class="me-3"><i class="fas fa-square text-primary"></i> Selected</span>
+            `;
+            for (let price in priceLevels) {
+                const level = priceLevels[price];
+                const colorClass = level.colorClass;
+                legendHtml += `
+                    <span class="me-3"><i style="width:12px;height:12px;border-radius:2px; display:inline-block" class="${colorClass}"> </i> ${level.currency} ${formatAmount(level.price)}</span>
+                `;
+            }
+            $('#seat-legend').html(legendHtml);
+        }
+    
+        // Check if seat is already selected
+        function isSeatSelected(seatNumber) {
+            if (!selectedSeats[currentSegmentIndex]) return false;
+            return Object.values(selectedSeats[currentSegmentIndex]).some(seat => seat.seatNumber === seatNumber);
+        }
+
+    
+        // Seat Selection Handler
+        $(document).on('click', '.seat.available', function() {
+            const seatNumber = $(this).data('seat-number');
+            const seatPrice = Number($(this).data('price') || 0);
+            const seatCurrency = $(this).data('currency');
+
+            const AirlineCode = $(this).data('airlinecode');
+            const FlightNumber = $(this).data('flightnumber');
+            const CraftType = $(this).data('crafttype');
+            const Origin = $(this).data('origin');
+            const Destination = $(this).data('destination');
+            const AvailablityType = $(this).data('availablitytype');
+            const Description = $(this).data('description');
+            const Code = $(this).data('code');
+            const RowNo = $(this).data('rowno');
+            const SeatType = $(this).data('seattype');
+            const SeatWayType = $(this).data('seatwaytype');
+            const Compartment = $(this).data('compartment');
+            const Deck = $(this).data('deck');
+
+            if (!selectedSeats[currentSegmentIndex]) {
+                selectedSeats[currentSegmentIndex] = {};
+            }
+
+            if ($(this).hasClass('selected')) {
+                // Deselect seat
+                $(this).removeClass('selected');
+                // Remove seat from selectedSeats
+                for (let key in selectedSeats[currentSegmentIndex]) {
+                    if (selectedSeats[currentSegmentIndex][key].seatNumber === seatNumber) {
+                        delete selectedSeats[currentSegmentIndex][key];
+                        break;
+                    }
+                }
+            } else {
+                // Select seat
+                if (Object.keys(selectedSeats[currentSegmentIndex]).length < passengers.length) {
+                    $(this).addClass('selected');
+                    // Assign seat to next unassigned passenger
+                    for (let i = 0; i < passengers.length; i++) {
+                        if (!selectedSeats[currentSegmentIndex][i]) {
+                            selectedSeats[currentSegmentIndex][i] = {
+                                seatNumber: seatNumber,
+                                price: seatPrice,
+                                currency: seatCurrency,
+
+                                SeatNo: seatNumber,
+                                Price: seatPrice,
+                                Currency: seatCurrency,
+                                passenger: passengers[i],
+                                AirlineCode: AirlineCode,
+                                FlightNumber: FlightNumber,
+                                CraftType: CraftType,
+                                Origin: Origin,
+                                Destination: Destination,
+                                AvailablityType: AvailablityType,
+                                Description: Description,
+                                Code: Code,
+                                RowNo: RowNo,
+                                SeatType: SeatType,
+                                SeatWayType: SeatWayType,
+                                Compartment: Compartment,
+                                Deck: Deck
+                            };
+                            break;
+                        }
+                    }
+                } else {
+                    alert('You have already selected seats for all passengers on this segment.');
+                }
+            }
+
+            // Update seat selection summary in the popup
+            displayPopupSeatSelection();
+        });
+
+
+        // Confirm Seat Selection
+        $('#confirm-seat-selection').on('click', function() {
+            $('#seatSelectionModal').modal('hide');
+            updateSeatCharges();
+            displaySeatSelection();
+            displayPriceSummary();
+        });
+    
+        function displaySeatSelection() {
+            let seatSelectionHtml = `
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Passenger</th>
+                            <th>Segment</th>
+                            <th>Seat</th>
+                            <th>Fee</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            for (let i = 0; i < passengers.length; i++) {
+                flightSegments.forEach((segment, segmentIndex) => {
+                    const seatInfo = selectedSeats[segmentIndex] && selectedSeats[segmentIndex][i];
+                    const seatNumber = seatInfo ? seatInfo.seatNumber : 'Not Selected';
+                    const seatFee = seatInfo ? `${seatInfo.currency} ${formatAmount(seatInfo.price)}` : '-';
+                    seatSelectionHtml += `
+                        <tr>
+                            <td>${passengers[i].name}</td>
+                            <td>${segment.origin} - ${segment.destination}</td>
+                            <td>${seatNumber}</td>
+                            <td>${seatFee}</td>
+                        </tr>
+                    `;
+                });
+            }
+            seatSelectionHtml += `
+                    </tbody>
+                </table>
+            `;
+            $('#seat-selection').html(seatSelectionHtml);
+        }
+
+        // Update Seat Charges
+        function updateSeatCharges() {
+            additionalCharges.seat = 0;
+            for (let segmentIndex in selectedSeats) {
+                for (let passengerIndex in selectedSeats[segmentIndex]) {
+                    const seatInfo = selectedSeats[segmentIndex][passengerIndex];
+                    additionalCharges.seat += Number(seatInfo.price || 0);
+                }
+            }
+        }
+
+    
+       // Updated displayPriceSummary function
+        function displayPriceSummary() {
+            const fare = fareQuoteData.Fare;
+            const currency = fare.Currency;
+            const baseFare = Number(fare.BaseFare);
+            const yqTax = Number(fare.YQTax);
+            const additionalTxnFeePub = Number(fare.AdditionalTxnFeePub);
+            const otherCharges = Number(fare.OtherCharges);
+            const publishedFare = Number(fare.PublishedFare);
+            const totalTax = Number(fare.Tax);
+            const discount = Number(fare.Discount || 0);
+
+            // Ensure additionalCharges.baggage is set to 0 if undefined
+            if (!additionalCharges.baggage) {
+                additionalCharges.baggage = 0;
+            }
+
+            const totalFare = publishedFare + additionalCharges.seat + additionalCharges.meal + additionalCharges.baggage;
+
+            // Update the HTML elements for the price summary
+            $('#base-fare').text(`${currency} ${formatAmount(baseFare)}`);
+            $('#yq-tax').text(`${currency} ${formatAmount(yqTax)}`);
+            $('#additional-txn-fee').text(`${currency} ${formatAmount(additionalTxnFeePub)}`);
+            $('#other-charges').text(`${currency} ${formatAmount(otherCharges)}`);
+            $('#total-tax').text(`${currency} ${formatAmount(totalTax)}`);
+
+            // Seat Selection Charges
+            if (additionalCharges.seat > 0) {
+                $('#seat-charges').text(`${currency} ${formatAmount(additionalCharges.seat)}`);
+                $('#seat-charges-row').show();
+            } else {
+                $('#seat-charges-row').hide();
+            }
+
+            // Meal Charges
+            if (additionalCharges.meal > 0) {
+                $('#meal-charges').text(`${currency} ${formatAmount(additionalCharges.meal)}`);
+                $('#meal-charges-row').show();
+            } else {
+                $('#meal-charges-row').hide();
+            }
+
+            // Baggage Charges
+            $('#baggage-charges').text(`${currency} ${formatAmount(additionalCharges.baggage)}`);
+            // Baggage charges row is always displayed with amount 0 if there are no charges
+
+            // Handle discount display
+            if (discount > 0) {
+                $('#discount').text(`-${currency} ${formatAmount(discount)}`);
+                $('#discount-row').show();
+            } else {
+                $('#discount-row').hide();
+            }
+
+            // Total Fare
+            $('#total-fare').text(`${currency} ${formatAmount(totalFare)}`);
+
+            // Display Cancellation Policy and Additional Details
+            displayCancellationPolicyAndDetails();
+        }
+
+        // Function to display Cancellation Policy and Additional Details
+        function displayCancellationPolicyAndDetails() {
+            const result = fareQuoteData;
+            let cancellationPolicy = '';
+            const isRefundable = result.IsRefundable;
+
+            if (isRefundable) {
+                cancellationPolicy = '<p>This fare is <strong>refundable</strong>. Cancellation charges may apply.</p>';
+            } else {
+                cancellationPolicy = '<p>This fare is <strong>non-refundable</strong>.</p>';
+            }
+
+            // Check for FareRules details
+            if (result.FareRules && result.FareRules.length > 0) {
+                result.FareRules.forEach(rule => {
+                    if (rule.FareRuleDetail) {
+                        cancellationPolicy += `<p><strong>From ${rule.Origin} to ${rule.Destination}:</strong> ${rule.FareRuleDetail}</p>`;
+                    }
+                });
+            }
+
+            $('#cancellation-policy').html(cancellationPolicy);
+
+        }
+
+        // Format Amount
+        function formatAmount(amount) {
+            return Number(amount).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+    
+       // Update Price Calculation
+        function initializePriceCalculation() {
+            // Meal Charges
+            $(document).on('change', '.meal-select', function() {
+                const passengerIndex = $(this).data('passenger-index');
+                const selectedMeal = $(this).val();
+                const meal_ = $(this).find('option:selected')
+
+                const airlinecode = meal_.data('airlinecode');
+                const flightnumber = meal_.data('flightnumber');
+                
+                const mealPrice = Number(meal_.data('price') || 0);
+                const nationality = meal_.data('nationality');
+                const airlineDescription = meal_.data('airlineDescription');
+                const wayType = meal_.data('waytype');
+                const description = meal_.data('description');
+                const currency = meal_.data('currency');
+                const origin = meal_.data('origin');
+                const destination = meal_.data('destination');
+
+                // Store selected meal
+                selectedMeals[passengerIndex] = {
+                    airlineCode: airlinecode,
+                    flightNumber: flightnumber,
+                    wayType: wayType,
+                    code: selectedMeal,
+                    description: description,
+                    currency: currency,
+                    origin: origin,
+                    destination: destination,
+                    airlineDescription: airlineDescription,
+                    quantity: 1,
+                    nationality: nationality,
+                    price: mealPrice,
+                    passenger: passengers[passengerIndex]
+                };
+                
+                updateMealCharges();
+                displayPriceSummary();
+            });
+
+            // Baggage Charges
+            $(document).on('change', '.baggage-select', function() {
+                const passengerIndex = $(this).data('passenger-index');
+                const segmentIndex = $(this).data('segment-index');
+                const baggageValue = $(this).val(); // Renamed from selectedBaggage to baggageValue
+                const baggage_ = $(this).find('option:selected')
+                const baggagePrice = Number(baggage_.data('price') || 0);
+                const wayType = baggage_.data('waytype');
+                const baggageWeight = baggage_.data('weight');
+                const description = baggage_.data('description');
+                const currency = baggage_.data('currency');
+                const origin = baggage_.data('origin');
+                const destination = baggage_.data('destination');
+
+                const flightnumber = baggage_.data('flightnumber');
+                const airlineCode = baggage_.data('airlinecode');
+
+                // Initialize baggage for the passenger if not already
+                if (!selectedBaggage[passengerIndex]) {
+                    selectedBaggage[passengerIndex] = {};
+                }
+
+                // Store selected baggage for the specific segment
+                selectedBaggage[passengerIndex][segmentIndex] = {
+                    "AirlineCode": airlineCode,
+                    "FlightNumber": flightnumber,
+                    "WayType": wayType,
+                    "Code": baggageValue,
+                    "Description": description,
+                    "Weight": baggageWeight,
+                    "Currency": currency,
+                    "Price": baggagePrice,
+                    "Origin": origin,
+                    "Destination": destination,
+                    "passenger": passengers[passengerIndex]
+                };
+
+                // Optional: Debugging statements
+                console.log(`Passenger Index: ${passengerIndex}, Segment Index: ${segmentIndex}`);
+                console.log(`Selected Baggage Code: ${baggageValue}, Price: ${baggagePrice}`);
+                console.log('Updated selectedBaggage:', selectedBaggage);
+
+                updateBaggageCharges();
+                displayPriceSummary();
+            });
+
+        }
+    
+        // Update Meal Charges
+        function updateMealCharges() {
+            additionalCharges.meal = 0;
+            $('.meal-select').each(function() {
+                const price = Number($(this).find('option:selected').data('price') || 0);
+                additionalCharges.meal += price;
+            });
+        }
+    
+        // Update Baggage Charges
+        function updateBaggageCharges() {
+            additionalCharges.baggage = 0;
+            $('.baggage-select').each(function() {
+                const price = Number($(this).find('option:selected').data('price') || 0);
+                additionalCharges.baggage += price;
+            });
+        }
+    });
+    </script>
+    

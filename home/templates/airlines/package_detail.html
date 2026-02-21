@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+
+</style>
+<main>
+  <!-- =======================
+  HERO SECTION START 
+  ======================= -->
+  <section 
+    class="position-relative text-light" 
+    style="
+      background: url('{{ direct_flight.image.url }}') no-repeat center center/cover;
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      padding-top: 12px;
+      padding-bottom: 100px;
+    "
+  >
+    <!-- Hero overlay -->
+    <div 
+      class="position-absolute top-0 start-0 w-100 h-100" 
+      style="background: rgba(0, 0, 0, 0.5);"
+    ></div>
+
+    <div class="container position-relative">
+      <div class="row">
+        <div class="col-md-12">
+          
+
+
+          {% include 'airlines/leadForm.html' %}
+
+          <h1 class="display-5 fw-bold text-white mb-3 animate__animated animate__fadeInUp" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">
+            {{ direct_flight.title }}
+          </h1>
+
+          {% if direct_flight.discount %}
+          <p class="fs-4 fw-light mb-2 animate__animated animate__fadeInUp animate__delay-1s">
+            Enjoy a discount of <strong>{{ direct_flight.discount }}%</strong> on this offer!
+          </p>
+          {% endif %}
+          {% if direct_flight.price %}
+          <p class="fs-4 fw-light mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+            Starting at <strong>${{ direct_flight.price }}</strong>
+          </p>
+          {% endif %}
+          <a href="#offer-details" class="btn btn-warning btn-lg mt-2 px-4 py-2 rounded-pill shadow-sm animate__animated animate__fadeInUp animate__delay-2s">
+            <i class="fas fa-info-circle me-2"></i>Learn More
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- HERO SECTION END -->
+
+  <!-- =======================
+  OFFER DETAILS SECTION START
+  ======================= -->
+  <section id="offer-details" class="py-5" style="background-color: #f5f7fa;">
+    <div class="container">
+      <!-- Introduction Section -->
+      <div class="row mb-5">
+        <div class="col-lg-8">
+          <h2 class="fw-bold mb-4 text-primary border-bottom pb-2" style="color: #012455 !important">Introduction</h2>
+          <div class="intro-content">
+            {{ direct_flight.intro|safe }}
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <!-- Offer Info Card -->
+          <div class="card shadow border-0 sticky-top" style="top: 20px; z-index: 999;">
+            <div class="card-header py-3" style="background-color: #001c42; color: white;">
+              <h4 class="card-title mb-0" style="color: white;"><i class="fas fa-tag me-2"></i>Offer Details</h4>
+            </div>
+            <div class="card-body p-4">
+              {% if direct_flight.discount %}
+              <p class="mb-3">
+                <strong>Discount:</strong>
+                <span class="text-success">{{ direct_flight.discount }}%</span>
+              </p>
+              {% endif %}
+              {% if direct_flight.price %}
+              <p class="mb-0">
+                <strong>Price:</strong>
+                <span class="text-primary">${{ direct_flight.price }}</span>
+              </p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advantages Section -->
+      {% if direct_flight.advantages %}
+      <div class="row mb-5">
+        <div class="col-lg-12">
+          <h2 class="fw-bold mb-4 text-primary border-bottom pb-2" style="color: #012455 !important">
+            {{ direct_flight.advantages_heading|default:"Advantages" }}
+          </h2>
+          <div class="content-section bg-white p-4 rounded shadow-sm">
+            {{ direct_flight.advantages|safe }}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Major Airlines Section -->
+      {% if direct_flight.major_airlines %}
+      <div class="row mb-5">
+        <div class="col-lg-12">
+          <h2 class="fw-bold mb-4 text-primary border-bottom pb-2" style="color: #012455 !important">
+            {{ direct_flight.airlines_heading|default:"Major Airlines" }}
+          </h2>
+          <div class="content-section bg-white p-4 rounded shadow-sm">
+            {{ direct_flight.major_airlines|safe }}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Popular Cities Section -->
+      {% if direct_flight.popular_cities %}
+      <div class="row mb-5">
+        <div class="col-lg-12">
+          <h2 class="fw-bold mb-4 text-primary border-bottom pb-2" style="color: #012455 !important">
+            {{ direct_flight.cities_heading|default:"Popular Cities" }}
+          </h2>
+          <div class="content-section bg-white p-4 rounded shadow-sm">
+            {{ direct_flight.popular_cities|safe }}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- FAQ Section -->
+      <div class="row mb-5">
+        <div class="col-lg-12">
+          <h2 class="fw-bold mb-4 text-center text-primary border-bottom pb-2" style="color: #012455 !important">Frequently Asked Questions</h2>
+          <div class="accordion shadow-sm" id="faqAccordion">
+            {% if direct_flight.faq.all %}
+              {% for faq_item in direct_flight.faq.all %}
+                <div class="accordion-item border-0 mb-3">
+                  <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                    <button 
+                      class="accordion-button collapsed fw-bold" 
+                      type="button" 
+                      data-bs-toggle="collapse" 
+                      data-bs-target="#collapse{{ forloop.counter }}" 
+                      aria-expanded="false" 
+                      aria-controls="collapse{{ forloop.counter }}"
+                      style="background-color: white; color: #012455 !important;"
+                    >
+                      <i class="fas fa-question-circle me-2" style="color: #0056b3;"></i>
+                      {{ faq_item.question }}
+                    </button>
+                  </h2>
+                  <div 
+                    id="collapse{{ forloop.counter }}" 
+                    class="accordion-collapse collapse" 
+                    aria-labelledby="heading{{ forloop.counter }}"
+                    data-bs-parent="#faqAccordion"
+                  >
+                    <div class="accordion-body bg-white">
+                      <div class="ps-4 border-start" style="border-color: #0056b3 !important;">
+                        {{ faq_item.answer }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="alert alert-info d-flex align-items-center">
+                <i class="fas fa-info-circle fs-4 me-3"></i>
+                <div>No FAQs available for this offer at this time.</div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- OFFER DETAILS SECTION END -->
+
+  <!-- =======================
+  SUPPORT / CTA SECTION START
+  ======================= -->
+  <section class="py-5 text-white" style="background: linear-gradient(135deg, #012455, #003366);">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <h2 class="fw-bold text-white mb-2" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.4);"><i class="fas fa-life-ring me-2"></i>Need Help?</h2>
+          <p class="mb-0 fs-5">For bookings, cancellations, or any assistance, reach us at:</p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+          <div class="support-number bg-white p-3 rounded-pill shadow d-inline-block" style="color: #012455 !important;">
+            <div class="fs-4 fw-bold">
+              <i class="fas fa-headset me-2"></i> 
+              {% if airline.support_number %}
+                {{ airline.support_number }}
+              {% else %}
+                +1 (888) 843-5849
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- SUPPORT / CTA SECTION END -->
+
+</main>
+{% endblock %}

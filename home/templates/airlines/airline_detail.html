@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<main>
+
+  <!-- =======================
+  HERO SECTION START 
+  ======================= -->
+  <section 
+    class="position-relative text-light" 
+    style="
+      background: url('{{ airline.hero_image }}') no-repeat center center/cover;
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      padding-top: 12px;
+      padding-bottom: 100px;
+    "
+  >
+    <!-- Hero overlay -->
+    <div 
+      class="position-absolute top-0 start-0 w-100 h-100" 
+      style="background: linear-gradient(rgba(0, 28, 66, 0.8), rgba(0, 28, 66, 0.5));"
+    ></div>
+
+    <div class="container position-relative">
+      <div class="row">
+        <div class="col-md-12">
+
+          {% include 'airlines/leadForm.html' %}
+
+
+
+          <h1 class="display-3 fw-bold text-white mb-3 animate__animated animate__fadeInUp">
+            {{ airline.name }}
+          </h1>
+          <p class="fs-4 fw-light mb-4 animate__animated animate__fadeInUp animate__delay-1s">{{ airline.tagline }}</p>
+          <a href="#detail-section" class="btn btn-warning btn-lg mt-2 px-4 py-2 rounded-pill shadow-sm animate__animated animate__fadeInUp animate__delay-2s">
+            <i class="fas fa-info-circle me-2"></i>Learn More
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- HERO SECTION END -->
+
+
+  <!-- =======================
+  DETAIL SECTION START
+  ======================= -->
+  <section id="detail-section" class="py-5" style="background-color: #f5f7fa;">
+    <div class="container">
+
+      <!-- Airline Overview -->
+      <div class="row">
+        <div class="col-lg-8">
+          <h2 class="fw-bold mb-4 border-bottom pb-2 text-primary">Overview</h2>
+          <div class="description mb-4">
+            {{ airline.description|safe|linebreaksbr }}
+          </div>
+          
+          {% if airline.booking_tips %}
+          <div class="card border-0 shadow-sm mb-4 bg-white">
+            <div class="card-body">
+              <h4 class="card-title mb-3 text-success"><i class="fas fa-lightbulb me-2"></i>Booking Tips</h4>
+              <div class="booking-tips">
+                {{ airline.booking_tips|safe|linebreaksbr }}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          
+          {% if airline.contact_info %}
+          <div class="contact-info p-3 bg-white rounded shadow-sm mb-4">
+            <h4 class="mb-3"><i class="fas fa-address-card me-2 text-primary"></i>Contact Information</h4>
+            <p class="mb-0">{{ airline.contact_info|linebreaksbr }}</p>
+          </div>
+          {% endif %}
+
+          {% if airline.support_number %}
+          <div class="support-info p-3 bg-white rounded shadow-sm mb-4 d-flex align-items-center">
+            <i style="font-size: 2rem;" class="fas fa-phone-alt text-success me-3"></i>
+            <div>
+              <h5 class="mb-1">Support Number</h5>
+              <p class="fs-5 fw-bold mb-0">{{ airline.support_number }}</p>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        <div class="col-lg-4">
+          <div class="card shadow border-0 sticky-top" style="top: 20px; z-index: 999;">
+            <div class="card-header py-3" style="background-color: #001c42; color: white;">
+              <h4 class="card-title mb-0" style="color: white;"><i class="fas fa-info-circle me-2"></i>Key Information</h4>
+            </div>
+            <div class="card-body p-4">
+              <ul class="list-unstyled">
+                <li class="mb-3 d-flex align-items-center">
+                  <i class="fas fa-map-marker-alt me-3 fs-5" style="color: #001c42;"></i>
+                  <div>
+                    <strong class="d-block">Hub:</strong>
+                    <span>{{ airline.hub }}</span>
+                  </div>
+                </li>
+                {% if airline.call_sign %}
+                <li class="mb-3 d-flex align-items-center">
+                  <i class="fas fa-broadcast-tower me-3 fs-5" style="color: #001c42;"></i>
+                  <div>
+                    <strong class="d-block">Call Sign:</strong>
+                    <span>{{ airline.call_sign }}</span>
+                  </div>
+                </li>
+                {% endif %}
+                <li class="mb-3 d-flex align-items-center">
+                  <i class="fas fa-building me-3 fs-5" style="color: #001c42;"></i>
+                  <div>
+                    <strong class="d-block">Headquarters:</strong>
+                    <span>{{ airline.headquarters }}</span>
+                  </div>
+                </li>
+                {% if airline.popular_route %}
+                <li class="mb-3 d-flex align-items-center">
+                  <i class="fas fa-route me-3 fs-5" style="color: #001c42;"></i>
+                  <div>
+                    <strong class="d-block">Popular Route:</strong>
+                    <span>{{ airline.popular_route }}</span>
+                  </div>
+                </li>
+                {% endif %}
+                {% if airline.popular_destinations %}
+                <li class="mb-3 d-flex align-items-center">
+                  <i class="fas fa-globe-americas me-3 fs-5" style="color: #001c42;"></i>
+                  <div>
+                    <strong class="d-block">Popular Destinations:</strong>
+                    <span>{{ airline.popular_destinations }}</span>
+                  </div>
+                </li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /Airline Overview -->
+
+    </div>
+  </section>
+  <!-- DETAIL SECTION END -->
+
+
+  <!-- =======================
+  TRAVEL INSIGHTS START
+  ======================= -->
+  <section class="py-5 bg-white">
+    <div class="container">
+      <h2 class="fw-bold mb-4 text-center position-relative pb-3">
+        <span class="position-relative z-index-1" style="color: #001c42;">{{ airline.name }} Travel Insights</span>
+        <span class="position-absolute start-50 bottom-0 translate-middle-x" style="height: 3px; width: 80px; background-color: #0056b3;"></span>
+      </h2>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card shadow-lg border-0 p-0 overflow-hidden">
+            <div class="card-header p-3" style="background-color: #001c42; color: white;">
+              <h4 class="mb-0" style="color: white;"><i class="fas fa-chart-pie me-2"></i>Passenger Demographics & Preferences</h4>
+            </div>
+            <div class="card-body p-4">
+              <div class="row">
+                {% if airline.senior_travelers_percentage %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="insight-card p-3 border rounded h-100" style="background-color: #f5f7fa;">
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="icon-wrapper rounded-circle p-3 me-3" style="background-color: #001c42; color: white;width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user-friends"></i>
+                      </div>
+                      <h5 class="mb-0">Senior Travelers</h5>
+                    </div>
+                    <p class="mb-0">The percentage of {{ airline.name }} passengers over the age of 60: <span class="fw-bold" style="color: #001c42;">{{ airline.senior_travelers_percentage }}</span></p>
+                  </div>
+                </div>
+                {% endif %}
+                
+                {% if airline.child_travelers_percentage %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="insight-card p-3 border rounded h-100" style="background-color: #f5f7fa;">
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="icon-wrapper rounded-circle p-3 me-3" style="background-color: #0056b3; color: white;width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+
+                        <i class="fas fa-child"></i>
+                      </div>
+                      <h5 class="mb-0">Child Travelers</h5>
+                    </div>
+                    <p class="mb-0">The percentage of kids under 14 traveling on {{ airline.name }} flights: <span class="fw-bold" style="color: #0056b3;">{{ airline.child_travelers_percentage }}</span></p>
+                  </div>
+                </div>
+                {% endif %}
+                
+                {% if airline.millennial_travelers_percentage %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="insight-card p-3 border rounded h-100" style="background-color: #f5f7fa;">
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="icon-wrapper rounded-circle p-3 me-3" style="background-color: #0056b3; color: white;width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-users"></i>
+                      </div>
+                      <h5 class="mb-0">Millennial Travelers</h5>
+                    </div>
+                    <p class="mb-0">The percentage of millennials traveling on {{ airline.name }} flights: <span class="fw-bold" style="color: #0056b3;">{{ airline.millennial_travelers_percentage }}</span></p>
+                  </div>
+                </div>
+                {% endif %}
+                
+                {% if airline.female_travelers_percentage %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="insight-card p-3 border rounded h-100" style="background-color: #f5f7fa;">
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="icon-wrapper rounded-circle p-3 me-3" style="background-color: #0056b3; color: white;width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-female"></i>
+                      </div>
+                      <h5 class="mb-0">Female Travelers</h5>
+                    </div>
+                    <p class="mb-0">The percentage of female travelers on {{ airline.name }} flights: <span class="fw-bold" style="color: #0056b3;">{{ airline.female_travelers_percentage }}</span></p>
+                  </div>
+                </div>
+                {% endif %}
+                
+                {% if airline.premium_class_bookings_percentage %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="insight-card p-3 border rounded h-100" style="background-color: #f5f7fa;">
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="icon-wrapper rounded-circle p-3 me-3" style="background-color: #0056b3; color: white;width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-crown"></i>
+                      </div>
+                      <h5 class="mb-0">Premium Bookings</h5>
+                    </div>
+                    <p class="mb-0">Percentage booking First or Business Class: <span class="fw-bold" style="color: #0056b3;">{{ airline.premium_class_bookings_percentage }}</span></p>
+                  </div>
+                </div>
+                {% endif %}
+                
+                {% if airline.most_popular_destination %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="insight-card p-3 border rounded h-100" style="background-color: #f5f7fa;">
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="icon-wrapper rounded-circle p-3 me-3" style="background-color: #0056b3; color: white;width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-map-marker-alt"></i>
+                      </div>
+                      <h5 class="mb-0">Popular Destination</h5>
+                    </div>
+                    <p class="mb-0">Most popular destination: <span class="fw-bold" style="color: #0056b3;">{{ airline.most_popular_destination }}</span></p>
+                  </div>
+                </div>
+                {% endif %}
+                
+                {% if airline.most_popular_airport %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="insight-card p-3 border rounded h-100" style="background-color: #f5f7fa;">
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="icon-wrapper rounded-circle p-3 me-3" style="background-color: #0056b3; color: white;width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-plane-departure"></i>
+                      </div>
+                      <h5 class="mb-0">Popular Airport</h5>
+                    </div>
+                    <p class="mb-0">Most popular airport: <span class="fw-bold" style="color: #0056b3;">{{ airline.most_popular_airport }}</span></p>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- TRAVEL INSIGHTS END -->
+
+
+  <!-- =======================
+  FAQ / Collapsible Section START
+  ======================= -->
+  <section class="py-5" style="background-color: #f5f7fa;">
+    <div class="container">
+      <h2 class="fw-bold mb-4 text-center position-relative pb-3">
+        <span class="position-relative z-index-1" style="color: #001c42;">Frequently Asked Questions</span>
+        <span class="position-absolute start-50 bottom-0 translate-middle-x" style="height: 3px; width: 80px; background-color: #0056b3;"></span>
+      </h2>
+
+      <div class="accordion shadow-sm" id="faqAccordion">
+        {% if airline.faq.all %}
+          {% for faq_item in airline.faq.all %}
+            <div class="accordion-item border-0 mb-3">
+              <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                <button 
+                  class="accordion-button collapsed fw-bold" 
+                  type="button" 
+                  data-bs-toggle="collapse" 
+                  data-bs-target="#collapse{{ forloop.counter }}" 
+                  aria-expanded="false" 
+                  aria-controls="collapse{{ forloop.counter }}"
+                  style="background-color: white; color: #001c42;"
+                >
+                  <i class="fas fa-question-circle me-2" style="color: #0056b3;"></i>
+                  {{ faq_item.question }}
+                </button>
+              </h2>
+              <div 
+                id="collapse{{ forloop.counter }}" 
+                class="accordion-collapse collapse" 
+                aria-labelledby="heading{{ forloop.counter }}"
+                data-bs-parent="#faqAccordion"
+              >
+                <div class="accordion-body bg-white">
+                  <div class="ps-4 border-start" style="border-color: #0056b3 !important;">
+                    {{ faq_item.answer|linebreaksbr }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="alert alert-info d-flex align-items-center">
+            <i class="fas fa-info-circle fs-4 me-3"></i>
+            <div>No FAQs available for {{ airline.name }} at this time.</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  <!-- FAQ / Collapsible Section END -->
+
+
+  <!-- =======================
+  SUPPORT / CTA SECTION START
+  ======================= -->
+  <section class="py-5 text-white" style="background: linear-gradient(135deg, #001c42, #003366);">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <h2 class="fw-bold text-white mb-2"><i class="fas fa-life-ring me-2"></i>Need Help?</h2>
+          <p class="mb-0 fs-5">For bookings, cancellations, or any assistance, reach us at:</p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+          <div class="support-number bg-white p-3 rounded-pill shadow d-inline-block" style="color: #001c42;">
+            <div class="fs-4 fw-bold">
+              <i class="fas fa-headset me-2"></i> 
+              
+                +1 (888) 843-5849
+            
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- SUPPORT / CTA SECTION END -->
+
+</main>
+{% endblock %}

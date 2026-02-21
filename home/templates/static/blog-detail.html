@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- =======================
+Main banner START -->
+<section class="py-0 mt-5">
+	<div class="container">
+		<!-- Title -->
+		<div class="row g-4">
+			<!-- Image -->
+			<div class="col-12">
+				<img src="{{ blog.featured_image.url }}" class="rounded-3" alt="{{ blog.title }}">
+			</div>
+			<!-- Title and content -->
+			<div class="col-11 col-lg-10 mx-auto position-relative mt-n5 mt-sm-n7 mt-md-n8">
+				<div class="bg-mode shadow rounded-3 p-4">
+					<!-- Badge -->
+					<div class="badge text-bg-success mb-2">{{ blog.category }}</div>
+					<!-- Title -->
+					<h1 class="fs-3">{{ blog.title }}</h1>
+					<p class="mb-2">{{ blog.excerpt }}</p>
+					
+					<!-- List -->
+					<ul class="nav nav-divider align-items-center">
+						<li class="nav-item">
+							<div class="nav-link">
+								<div class="d-flex align-items-center">
+									<!-- Info -->
+									<div>
+										<h6 class="mb-0">{{ blog.author }}</h6>
+									</div>
+								</div>
+							</div>
+						</li>
+						<li class="nav-item">{{ blog.published_date|date:"M d, Y" }}</li>
+						<li class="nav-item">{{ blog.read_time|default:"5" }} min read</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- =======================
+Main banner END -->
+
+<!-- =======================
+Blog content START -->
+<section>
+	<div class="container">
+		<div class="row">
+			
+			<div class="col-lg-10 mx-auto">
+				{{ blog.content|safe }}
+				
+				<!-- Author info -->
+				<div class="bg-mode border rounded p-4">
+					<!-- Avatar and info -->
+					<div class="d-flex">
+						<!-- Info -->
+						<div>
+							<h4 class="m-0">{{ blog.author }}</h4>
+							<small>Author</small>
+						</div>
+					</div>
+
+					<!-- Content -->
+					<p class="my-3">Author of this article</p>
+				</div>
+
+				<!-- Review poll START -->
+				<div class="bg-light rounded d-md-flex justify-content-between align-items-center text-center p-3 mt-4">
+					<!-- Title -->
+					<h6 class="mb-0">Was this article helpful?</h6>
+					<small class="py-3 p-md-0 d-block">0 out of 0 found this helpful</small>
+					<!-- Check buttons -->
+					<div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+						<!-- Yes button -->
+						<input type="radio" class="btn-check" name="btnradio" id="btnradio1" data-blog-id="{{ blog.hex }}" data-vote="helpful">
+						<label class="btn btn-outline-secondary btn-sm mb-0" for="btnradio1"><i class="fa-regular fa-thumbs-up me-1"></i> Yes</label>
+						<!-- No button -->
+						<input type="radio" class="btn-check" name="btnradio" id="btnradio2" data-blog-id="{{ blog.hex }}" data-vote="not-helpful">
+						<label class="btn btn-outline-secondary btn-sm mb-0" for="btnradio2"> No <i class="fa-regular fa-thumbs-down ms-1"></i></label>
+					</div>
+				</div>
+				<!-- Review poll END -->
+
+				<!-- Social links and tags -->
+				<div class="d-lg-flex justify-content-lg-between mt-4">
+					<!-- Social media button -->
+					<div class="align-items-center mb-3 mb-lg-0">
+						<h6 class="d-inline-block mb-2 me-4">Share on:</h6>
+						<ul class="list-inline hstack flex-wrap gap-3 h6 fw-normal mb-0">
+							<li class="list-inline-item"> <a class="text-facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"><i class="fa-brands fa-facebook-square"></i> Facebook</a> </li>
+							<li class="list-inline-item"> <a class="text-instagram-gradient" href="https://www.instagram.com/create/story?url={{ request.build_absolute_uri }}&title={{ blog.title }}"><i class="fa-brands fa-instagram-square"></i> Instagram</a> </li>
+							<li class="list-inline-item"> <a class="text-twitter" href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ blog.title }}"><i class="fa-brands fa-twitter-square"></i> Twitter</a> </li>
+						</ul>
+					</div>
+					<!-- Popular tags -->
+					<div class="align-items-center">
+						<h6 class="d-inline-block mb-2 me-4">Popular Tags:</h6>
+						<ul class="list-inline mb-0">
+							{% if blog.tags %}
+								{% for tag in blog.tags.split %}
+									<li class="list-inline-item"> <a class="btn btn-light btn-sm mb-xl-0" >{{ tag|stringformat:"s" }}</a> </li>
+								{% endfor %}
+							{% endif %}
+						</ul>
+					</div>
+				</div>
+				<!-- Social links and END -->
+	
+			</div>	
+		</div>
+	</div>
+</section>
+<!-- =======================
+Blog content END -->
+
+<!-- =======================
+Related posts START -->
+{% if related_posts %}
+<section class="pt-0">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<h4 class="mb-4">Related Posts</h4>
+				<div class="row g-4">
+					{% for post in related_posts %}
+					<div class="col-md-4">
+						<div class="card">
+							<div class="card-img-top position-relative">
+								<img src="{{ post.featured_image.url }}" class="card-img-top" alt="{{ post.title }}">
+							</div>
+							<div class="card-body">
+								<a href="{% url 'blog_detail' post.slug %}" class="btn btn-sm btn-primary mb-2">{{ post.category }}</a>
+								<h5 class="card-title"><a href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a></h5>
+								<p class="mb-0">{{ post.excerpt|truncatechars:100 }}</p>
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+{% endif %}
+<!-- =======================
+Related posts END -->
+
+{% endblock %}

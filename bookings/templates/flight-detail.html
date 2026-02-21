@@ -1,0 +1,693 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+    <style>
+        .session-expire{
+            background-color: rgb(53, 53, 53);
+            color: white;
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            text-align: center;
+            padding: 5px 24px;
+            z-index: 9999;
+        }
+        body {
+            background-color: #F8F9FA;
+            color: #333333;
+            font-family: 'Roboto', Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Typography */
+        h3 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333333;
+        }
+
+        h5, h6 {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333333;
+        }
+
+        p, label, span, small {
+            font-size: 16px;
+            color: #333333;
+        }
+
+        small {
+            font-size: 14px;
+            color: #666666;
+        }
+
+        /* Stepper Styles */
+        .stepper {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .stepper .nav-item {
+            flex: 1;
+            position: relative;
+        }
+
+        .stepper .nav-item::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background-color: #CCCCCC;
+            z-index: -1;
+        }
+
+        .stepper .nav-item:last-child::after {
+            display: none;
+        }
+
+        .stepper .step-indicator {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #CCCCCC;
+            color: #FFFFFF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 10px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .stepper .nav-item.active .step-indicator {
+            background-color: #0071C2;
+            color: #FFFFFF;
+        }
+
+        .stepper .nav-item.completed .step-indicator {
+            background-color: #28A745;
+            color: #FFFFFF;
+        }
+
+        .stepper .step-label {
+            display: block;
+            font-size: 14px;
+            color: #333333;
+        }
+
+        /* Ticket Option Wrapper */
+        .ticket-option-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Ticket Option Card */
+        .ticket-option {
+            border: 2px solid #CCCCCC;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .ticket-option:hover {
+            border-color: #0071C2;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .ticket-option.selected {
+            border-color: #0071C2;
+            background-color: #E3F2FD;
+        }
+
+        .ticket-option .form-check-input {
+            cursor: pointer;
+        }
+
+        .ticket-option .ticket-details .price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0071C2;
+        }
+
+        .ticket-option .ticket-details .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .ticket-option .ticket-details .card-text {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        /* Price Summary */
+        .price-summary {
+            border: none;
+            border-radius: 12px;
+            padding: 20px;
+            background-color: #F0F4F8;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .price-summary h5 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333333;
+        }
+
+        .price-summary .price-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 16px;
+            color: #333333;
+        }
+
+        .price-summary .price-item.total {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0071C2;
+        }
+
+        .price-summary .price-note {
+            font-size: 14px;
+            color: #666666;
+            margin-top: 16px;
+        }
+
+        /* Buttons */
+        .btn-custom {
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-back {
+            background-color: #6C757D;
+            color: #FFFFFF;
+        }
+
+        .btn-back:hover:not([disabled]) {
+            background-color: #5A6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-next {
+            background-color: #0071C2;
+            color: #FFFFFF;
+        }
+
+        .btn-next:hover {
+            background-color: #005fa3;
+            transform: translateY(-2px);
+        }
+
+        .btn-custom:disabled,
+        .btn-custom[aria-disabled="true"] {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        /* Modal Styles */
+        .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .modal-header h5 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333333;
+        }
+
+        .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #333333;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-body h5 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #333333;
+        }
+
+        .modal-body p {
+            font-size: 16px;
+            color: #666666;
+            margin-bottom: 8px;
+        }
+
+        .modal-body .total-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0071C2;
+            margin-top: 16px;
+        }
+
+        /* Back to Top Button */
+        .back-top {
+            display: none;
+        }
+
+        .back-top.show {
+            display: block;
+        }
+
+        #backToTop {
+            width: 50px;
+            height: 50px;
+            background-color: #0071C2;
+            color: #FFFFFF;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        #backToTop:hover {
+            background-color: #005fa3;
+            transform: translateY(-2px);
+        }
+
+      
+        @media (min-width: 1200px) {
+            body {
+                font-size: 18px;
+            }
+        }
+
+        /* Global Enhancements */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        h3, h5 {
+            color: #333333;
+        }
+
+        .text-primary {
+            color: #0071C2 !important;
+        }
+
+        .text-success {
+            color: #28A745 !important;
+        }
+
+        .text-danger {
+            color: #DC3545 !important;
+        }
+
+        .text-muted {
+            color: #6C757D !important;
+        }
+
+        a.text-decoration-underline {
+            text-decoration: underline !important;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #CCCCCC;
+            padding: 12px 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            width: 100%;
+        }
+
+        .form-control:focus {
+            border-color: #0071C2;
+            box-shadow: 0 0 8px rgba(0, 113, 194, 0.2);
+        }
+
+        /* Responsive Images and Media */
+        img, video {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+
+    <main>
+        <!-- Main Content START -->
+        <section class="py-5">
+            <div class="container">
+                <!-- Progress Tracker -->
+                <div class="mb-5">
+                    <ul class="stepper d-flex justify-content-between mb-5">
+                        <!-- Step 1: Your Details -->
+                        <li class="nav-item text-center position-relative {% if current_step > 2 %}completed{% elif current_step == 2 %}active{% endif %}">
+                            <div class="step-indicator">
+                                {% if current_step > 1 %}
+                                    <i class="fas fa-check"></i>
+                                {% else %}
+                                    1
+                                {% endif %}
+                            </div>
+                            <span class="step-label mt-2">Your Details</span>
+                        </li>
+                        <!-- Step 2: Select Seat -->
+                        <li class="nav-item text-center position-relative {% if current_step > 3 %}completed{% elif current_step == 3 %}active{% endif %}">
+                            <div class="step-indicator">
+                                {% if current_step > 2 %}
+                                    <i class="fas fa-check"></i>
+                                {% else %}
+                                    2
+                                {% endif %}
+                            </div>
+                            <span class="step-label mt-2">Select Seat</span>
+                        </li>
+                        <!-- Step 3: Check & Pay -->
+                        <li class="nav-item text-center position-relative {% if current_step > 4 %}completed{% elif current_step == 4 %}active{% endif %}">
+                            <div class="step-indicator">
+                                {% if current_step > 3 %}
+                                    <i class="fas fa-check"></i>
+                                {% else %}
+                                    3
+                                {% endif %}
+                            </div>
+                            <span class="step-label mt-2">Check & Pay</span>
+                        </li>
+                    </ul>
+                </div>
+
+				<div id="loader" >
+					{% include 'components/loader.html' %}
+				</div>
+                <!-- Booking Steps Content -->
+                <div class="row">
+					{% if current_step == 2 %}
+                        {% include 'components/seat-selection.html' %}
+					{% elif current_step == 3 %}
+						{% include 'components/flight_payment_page.html' %}
+					{% endif %}
+                    <!-- Left Column: Booking Forms and Details -->
+                    <div class="col-12 col-md-8">
+                        {% if current_step == 1 %}
+							<div id="stepOneInsert">
+							</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Right Column: Price Summary and Offers -->
+                    <div class="col-12 col-md-4">
+                        <div class="sticky-top" style="top: 100px;">
+                            <!-- Price Summary -->
+                            <div id="stepPriceSummary"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cancellation Policy Modal -->
+                <div class="modal fade" id="cancellationPolicyModal" tabindex="-1" aria-labelledby="cancellationPolicyModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 id="cancellationPolicyModalLabel">Cancellation Policy</h5>
+                                <button type="button" class="close-btn" data-bs-dismiss="modal" aria-label="Close">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>If you cancel your booking within 24 hours of purchase, you will receive a full refund. Cancellations made after 24 hours are subject to a cancellation fee based on the fare rules of your ticket.</p>
+                                <p>Please refer to the fare rules for more detailed information.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+        <!-- Main Content END -->
+    </main>
+
+    <!-- Back to Top button -->
+    <div class="back-top position-fixed bottom-0 end-0 p-3">
+        <button type="button" class="btn-custom btn-next" id="backToTop" aria-label="Back to Top">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+    </div>
+
+    <script>
+        // JavaScript for Multi-Step Form Navigation
+        let currentStep = parseFloat("{{ current_step }}");
+        const totalSteps = 4;
+
+        function showStep(step) {
+            // Hide all steps
+            for (let i = 1; i <= totalSteps; i++) {
+                const stepCard = document.getElementById(`step-${i}`);
+                if (stepCard) {
+                    stepCard.classList.remove('active');
+                }
+            }
+            // Show the current step
+            const activeStep = document.getElementById(`step-${step}`);
+            if (activeStep) {
+                activeStep.classList.add('active');
+            }
+            currentStep = step;
+            updateProgressTracker();
+        }
+
+        function nextStep(step) {
+            // Basic validation before proceeding
+            // Additional validation can be implemented as needed
+            if (step === 4) { // Before proceeding to payment
+                const selectedSeat = document.getElementById('selected_seat').value;
+                if (!selectedSeat) {
+                    alert('Please select a seat before proceeding.');
+                    return;
+                }
+            }
+            showStep(step);
+        }
+
+        function prevStep(step) {
+            showStep(step);
+        }
+
+        // Update Progress Tracker
+        function updateProgressTracker() {
+            const navItems = document.querySelectorAll('.stepper .nav-item');
+            navItems.forEach((item, index) => {
+                const stepNumber = index + 1;
+                const circle = item.querySelector('.step-indicator');
+
+                if (stepNumber < currentStep) {
+                    item.classList.add('completed');
+                    item.classList.remove('active');
+                } else if (stepNumber === currentStep) {
+                    item.classList.add('active');
+                    item.classList.remove('completed');
+                } else {
+                    item.classList.remove('active');
+                    item.classList.remove('completed');
+                }
+            });
+        }
+
+        // Initialize Progress Tracker
+        updateProgressTracker();
+
+        // JavaScript for Seat Selection
+        document.querySelectorAll('.seat.available').forEach(function(button) {
+            button.addEventListener('click', function() {
+                // Deselect all seats
+                document.querySelectorAll('.seat.available').forEach(btn => btn.classList.remove('selected'));
+                // Select the clicked seat
+                this.classList.add('selected');
+                // Update the hidden input field
+                document.getElementById('selected_seat').value = this.getAttribute('data-seat');
+                // Real-time price update (assuming seat cost is $20)
+                updateTotalFare(20);
+            });
+        });
+
+        // Function to update total fare dynamically
+        function updateTotalFare(additionalCost) {
+            // Fetch current total fare
+            let totalFareElement = document.querySelector('.price-summary .total span');
+            if (totalFareElement) {
+                let currentTotal = parseFloat(totalFareElement.textContent.replace('$', ''));
+                // Add the additional cost
+                currentTotal += additionalCost;
+                totalFareElement.textContent = `$${currentTotal}`;
+                // Update the price summary in the sidebar
+                let sidebarTotal = document.querySelector('.col-lg-4 .price-summary .total span');
+                if (sidebarTotal) {
+                    sidebarTotal.textContent = `$${currentTotal}`;
+                }
+            }
+        }
+
+        // Back to Top Button Logic
+        const backToTopButton = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopButton.parentElement.classList.add('show');
+            } else {
+                backToTopButton.parentElement.classList.remove('show');
+            }
+        });
+
+        backToTopButton.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Initialize Bootstrap Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+        // JavaScript for Coupon Form
+        document.getElementById('coupon-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const couponCode = this.coupon_code.value.trim();
+            const messageDiv = document.getElementById('coupon-message');
+
+            // Example validation
+            if (couponCode.toUpperCase() === "DISCOUNT10") {
+                messageDiv.innerHTML = '<div class="text-success"><i class="fas fa-check-circle me-2"></i> Coupon applied! You saved $10.</div>';
+                // Update price summary accordingly (this would require additional backend logic)
+            } else {
+                messageDiv.innerHTML = '<div class="text-danger"><i class="fas fa-times-circle me-2"></i> Invalid coupon code.</div>';
+            }
+        });
+
+        // JavaScript for Payment Confirmation
+        document.getElementById('payment-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Implement real payment processing here
+            alert('Payment Successful! Redirecting to confirmation page.');
+            // Redirect to confirmation step
+        });
+    </script>
+
+    <script>
+        function selectTicket(ticketType) {
+            document.querySelectorAll('.ticket-option').forEach(card => {
+                card.classList.remove('selected');
+                card.querySelector('input[name="ticket_type"]').checked = false;
+            });
+            const selectedCard = document.querySelector(`.ticket-option input[value="${ticketType}"]`).closest('.ticket-option');
+            selectedCard.classList.add('selected');
+            selectedCard.querySelector('input[name="ticket_type"]').checked = true;
+        }
+    </script>
+
+
+<script>
+	$(document).ready(function(){
+		const urlParams = new URLSearchParams(window.location.search);
+            const TraceId = "{{TraceId}}";
+            const ResultIndex = "{{ResultIndex}}";
+			const stepCount = "{{current_step}}";
+			if(stepCount == 2 || stepCount==3) $('#loader').hide();
+            if(stepCount == 1) $.ajax({
+                url: "{% url 'fare_quote'  %}",
+                type: 'POST',
+                data: {
+                    TraceId:TraceId,
+                    ResultIndex:ResultIndex
+                },
+                success: function(data) {
+					$('#loader').hide();
+                    console.log("hoe",data);
+
+
+                    // fare quote processing
+
+
+                    $("#passengersAccordion").empty();
+					const error = data?.fare_rule?.Response.Error?.ErrorMessage;
+					if(error) window.history.back();
+                    const result = data?.fare_rule?.Response.Results;
+                    
+					$('#stepOneInsert').html(data?.travellerDetails);
+					$('#stepPriceSummary').html(data?.priceSummary);
+					
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+	})
+</script>
+
+<div class="session-expire">
+    Your session will expire in <strong style="color: white;" id="session-expire-timer">--:--</strong> minutes.
+</div>
+
+<script>
+    const sessionExpireTimer = document.getElementById('session-expire-timer');
+    const sessionExpiry = "{{session_expiry}}"; // Ensure this value is populated with a valid ISO date string.
+    const now = new Date();
+    const expiry = new Date(sessionExpiry);
+
+    // Calculate time left in seconds
+    const timeLeft = Math.floor((expiry.getTime() - now.getTime()) / 1000);
+    console.log("Current Time:", now);
+    console.log("Expiry Time:", expiry);
+    console.log("Time Left (seconds):", timeLeft);
+
+    // Use 10 minutes (600 seconds) as fallback if timeLeft is negative or invalid
+    let sessionExpireTime = timeLeft > 0 ? timeLeft : 0
+    //window.history.back();
+
+    // Update the timer every second
+    const intervalId = setInterval(() => {
+        // Decrement the remaining time
+        sessionExpireTime -= 1;
+
+        // Calculate minutes and seconds
+        const minutes = Math.floor(sessionExpireTime / 60);
+        const seconds = sessionExpireTime % 60;
+
+        // Update the timer display
+        sessionExpireTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        // Check if time has expired
+        if (sessionExpireTime <= 0) {
+            clearInterval(intervalId);
+            // window.location.href = '/login';
+            // window.history.back();
+        }
+    }, 1000);
+</script>
+
+
+{% endblock %}

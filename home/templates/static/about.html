@@ -1,0 +1,616 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="about-page">
+
+    <style>
+        .text-myheading{
+            color : #1b203d !important;
+        }
+    </style>
+<!-- =======================
+Main Banner START -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-xl-10 mx-auto text-center">
+                <h1 class="display-4 fw-bold">Your Trusted Partner for International Travel</h1>
+                <p class="lead text-muted">At TicketClue.com, we're more than just a travel agency—we're your gateway to the world. With a passion for exploration and a commitment to excellence, we make international travel seamless, affordable, and unforgettable. From flights to hotels, tours to travel assistance, we've got every detail covered so you can focus on creating memories.</p>
+                <div class="hstack gap-3 flex-wrap justify-content-center mt-4">
+                    <h6 class="bg-white shadow-sm rounded-2 fw-normal d-inline-block py-2 px-4">
+                        <img src="{% static 'assets/images/element/06.svg' %}" class="h-20px me-2" alt="Global Customers">
+                        14K+ Global Customers
+                    </h6>
+                    <h6 class="bg-white shadow-sm rounded-2 fw-normal d-inline-block py-2 px-4">
+                        <img src="{% static 'assets/images/element/07.svg' %}" class="h-20px me-2" alt="Happy Customers">
+                        10K+ Happy Customers
+                    </h6>
+                    <h6 class="bg-white shadow-sm rounded-2 fw-normal d-inline-block py-2 px-4">
+                        <img src="{% static 'assets/images/element/08.svg' %}" class="h-20px me-2" alt="Subscribers">
+                        1M+ Subscribers
+                    </h6>
+                    <h6 class="bg-white shadow-sm rounded-2 fw-normal d-inline-block py-2 px-4">
+                        <img src="{% static 'assets/images/element/09.svg' %}" class="h-20px me-2" alt="Destinations">
+                        200+ Destinations Served
+                    </h6>
+                </div>
+            </div>
+        </div>
+        <div class="row g-4 align-items-center">
+            <div class="col-md-6">
+                <img src="{% static 'assets/images/about/02.jpg' %}" class="rounded-3 w-100 shadow" alt="Travel Image 1">
+            </div>
+            <div class="col-md-6">
+                <div class="row g-4">
+                    <div class="col-md-8">
+                        <img src="{% static 'assets/images/about/03.jpg' %}" class="rounded-3 w-100 shadow" alt="Travel Image 2">
+                    </div>
+                    <div class="col-12">
+                        <img src="{% static 'assets/images/about/04.jpg' %}" class="rounded-3 w-100 shadow" alt="Travel Image 3">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="row mt-5">
+            <div class="col-12 text-center">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item rounded-3 shadow" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen style="max-width: 800px; height: 450px;"></iframe>
+                </div>
+                <p class="text-muted mt-2">Watch our journey in this short video!</p>
+            </div>
+        </div> -->
+    </div>
+</section>
+<!-- =======================
+Main Banner END -->
+
+<!-- =======================
+About Content START -->
+<section class="pt-0 pt-lg-5">
+    <div class="container">
+        <!-- Our Story -->
+        <div class="row mb-5">
+            <div class="col-md-10 mx-auto">
+                <h3 class="mb-4 text-myheading">Our Story: From Vision to Victory</h3>
+                <p>TicketClue.com was founded in 2010 by a group of travel enthusiasts who shared a common dream: to break down the barriers of international travel and make it accessible to everyone, everywhere. What began as a modest platform offering flight bookings has since evolved into a comprehensive travel ecosystem, serving over 14,000 customers across 200+ countries.</p>
+                <p>The spark for TicketClue.com came during a backpacking trip across Southeast Asia, where our founders encountered the complexities of booking affordable flights, securing reliable accommodations, and navigating visa processes. Determined to simplify these challenges, they returned home and built a platform that combined cutting-edge technology with a deep understanding of travelers' needs.</p>
+                <p>Over the past decade, we've expanded our offerings to include hotel bookings, curated tour packages, cab services, and a full suite of travel assistance options. Our growth hasn't just been about adding services—it's been about perfecting the travel experience. From securing IATA certification to launching a mobile app in 2023, every step has been guided by our commitment to innovation and customer satisfaction.</p>
+                <p>Today, TicketClue.com stands as a trusted name in the travel industry, recognized for its reliability, affordability, and personalized approach. Whether you're planning a solo adventure, a family vacation, or a business trip, we're here to turn your travel dreams into reality.</p>
+            </div>
+        </div>
+
+        <!-- Mission, Vision, and Values -->
+        <div class="row mb-5">
+            <div class="col-md-10 mx-auto">
+                <h3 class="mb-4 text-myheading">Our Mission, Vision, and Values</h3>
+                <p>At TicketClue.com, we're driven by a clear purpose and a bold vision, underpinned by values that shape everything we do.</p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="text-myheading">Our Mission</h5>
+                                <p>To empower travelers worldwide with seamless, affordable, Unforgettable travel experiences through innovative technology and exceptional customer service. We aim to remove the stress from planning and let the joy of travel take center stage.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="text-myheading">Our Vision</h5>
+                                <p>To become the world's most trusted travel partner, inspiring people to explore new horizons with confidence, ease, and excitement. We envision a future where travel is a universal right, not a luxury.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="text-myheading">Our Values</h5>
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Customer-Centricity:</strong> Your needs are our priority.</li>
+                                    <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Integrity:</strong> We operate with honesty and transparency.</li>
+                                    <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Innovation:</strong> We embrace technology to enhance your experience.</li>
+                                    <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Excellence:</strong> We strive for perfection in every detail.</li>
+                                    <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Passion:</strong> Our love for travel fuels our work.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IATA Certified -->
+        <div class="row mb-5">
+            <div class="col-md-10 mx-auto text-center">
+                <h3 class="mb-4 text-myheading">IATA Certified: Travel with Confidence</h3>
+                <img src="{% static 'assets/images/iata.webp' %}" style="height: 80px;" alt="IATA Certified" class="mb-3">
+                <p class="fw-bold">As an IATA-certified travel agency, TicketClue.com meets the highest global standards for reliability, security, and professionalism. But what does this mean for you?</p>
+                <p>Our certification by the International Air Transport Association (IATA) ensures that we have direct access to an extensive network of airlines, allowing us to secure exclusive fares and routes that others can't offer. It also guarantees that your bookings are protected by industry-leading financial and operational standards, giving you peace of mind from the moment you book to the moment you land.</p>
+                <p>Whether it's a last-minute flight change or a complex multi-city itinerary, our IATA certification means we've got the expertise and connections to make it happen smoothly. It's just one more way we're committed to being your trusted travel partner.</p>
+            </div>
+        </div>
+
+        <!-- Our Services -->
+        <div class="row g-4 mb-5">
+            <div class="col-12">
+                <h3 class="mb-4 text-myheading text-center">Our Services: Tailored for Every Traveler</h3>
+                <p class="text-center">We offer a full spectrum of travel solutions, designed to meet your unique needs and preferences. Here's how we make your journey exceptional:</p>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="icon-lg bg-success bg-opacity-10 text-success rounded-2 mb-3"><i class="fa-solid fa-plane fs-5"></i></div>
+                        <h5 class="mt-2">International Flight Bookings</h5>
+                        <p class="mb-0">We've partnered with over 100 leading airlines—like Emirates, Delta, and Singapore Airlines—to bring you unbeatable fares across thousands of routes. Whether you're flying economy to save or splurging on business class, enjoy flexible cancellations, priority boarding options, and loyalty program integration.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="icon-lg bg-orange bg-opacity-10 text-orange rounded-2 mb-3"><i class="fa-solid fa-hotel fs-5"></i></div>
+                        <h5 class="mt-2">Hotel Booking</h5>
+                        <p class="mb-0">Choose from budget hostels, cozy boutique hotels, or five-star resorts in over 200 countries. Our partnerships with chains like Marriott and Hilton, plus exclusive deals with local properties, mean you get the best rates and perks like free breakfasts or late checkouts.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="icon-lg bg-primary bg-opacity-10 text-myheading rounded-2 mb-3"><i class="fa-solid fa-globe-americas fs-5"></i></div>
+                        <h5 class="mt-2">Tour Booking</h5>
+                        <p class="mb-0">Our hand-picked tours cater to every taste—think guided treks in the Himalayas, cultural immersions in Europe, or beach getaways in the Caribbean. Opt for group adventures or private escapes, all customizable to your schedule and interests.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="icon-lg bg-info bg-opacity-10 text-info rounded-2 mb-3"><i class="fa-solid fa-car fs-5"></i></div>
+                        <h5 class="mt-2">Cab Booking</h5>
+                        <p class="mb-0">Arrive in style with our cab services, available in major cities worldwide. From airport transfers to full-day rentals, our trusted partners ensure safe, punctual rides with options like eco-friendly vehicles or luxury sedans.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Travel Assistance -->
+        <div class="row mb-5">
+            <div class="col-md-10 mx-auto">
+                <h3 class="mb-4 text-myheading">Comprehensive Travel Assistance: We've Got You Covered</h3>
+                <p>Traveling can be unpredictable, but with TicketClue.com, you're never alone. Our assistance services are designed to handle every detail, so you can relax and enjoy the journey. Here's what we offer:</p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>Visa Guidance:</strong> Navigating visa requirements can be daunting, but our experts make it easy. We provide personalized advice, document checklists, and application support for over 150 countries, ensuring you're approved and ready to go.
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Itinerary Planning:</strong> From multi-city adventures to weekend getaways, we craft bespoke itineraries tailored to your interests—be it food, history, or outdoor thrills. We factor in travel times, budgets, and even local events to maximize your trip.
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Travel Insurance:</strong> Unexpected hiccups happen, and we're here to protect you. Our plans cover flight delays, lost luggage, medical emergencies, and more, with options for solo travelers, families, or seniors—all at competitive rates.
+                    </li>
+                    <li class="list-group-item">
+                        <strong>24/7 Support:</strong> Day or night, our multilingual support team is just a call or click away. Whether you're stranded at an airport or need a last-minute hotel switch, we're here to resolve issues fast, anywhere in the world.
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Why Choose Us -->
+        <div class="row mb-5">
+            <div class="col-md-10 mx-auto">
+                <h3 class="mb-4 text-myheading">Why Choose TicketClue.com? Your Travel Advantage</h3>
+                <p>We're not just another booking site—we're your travel ally. Here's why travelers worldwide choose us:</p>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Unbeatable Prices</h5>
+                                <p>Our airline and hotel partnerships unlock exclusive discounts, backed by a price match guarantee. If you find a lower fare elsewhere, we'll match it—no questions asked.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Expert Support</h5>
+                                <p>Our team of travel pros averages 10+ years of experience, offering insider tips and hands-on help for every booking, big or small.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Secure Booking</h5>
+                                <p>With advanced encryption and IATA-backed processes, your data and payments are safe. We've earned a 99.8% trust rating from customers for security.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>User-Friendly Platform</h5>
+                                <p>Our website and top-rated mobile app (4.8/5 stars) let you book, track, and modify plans effortlessly, even on the go.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Award-Winning Service</h5>
+                                <p>We've been honored with the "Best Travel Agency" award three years running (2021-2023) by the Global Travel Association for our dedication to excellence.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Global Reach</h5>
+                                <p>Operating in over 200 countries, we've served travelers from New York to New Delhi, with local expertise and worldwide connections.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Sustainability Commitment</h5>
+                                <p>We offset carbon emissions for every flight booked and partner with eco-conscious hotels and tour operators to support sustainable travel.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Loyalty Rewards</h5>
+                                <p>Join our free Cluemiles program to earn points on every booking, redeemable for discounts, upgrades, or exclusive travel perks.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Our Journey So Far -->
+        <div class="row mb-5">
+            <div class="col-md-12 mx-auto">
+                <h3 class="mb-4" style="color:#001c42;font-weight:800;text-align:center;letter-spacing:0.01em;">Our Journey So Far: Milestones of Excellence</h3>
+                <p class="text-center" style="font-size:1.15rem;color:#555;max-width:700px;margin:0 auto 2.5rem auto;">From humble beginnings to global impact, here's how TicketClue.com has grown over the years:</p>
+                <div class="timeline-modern d-flex flex-nowrap overflow-auto py-4 px-2" style="gap:2.5rem;">
+                    <div class="timeline-milestone card border-0 shadow-sm text-center p-4 flex-shrink-0" style="min-width:220px;max-width:220px;background:linear-gradient(135deg,#f5f8ff 70%,#eaf0fa 100%);">
+                        <div class="timeline-year-badge mb-2" style="background:#001c42;color:#fff;font-weight:700;border-radius:1.5rem;padding:0.4rem 1.2rem;display:inline-block;font-size:1.1rem;">2010</div>
+                        <div class="timeline-icon mb-3" style="font-size:2.2rem;color:#17a2b8;"><i class="fa-solid fa-rocket"></i></div>
+                        <h5 class="fw-bold mb-2" style="color:#001c42;">Founded</h5>
+                        <p class="mb-0">TicketClue.com launched with a mission to simplify flight bookings, starting with a team of five and a single office.</p>
+                    </div>
+                    <div class="timeline-milestone card border-0 shadow-sm text-center p-4 flex-shrink-0" style="min-width:220px;max-width:220px;background:linear-gradient(135deg,#f5f8ff 70%,#eaf0fa 100%);">
+                        <div class="timeline-year-badge mb-2" style="background:#001c42;color:#fff;font-weight:700;border-radius:1.5rem;padding:0.4rem 1.2rem;display:inline-block;font-size:1.1rem;">2012</div>
+                        <div class="timeline-icon mb-3" style="font-size:2.2rem;color:#fd7e14;"><i class="fa-solid fa-hotel"></i></div>
+                        <h5 class="fw-bold mb-2" style="color:#001c42;">Hotel Bookings</h5>
+                        <p class="mb-0">We added hotel reservations, partnering with 500 properties worldwide to offer more travel options.</p>
+                    </div>
+                    <div class="timeline-milestone card border-0 shadow-sm text-center p-4 flex-shrink-0" style="min-width:220px;max-width:220px;background:linear-gradient(135deg,#f5f8ff 70%,#eaf0fa 100%);">
+                        <div class="timeline-year-badge mb-2" style="background:#001c42;color:#fff;font-weight:700;border-radius:1.5rem;padding:0.4rem 1.2rem;display:inline-block;font-size:1.1rem;">2014</div>
+                        <div class="timeline-icon mb-3" style="font-size:2.2rem;color:#5143d9;"><i class="fa-solid fa-certificate"></i></div>
+                        <h5 class="fw-bold mb-2" style="color:#001c42;">IATA Certified</h5>
+                        <p class="mb-0">Our IATA certification marked a turning point, boosting our credibility and expanding our airline network.</p>
+                    </div>
+                    <div class="timeline-milestone card border-0 shadow-sm text-center p-4 flex-shrink-0" style="min-width:220px;max-width:220px;background:linear-gradient(135deg,#f5f8ff 70%,#eaf0fa 100%);">
+                        <div class="timeline-year-badge mb-2" style="background:#001c42;color:#fff;font-weight:700;border-radius:1.5rem;padding:0.4rem 1.2rem;display:inline-block;font-size:1.1rem;">2015</div>
+                        <div class="timeline-icon mb-3" style="font-size:2.2rem;color:#0cbc87;"><i class="fa-solid fa-map-signs"></i></div>
+                        <h5 class="fw-bold mb-2" style="color:#001c42;">Tour Packages</h5>
+                        <p class="mb-0">Our first tour packages debuted, offering guided experiences in 20 destinations, from Paris to Bali.</p>
+                    </div>
+                    <div class="timeline-milestone card border-0 shadow-sm text-center p-4 flex-shrink-0" style="min-width:220px;max-width:220px;background:linear-gradient(135deg,#f5f8ff 70%,#eaf0fa 100%);">
+                        <div class="timeline-year-badge mb-2" style="background:#001c42;color:#fff;font-weight:700;border-radius:1.5rem;padding:0.4rem 1.2rem;display:inline-block;font-size:1.1rem;">2017</div>
+                        <div class="timeline-icon mb-3" style="font-size:2.2rem;color:#fd7e14;"><i class="fa-solid fa-building"></i></div>
+                        <h5 class="fw-bold mb-2" style="color:#001c42;">Regional Offices</h5>
+                        <p class="mb-0">New offices in London, Dubai, and Singapore strengthened our global presence and local support.</p>
+                    </div>
+                    <div class="timeline-milestone card border-0 shadow-sm text-center p-4 flex-shrink-0" style="min-width:220px;max-width:220px;background:linear-gradient(135deg,#f5f8ff 70%,#eaf0fa 100%);">
+                        <div class="timeline-year-badge mb-2" style="background:#001c42;color:#fff;font-weight:700;border-radius:1.5rem;padding:0.4rem 1.2rem;display:inline-block;font-size:1.1rem;">2018</div>
+                        <div class="timeline-icon mb-3" style="font-size:2.2rem;color:#17a2b8;"><i class="fa-solid fa-taxi"></i></div>
+                        <h5 class="fw-bold mb-2" style="color:#001c42;">Cab Booking</h5>
+                        <p class="mb-0">Cab bookings rolled out in 50 cities, enhancing end-to-end travel convenience.</p>
+                    </div>
+                    <div class="timeline-milestone card border-0 shadow-sm text-center p-4 flex-shrink-0" style="min-width:220px;max-width:220px;background:linear-gradient(135deg,#f5f8ff 70%,#eaf0fa 100%);">
+                        <div class="timeline-year-badge mb-2" style="background:#001c42;color:#fff;font-weight:700;border-radius:1.5rem;padding:0.4rem 1.2rem;display:inline-block;font-size:1.1rem;">2020</div>
+                        <div class="timeline-icon mb-3" style="font-size:2.2rem;color:#d6293e;"><i class="fa-solid fa-users"></i></div>
+                        <h5 class="fw-bold mb-2" style="color:#001c42;">10K+ Customers</h5>
+                        <p class="mb-0">We hit a major milestone despite a global pandemic, proving our resilience and customer trust.</p>
+                    </div>
+                    <div class="timeline-milestone card border-0 shadow-sm text-center p-4 flex-shrink-0" style="min-width:220px;max-width:220px;background:linear-gradient(135deg,#f5f8ff 70%,#eaf0fa 100%);">
+                        <div class="timeline-year-badge mb-2" style="background:#001c42;color:#fff;font-weight:700;border-radius:1.5rem;padding:0.4rem 1.2rem;display:inline-block;font-size:1.1rem;">2022</div>
+                        <div class="timeline-icon mb-3" style="font-size:2.2rem;color:#0cbc87;"><i class="fa-solid fa-leaf"></i></div>
+                        <h5 class="fw-bold mb-2" style="color:#001c42;">Sustainability</h5>
+                        <p class="mb-0">Our carbon offset program began, partnering with Green Earth to make travel eco-friendlier.</p>
+                    </div>
+                    <div class="timeline-milestone card border-0 shadow-sm text-center p-4 flex-shrink-0" style="min-width:220px;max-width:220px;background:linear-gradient(135deg,#f5f8ff 70%,#eaf0fa 100%);">
+                        <div class="timeline-year-badge mb-2" style="background:#001c42;color:#fff;font-weight:700;border-radius:1.5rem;padding:0.4rem 1.2rem;display:inline-block;font-size:1.1rem;">2023</div>
+                        <div class="timeline-icon mb-3" style="font-size:2.2rem;color:#5143d9;"><i class="fa-solid fa-mobile-alt"></i></div>
+                        <h5 class="fw-bold mb-2" style="color:#001c42;">Mobile App</h5>
+                        <p class="mb-0">Our app went live, earning 100,000 downloads in its first month and a 4.8/5 rating for usability.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Stories -->
+        <div class="row mb-5">
+            <div class="col-md-10 mx-auto">
+                <h3 class="mb-4 text-myheading">Customer Stories: Real Journeys, Real Impact</h3>
+                <p>Our customers are at the heart of everything we do. Here's how we've helped travelers like you:</p>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <p>"TicketClue.com turned my chaotic Europe trip into a breeze. They handled my visas, found me affordable flights, and even suggested a hidden gem hotel in Rome. I'm already planning my next trip with them!"</p>
+                                <p class="fw-bold">- Sarah K., USA</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <p>"I had a flight cancellation in Tokyo, and their 24/7 support team rebooked me within an hour. No other site has matched their service—I'm a customer for life."</p>
+                                <p class="fw-bold">- Raj P., India</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <p>"The tour package to Thailand was perfect for my family. The itinerary was spot-on, and the cab service made getting around so easy. TicketClue.com really gets family travel."</p>
+                                <p class="fw-bold">- Maria L., Brazil</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <p>"As a solo traveler, I was nervous about my first trip to Africa. Their team planned everything—flights, safaris, insurance—and checked in during my trip. It was flawless."</p>
+                                <p class="fw-bold">- Liam O., Australia</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blog Highlights -->
+        <div class="row mb-5">
+            <div class="col-md-10 mx-auto">
+                <h3 class="mb-4 text-myheading">From Our Blog: Travel Tips & Inspiration</h3>
+                <p>Our blog is packed with insights to help you travel smarter. Check out these popular posts:</p>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <img src="{% static 'assets/images/blog/01.jpg' %}" class="card-img-top" alt="Blog Post 1">
+                            <div class="card-body">
+                                <h5>Top 10 Destinations for 2025</h5>
+                                <p>From Iceland's Northern Lights to Japan's cherry blossoms, explore the must-visit spots for your next adventure.</p>
+                                <a href="#" class="btn btn-link">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <img src="{% static 'assets/images/blog/02.jpg' %}" class="card-img-top" alt="Blog Post 2">
+                            <div class="card-body">
+                                <h5>How to Travel on a Budget</h5>
+                                <p>Learn expert hacks like off-season booking and local dining to stretch your travel dollars further.</p>
+                                <a href="#" class="btn btn-link">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <img src="{% static 'assets/images/blog/03.jpg' %}" class="card-img-top" alt="Blog Post 3">
+                            <div class="card-body">
+                                <h5>Understanding Travel Insurance</h5>
+                                <p>Unpack the essentials of coverage and find the right plan for your peace of mind.</p>
+                                <a href="#" class="btn btn-link">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <img src="{% static 'assets/images/blog/04.jpg' %}" class="card-img-top" alt="Blog Post 4">
+                            <div class="card-body">
+                                <h5> Packing Like a Pro</h5>
+                                <p>Master the art of packing light with our ultimate checklist for every trip type.</p>
+                                <a href="#" class="btn btn-link">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <img src="{% static 'assets/images/blog/05.jpg' %}" class="card-img-top" alt="Blog Post 5">
+                            <div class="card-body">
+                                <h5>Solo Travel 101</h5>
+                                <p>Tips for staying safe, meeting people, and making the most of your solo journey.</p>
+                                <a href="#" class="btn btn-link">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <img src="{% static 'assets/images/blog/06.jpg' %}" class="card-img-top" alt="Blog Post 6">
+                            <div class="card-body">
+                                <h5>Family Vacation Planning</h5>
+                                <p>From kid-friendly destinations to stress-free itineraries, we've got families covered.</p>
+                                <a href="#" class="btn btn-link">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Frequently Asked Questions -->
+        <div class="row mb-5">
+            <div class="col-md-10 mx-auto">
+                <h3 class="mb-4" style="color:#001c42;">Frequently Asked Questions: Your Queries Answered</h3>
+                <p>Got questions? We've got answers. Here are some of the most common inquiries we receive:</p>
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                How do I book a flight on TicketClue.com?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                It's easy! Visit our homepage, enter your departure and arrival cities, pick your dates, and browse available flights. Use filters for price, airline, or duration, then secure your booking with a few clicks. Need help? Our support team is here 24/7.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                What payment methods do you accept?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We accept all major credit and debit cards (Visa, Mastercard, Amex), plus digital wallets like PayPal, Apple Pay, and Google Pay. For select regions, we also offer bank transfers and installment plans—check your options at checkout!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Can I cancel or change my booking?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Absolutely! Most bookings allow changes or cancellations, though fees depend on the airline, hotel, or tour provider's policy. Log into your account to manage your booking, or contact our team for assistance—we'll handle the details.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                How does your price match guarantee work?
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Found a lower price elsewhere within 24 hours of booking? Send us the details, and we'll match it or refund the difference. It's our promise to keep your travel costs as low as possible.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFive">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                What's included in your travel insurance?
+                            </button>
+                        </h2>
+                        <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Our plans vary, but typically include coverage for trip cancellations, medical emergencies, lost baggage, and flight delays. Customize your policy at checkout—options range from basic to premium for all-around protection.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Impact -->
+        <div class="row mb-5">
+            <div class="col-md-10 mx-auto">
+                <h3 class="mb-4 text-myheading">Our Global Impact: Travel with Purpose</h3>
+                <p>We believe travel can change the world for the better. Here's how we're making a difference:</p>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Sustainable Travel</h5>
+                                <p>Since 2022, we've offset over 50,000 tons of CO2 through our flight booking program, partnering with Green Earth to fund reforestation and renewable energy projects.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Community Support</h5>
+                                <p>We donate 1% of every booking to local charities in the destinations we serve, supporting education, healthcare, and cultural preservation initiatives.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Empowering Travelers</h5>
+                                <p>Our free travel resources—guides, webinars, and blog posts—have reached over 1 million readers, helping people plan smarter and travel confidently.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Economic Growth</h5>
+                                <p>By working with local tour operators and small businesses, we've contributed $5 million to economies in developing regions since 2015.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Photo Gallery -->
+        <div class="row mb-5">
+            <div class="col-md-10 mx-auto">
+                <h3 class="mb-4 text-myheading">Explore the World: Our Photo Gallery</h3>
+                <p>Take a peek at some of the stunning destinations our customers have visited with us:</p>
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <img src="{% static 'assets/images/gallery/01.jpg' %}" class="rounded-3 w-100 shadow" alt="Paris">
+                        <p class="text-center text-muted mt-2">Paris, France</p>
+                    </div>
+                    <div class="col-md-3">
+                        <img src="{% static 'assets/images/gallery/02.jpg' %}" class="rounded-3 w-100 shadow" alt="New York">
+                        <p class="text-center text-muted mt-2">New York, USA</p>
+                    </div>
+                    <div class="col-md-3">
+                        <img src="{% static 'assets/images/gallery/03.jpg' %}" class="rounded-3 w-100 shadow" alt="Tokyo">
+                        <p class="text-center text-muted mt-2">Tokyo, Japan</p>
+                    </div>
+                    <div class="col-md-3">
+                        <img src="{% static 'assets/images/gallery/04.jpg' %}" class="rounded-3 w-100 shadow" alt="Sydney">
+                        <p class="text-center text-muted mt-2">Sydney, Australia</p>
+                    </div>
+                    <div class="col-md-3">
+                        <img src="{% static 'assets/images/gallery/05.jpg' %}" class="rounded-3 w-100 shadow" alt="Cape Town">
+                        <p class="text-center text-muted mt-2">Cape Town, South Africa</p>
+                    </div>
+                    <div class="col-md-3">
+                        <img src="{% static 'assets/images/gallery/06.jpg' %}" class="rounded-3 w-100 shadow" alt="Rio">
+                        <p class="text-center text-muted mt-2">Rio de Janeiro, Brazil</p>
+                    </div>
+                    <div class="col-md-3">
+                        <img src="{% static 'assets/images/gallery/07.jpg' %}" class="rounded-3 w-100 shadow" alt="Bangkok">
+                        <p class="text-center text-muted mt-2">Bangkok, Thailand</p>
+                    </div>
+                    <div class="col-md-3">
+                        <img src="{% static 'assets/images/gallery/08.jpg' %}" class="rounded-3 w-100 shadow" alt="Dubai">
+                        <p class="text-center text-muted mt-2">Dubai, UAE</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="text-center mt-5">
+            <h4 class="mb-3">Ready to Explore the World?</h4>
+            <p class="text-muted mb-4">Join thousands of happy travelers and let TicketClue.com plan your next adventure.</p>
+            <a href="#" style="background-color: #001c42;" class="btn btn-primary btn-lg">Start Your Journey Today</a>
+        </div>
+    </div>
+</section>
+<!-- =======================
+About Content END -->
+
+</main>
+{% endblock %}

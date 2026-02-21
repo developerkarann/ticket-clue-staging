@@ -1,0 +1,106 @@
+<!-- price-summary.html -->
+<div class="card p-4 mb-3 shadow-sm">
+    <h5 class="card-title mb-3" style="color: #0e0090;">Price Summary</h5>
+    <div class="price-item d-flex justify-content-between py-2 border-bottom">
+        <span class="font-weight-bold" style="color: #0e0090;">Base Fare</span>
+        <span id="base-fare" class="font-weight-bold"></span>
+    </div>
+    <!-- <div class="price-item d-flex justify-content-between py-2 border-bottom">
+        <span class="font-weight-bold" style="color: #0e0090;">Fuel Surcharge (YQ Tax)</span>
+        <span id="yq-tax" class="font-weight-bold"></span>
+    </div>
+    <div class="price-item d-flex justify-content-between py-2 border-bottom">
+        <span class="font-weight-bold" style="color: #0e0090;">Additional Transaction Fee</span>
+        <span id="additional-txn-fee" class="font-weight-bold"></span>
+    </div>
+    <div class="price-item d-flex justify-content-between py-2 border-bottom">
+        <span class="font-weight-bold" style="color: #0e0090;">Other Charges</span>
+        <span id="other-charges" class="font-weight-bold"></span>
+    </div> -->
+    <div class="price-item d-flex justify-content-between py-2 border-bottom">
+        <span class="font-weight-bold" style="color: #0e0090;">Total Tax</span>
+        <span id="total-tax" class="font-weight-bold"></span>
+    </div>
+    <!-- <div class="price-item d-flex justify-content-between py-2 border-bottom text-success" id="discount-row" style="display: none;">
+        <span class="font-weight-bold" style="color: #0e0090;">Discount</span>
+        <span id="discount" class="font-weight-bold"></span>
+    </div> -->
+    <div class="price-item d-flex justify-content-between py-3" style="border-top: 1px solid #ddd;">
+        <span class="font-weight-bold" style="color: #0e0090; font-size: 1.1em;">Total Fare</span>
+        <span id="total-fare" class="font-weight-bold" style="font-size: 1.1em;"></span>
+    </div>
+    <div class="price-note mt-3 text-muted">
+        No hidden fees – track your price at every step
+    </div>
+</div>
+
+<div class="card p-4 shadow-sm">
+    <!-- Cancellation Policy Section -->
+    <h5 class="card-title mt-4 mb-3" style="color: #0e0090;">Cancellation Policy</h5>
+    <div id="cancellation-policy">
+        <!-- Cancellation policy will be displayed here -->
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Parse the JSON data safely
+        const data = JSON.parse('{{ fare_rule|escapejs }}');
+        const result = data.Response?.Results || data;
+        const fare = result.Fare;
+    
+        // Ensure values are numbers
+        const baseFare = Number(fare.BaseFare);
+        const yqTax = Number(fare.YQTax);
+        const additionalTxnFeePub = Number(fare.AdditionalTxnFeePub);
+        const otherCharges = Number(fare.OtherCharges);
+        const totalTax = Number(fare.Tax);
+        const publishedFare = Number(fare.PublishedFare);
+        const discount = Number(fare.Discount || 0);
+        const currency = fare.Currency;
+    
+        // Function to format amounts with commas
+        function formatAmount(amount) {
+            return amount.toLocaleString('en-IN');
+        }
+    
+        // Update the HTML elements for the price summary
+        $('#base-fare').text(`${currency} ${formatAmount(baseFare)}`);
+        $('#yq-tax').text(`${currency} ${formatAmount(yqTax)}`);
+        $('#additional-txn-fee').text(`${currency} ${formatAmount(additionalTxnFeePub)}`);
+        $('#other-charges').text(`${currency} ${formatAmount(otherCharges)}`);
+        $('#total-tax').text(`${currency} ${formatAmount(totalTax)}`);
+        $('#total-fare').text(`${currency} ${formatAmount(publishedFare)}`);
+    
+        // Handle discount display
+        if (discount > 0) {
+            $('#discount').text(`-${currency} ${formatAmount(discount)}`);
+            $('#discount-row').show();
+        } else {
+            $('#discount-row').hide();
+        }
+    
+        // Display Cancellation Policy
+        const isRefundable = result.IsRefundable;
+        let cancellationPolicy = '';
+    
+        if (isRefundable) {
+            cancellationPolicy = '<p>This fare is <strong>refundable</strong>. Cancellation charges may apply.</p>';
+        } else {
+            cancellationPolicy = '<p>This fare is <strong>non-refundable</strong>.</p>';
+        }
+    
+        // Check for FareRules details
+        if (result.FareRules && result.FareRules.length > 0) {
+            result.FareRules.forEach(rule => {
+                if (rule.FareRuleDetail) {
+                    cancellationPolicy += `<p><strong>From ${rule.Origin} to ${rule.Destination}:</strong> ${rule.FareRuleDetail}</p>`;
+                }
+            });
+        }
+    
+        $('#cancellation-policy').html(cancellationPolicy);
+    });
+    </script>
+    
