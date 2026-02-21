@@ -39,8 +39,14 @@ DEBUG = os.getenv('DEBUG')
 AIRPORT_API_URL = os.getenv('AIRPORT_API_URL')  # e.g. https://your-api.com/airports
 AIRPORT_API_QUERY_PARAM = os.getenv('AIRPORT_API_QUERY_PARAM', 'q')
 
-ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8000","http://ticketclue.com","https://ticketclue.com"]
+ALLOWED_HOSTS = ["*", ".vercel.app", ".now.sh"]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "http://ticketclue.com",
+    "https://ticketclue.com",
+    "https://.vercel.app",
+    "https://.now.sh",
+]
 
 
 # Use SQLite for local dev when USE_SQLITE=True (no PostgreSQL needed)
@@ -78,6 +84,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -156,13 +163,12 @@ USE_TZ = True
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240 # higher than the count of fields
 
